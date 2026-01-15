@@ -1,0 +1,36 @@
+[
+  {
+    "_id": {
+      "$oid": "695a6f19a389b38ead0ee319"
+    },
+    "user_id": "6943fb9ba92b17b8be705c53",
+    "type": "analysis",
+    "title": "000001 分析完成",
+    "content": "---\n\n 风险管理委员会主席最终决策报告\n\n> 明确建议：卖出。  \n> 立即执行，无需等待破位确认。\n\n这不是折中，也不是保守退让，而是在全面审视三方观点、结合过往教训与当前市场信号后，做出的果断且最优的风险控制决策。\n\n---\n\n 一",
+    "link": "/stocks/000001",
+    "source": "analysis",
+    "severity": "info",
+    "status": "unread",
+    "created_at": {
+      "$date": "2026-01-04T13:46:01.728Z"
+    },
+    "metadata": {}
+  },
+  {
+    "_id": {
+      "$oid": "6965dfb6de84520a185c28a3"
+    },
+    "user_id": "6943fb9ba92b17b8be705c53",
+    "type": "analysis",
+    "title": "000001 分析完成",
+    "content": "---\n\n 风险管理委员会主席最终裁决：明确投资建议与战略执行方案\n\n> “在信息爆炸的时代，决策的真正价值不在于‘平衡各方’，而在于穿透噪音、识别真相、果断行动。”  \n——作为风险管理委员会主席兼辩论主持人，我的职责不是维持中立，而是在",
+    "link": "/stocks/000001",
+    "source": "analysis",
+    "severity": "info",
+    "status": "unread",
+    "created_at": {
+      "$date": "2026-01-13T06:01:26.153Z"
+    },
+    "metadata": {}
+  }
+]

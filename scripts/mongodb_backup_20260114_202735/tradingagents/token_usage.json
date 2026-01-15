@@ -1,0 +1,376 @@
+[
+  {
+    "_id": {
+      "$oid": "695a6e16a389b38ead0ee303"
+    },
+    "timestamp": "2026-01-04T21:41:42.355736+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 1108,
+    "output_tokens": 60,
+    "cost": 0.000256,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_4009",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:41:42.355Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e25a389b38ead0ee304"
+    },
+    "timestamp": "2026-01-04T21:41:57.015178+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 1474,
+    "output_tokens": 1495,
+    "cost": 0.002464,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_7994",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:41:57.016Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e43a389b38ead0ee306"
+    },
+    "timestamp": "2026-01-04T21:42:27.592684+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 1848,
+    "output_tokens": 2900,
+    "cost": 0.004627,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_7640",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:42:27.592Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e66a389b38ead0ee308"
+    },
+    "timestamp": "2026-01-04T21:43:02.363498+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 7664,
+    "output_tokens": 3153,
+    "cost": 0.005879,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_8707",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:43:02.363Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e94a389b38ead0ee30a"
+    },
+    "timestamp": "2026-01-04T21:43:48.521153+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-plus",
+    "input_tokens": 7918,
+    "output_tokens": 1965,
+    "cost": 0.010264,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_5786",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:43:48.521Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6eaca389b38ead0ee30c"
+    },
+    "timestamp": "2026-01-04T21:44:12.457987+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 2576,
+    "output_tokens": 1808,
+    "cost": 0.003098,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_5067",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:44:12.458Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6eb8a389b38ead0ee30e"
+    },
+    "timestamp": "2026-01-04T21:44:24.191541+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 3604,
+    "output_tokens": 1032,
+    "cost": 0.002089,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_9923",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:44:24.193Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6ec4a389b38ead0ee310"
+    },
+    "timestamp": "2026-01-04T21:44:36.688192+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 5661,
+    "output_tokens": 1032,
+    "cost": 0.002397,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_3573",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:44:36.689Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6ed2a389b38ead0ee312"
+    },
+    "timestamp": "2026-01-04T21:44:50.406387+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 7700,
+    "output_tokens": 1085,
+    "cost": 0.002783,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_5922",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:44:50.406Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6f18a389b38ead0ee314"
+    },
+    "timestamp": "2026-01-04T21:46:00.172637+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-plus",
+    "input_tokens": 5408,
+    "output_tokens": 2065,
+    "cost": 0.008456,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_6827",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:46:00.173Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6f19a389b38ead0ee316"
+    },
+    "timestamp": "2026-01-04T21:46:01.646736+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 2350,
+    "output_tokens": 95,
+    "cost": 0.000495,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_8981",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-04T13:46:01.646Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965de84de84520a185c287c"
+    },
+    "timestamp": "2026-01-13T13:56:20.264959+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 1108,
+    "output_tokens": 60,
+    "cost": 0.000256,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_7527",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:56:20.264Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965de93de84520a185c287d"
+    },
+    "timestamp": "2026-01-13T13:56:35.846452+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 1456,
+    "output_tokens": 1597,
+    "cost": 0.002614,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_6614",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:56:35.846Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965deadde84520a185c287f"
+    },
+    "timestamp": "2026-01-13T13:57:01.216792+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 1949,
+    "output_tokens": 2836,
+    "cost": 0.004546,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_657",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:57:01.216Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dec7de84520a185c2881"
+    },
+    "timestamp": "2026-01-13T13:57:27.663295+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 7635,
+    "output_tokens": 2953,
+    "cost": 0.005575,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_5312",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:57:27.664Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df1cde84520a185c2883"
+    },
+    "timestamp": "2026-01-13T13:58:52.180878+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-plus",
+    "input_tokens": 7754,
+    "output_tokens": 2178,
+    "cost": 0.010559,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_6942",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:58:52.180Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df2bde84520a185c2885"
+    },
+    "timestamp": "2026-01-13T13:59:07.072330+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 2789,
+    "output_tokens": 1462,
+    "cost": 0.002611,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_6027",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:59:07.072Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df33de84520a185c2887"
+    },
+    "timestamp": "2026-01-13T13:59:15.246498+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 3358,
+    "output_tokens": 964,
+    "cost": 0.00195,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_2704",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:59:15.246Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df3ede84520a185c2889"
+    },
+    "timestamp": "2026-01-13T13:59:26.673427+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 5277,
+    "output_tokens": 1197,
+    "cost": 0.002587,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_8759",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:59:26.673Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df4bde84520a185c288b"
+    },
+    "timestamp": "2026-01-13T13:59:39.251136+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 7646,
+    "output_tokens": 1244,
+    "cost": 0.003013,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_6543",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T05:59:39.251Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dfb4de84520a185c289e"
+    },
+    "timestamp": "2026-01-13T14:01:24.871622+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-plus",
+    "input_tokens": 5876,
+    "output_tokens": 2716,
+    "cost": 0.010133,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_2487",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T06:01:24.871Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dfb6de84520a185c28a0"
+    },
+    "timestamp": "2026-01-13T14:01:26.082464+08:00",
+    "provider": "dashscope",
+    "model_name": "qwen-flash",
+    "input_tokens": 3001,
+    "output_tokens": 103,
+    "cost": 0.000605,
+    "currency": "CNY",
+    "session_id": "dashscope_openai_4956",
+    "analysis_type": "stock_analysis",
+    "_created_at": {
+      "$date": "2026-01-13T06:01:26.082Z"
+    }
+  }
+]

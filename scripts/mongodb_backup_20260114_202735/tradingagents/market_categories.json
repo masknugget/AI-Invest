@@ -1,0 +1,53 @@
+[
+  {
+    "_id": {
+      "$oid": "68a3cdd9016e91d6d8e97209"
+    },
+    "id": "a_shares",
+    "name": "a_shares",
+    "display_name": "A股",
+    "description": "中国A股市场数据源",
+    "enabled": true,
+    "sort_order": 1,
+    "created_at": {
+      "$date": "2025-08-19T01:05:29.089Z"
+    },
+    "updated_at": {
+      "$date": "2025-08-19T01:05:29.089Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a3cdd9016e91d6d8e9720a"
+    },
+    "id": "us_stocks",
+    "name": "us_stocks",
+    "display_name": "美股",
+    "description": "美国股票市场数据源",
+    "enabled": true,
+    "sort_order": 2,
+    "created_at": {
+      "$date": "2025-08-19T01:05:29.089Z"
+    },
+    "updated_at": {
+      "$date": "2025-08-19T01:05:29.089Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a3cdd9016e91d6d8e9720b"
+    },
+    "id": "hk_stocks",
+    "name": "hk_stocks",
+    "display_name": "港股",
+    "description": "香港股票市场数据源",
+    "enabled": true,
+    "sort_order": 3,
+    "created_at": {
+      "$date": "2025-08-19T01:05:29.089Z"
+    },
+    "updated_at": {
+      "$date": "2025-08-19T01:05:29.089Z"
+    }
+  }
+]

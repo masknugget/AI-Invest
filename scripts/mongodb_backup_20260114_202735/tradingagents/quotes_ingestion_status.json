@@ -1,0 +1,20 @@
+[
+  {
+    "_id": {
+      "$oid": "6965b5ed4c6c8dd034750e0b"
+    },
+    "job": "quotes_ingestion",
+    "data_source": "akshare_sina",
+    "error_message": null,
+    "interval_seconds": 360,
+    "last_sync_time": {
+      "$date": "2026-01-13T06:04:14.134Z"
+    },
+    "last_sync_time_iso": "2026-01-13T14:04:14.134644+08:00",
+    "records_count": 5469,
+    "success": true,
+    "updated_at": {
+      "$date": "2026-01-13T06:04:14.134Z"
+    }
+  }
+]

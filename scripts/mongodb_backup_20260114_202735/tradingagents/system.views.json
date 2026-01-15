@@ -1,0 +1,104 @@
+[
+  {
+    "_id": "tradingagents.stock_screening_view",
+    "viewOn": "stock_basic_info",
+    "pipeline": [
+      {
+        "$lookup": {
+          "from": "market_quotes",
+          "localField": "code",
+          "foreignField": "code",
+          "as": "quote_data"
+        }
+      },
+      {
+        "$unwind": {
+          "path": "$quote_data",
+          "preserveNullAndEmptyArrays": true
+        }
+      },
+      {
+        "$lookup": {
+          "from": "stock_financial_data",
+          "let": {
+            "stock_code": "$code",
+            "stock_source": "$source"
+          },
+          "pipeline": [
+            {
+              "$match": {
+                "$expr": {
+                  "$and": [
+                    {
+                      "$eq": [
+                        "$code",
+                        "$$stock_code"
+                      ]
+                    },
+                    {
+                      "$eq": [
+                        "$data_source",
+                        "$$stock_source"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "$sort": {
+                "report_period": -1
+              }
+            },
+            {
+              "$limit": 1
+            }
+          ],
+          "as": "financial_data"
+        }
+      },
+      {
+        "$unwind": {
+          "path": "$financial_data",
+          "preserveNullAndEmptyArrays": true
+        }
+      },
+      {
+        "$project": {
+          "code": 1,
+          "name": 1,
+          "industry": 1,
+          "area": 1,
+          "market": 1,
+          "list_date": 1,
+          "source": 1,
+          "total_mv": 1,
+          "circ_mv": 1,
+          "pe": 1,
+          "pb": 1,
+          "pe_ttm": 1,
+          "pb_mrq": 1,
+          "roe": "$financial_data.roe",
+          "roa": "$financial_data.roa",
+          "netprofit_margin": "$financial_data.netprofit_margin",
+          "gross_margin": "$financial_data.gross_margin",
+          "report_period": "$financial_data.report_period",
+          "turnover_rate": 1,
+          "volume_ratio": 1,
+          "close": "$quote_data.close",
+          "open": "$quote_data.open",
+          "high": "$quote_data.high",
+          "low": "$quote_data.low",
+          "pre_close": "$quote_data.pre_close",
+          "pct_chg": "$quote_data.pct_chg",
+          "amount": "$quote_data.amount",
+          "volume": "$quote_data.volume",
+          "trade_date": "$quote_data.trade_date",
+          "updated_at": 1,
+          "quote_updated_at": "$quote_data.updated_at",
+          "financial_updated_at": "$financial_data.updated_at"
+        }
+      }
+    ]
+  }
+]

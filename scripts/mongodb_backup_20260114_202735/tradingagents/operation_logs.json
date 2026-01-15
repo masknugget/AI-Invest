@@ -1,0 +1,1520 @@
+[
+  {
+    "_id": {
+      "$oid": "6943fbebfa8579e8253e1e88"
+    },
+    "user_id": "6943fb9ba92b17b8be705c53",
+    "username": "admin",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "login_method": "password"
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 24,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2025-12-18T21:04:43.454Z"
+    },
+    "created_at": {
+      "$date": "2025-12-18T21:04:43.454Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6943fbfdfa8579e8253e1e98"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 30,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2025-12-18T21:05:01.637Z"
+    },
+    "created_at": {
+      "$date": "2025-12-18T21:05:01.637Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6943fbfdfa8579e8253e1e99"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 29,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2025-12-18T21:05:01.638Z"
+    },
+    "created_at": {
+      "$date": "2025-12-18T21:05:01.638Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6943fbfdfa8579e8253e1e9c"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 51,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2025-12-18T21:05:01.691Z"
+    },
+    "created_at": {
+      "$date": "2025-12-18T21:05:01.691Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "694408e1fa8579e8253e1e9d"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建认证操作",
+    "details": {
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 2,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2025-12-18T22:00:01.620Z"
+    },
+    "created_at": {
+      "$date": "2025-12-18T22:00:01.620Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69441601fa8579e8253e1e9e"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建认证操作",
+    "details": {
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 1,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2025-12-18T22:56:01.620Z"
+    },
+    "created_at": {
+      "$date": "2025-12-18T22:56:01.620Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6dfea389b38ead0ee2ec"
+    },
+    "user_id": "6943fb9ba92b17b8be705c53",
+    "username": "admin",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "login_method": "password"
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 17,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T21:41:18.616Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T21:41:18.616Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e08a389b38ead0ee2f1"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 79,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T21:41:28.841Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T21:41:28.841Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e08a389b38ead0ee2f2"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 77,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T21:41:28.841Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T21:41:28.841Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e08a389b38ead0ee2f5"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 14,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T21:41:28.858Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T21:41:28.858Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e0ca389b38ead0ee2f8"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 61,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T21:41:32.235Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T21:41:32.235Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a6e12a389b38ead0ee2f9"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "stock_analysis",
+    "action": "创建单股分析任务",
+    "details": {
+      "method": "POST",
+      "path": "/api/analysis/single",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 53,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T21:41:38.802Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T21:41:38.802Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695a7b1ea389b38ead0ee31a"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建认证操作",
+    "details": {
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 2,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-04T22:37:18.643Z"
+    },
+    "created_at": {
+      "$date": "2026-01-04T22:37:18.643Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "695bc8106f52bf5eae423fc2"
+    },
+    "user_id": "unknown",
+    "username": "unknown",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "reason": "用户名和密码不能为空"
+    },
+    "success": false,
+    "error_message": "用户名和密码不能为空",
+    "duration_ms": 0,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Apifox/1.0.0 (https://apifox.com)",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-05T22:17:52.769Z"
+    },
+    "created_at": {
+      "$date": "2026-01-05T22:17:52.769Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dc8bde84520a185c284c"
+    },
+    "user_id": "6943fb9ba92b17b8be705c53",
+    "username": "admin",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "login_method": "password"
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 27,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:47:55.645Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:47:55.645Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd81de84520a185c284f"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 50,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:01.225Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:01.225Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd81de84520a185c2852"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 14,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:01.249Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:01.249Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd8ade84520a185c285f"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 37,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:10.208Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:10.208Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd8ade84520a185c2862"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 27,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:10.249Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:10.249Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd8ade84520a185c2865"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 48,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:10.581Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:10.581Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd92de84520a185c286a"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 49,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:18.284Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:18.284Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd92de84520a185c286b"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 48,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:18.285Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:18.285Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965dd92de84520a185c286e"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 41,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:52:18.329Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:52:18.329Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965de46de84520a185c2871"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 33,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:55:18.626Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:55:18.626Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965de81de84520a185c2872"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "stock_analysis",
+    "action": "创建单股分析任务",
+    "details": {
+      "method": "POST",
+      "path": "/api/analysis/single",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 67,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T13:56:17.057Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T13:56:17.057Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df9ede84520a185c2894"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 37,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T14:01:02.489Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T14:01:02.489Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df9ede84520a185c2897"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 71,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T14:01:02.562Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T14:01:02.562Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df9ede84520a185c289a"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 47,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T14:01:02.762Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T14:01:02.762Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965df9ede84520a185c289d"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 44,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T14:01:02.809Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T14:01:02.809Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965e9d9749e8e29665cd8c3"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建认证操作",
+    "details": {
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "status_code": 404,
+      "query_params": null
+    },
+    "success": false,
+    "error_message": "HTTP 404",
+    "duration_ms": 16,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T14:44:41.085Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T14:44:41.085Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f10a13939375a8cd685b"
+    },
+    "user_id": "unknown",
+    "username": "admin",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "error": "name 'user_service' is not defined"
+    },
+    "success": false,
+    "error_message": "系统错误: name 'user_service' is not defined",
+    "duration_ms": 0,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:15:22.499Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:15:22.499Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f18664fc8955f63f3330"
+    },
+    "user_id": "unknown",
+    "username": "admin",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "reason": "用户名或密码错误"
+    },
+    "success": false,
+    "error_message": "用户名或密码错误",
+    "duration_ms": 15,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:17:26.482Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:17:26.482Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f1a264fc8955f63f3331"
+    },
+    "user_id": "6943fb9ba92b17b8be705c53",
+    "username": "admin",
+    "action_type": "user_login",
+    "action": "用户登录",
+    "details": {
+      "login_method": "password"
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 4,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:17:54.146Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:17:54.146Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f1b664fc8955f63f3336"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 66,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:18:14.960Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:18:14.960Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f1b664fc8955f63f3337"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 65,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:18:14.960Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:18:14.960Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f1bc64fc8955f63f333a"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 22,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:18:20.949Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:18:20.949Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f1bc64fc8955f63f333d"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 43,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:18:20.974Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:18:20.974Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f22964fc8955f63f3340"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 23,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:20:09.138Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:20:09.138Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f22964fc8955f63f3343"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 56,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:20:09.173Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:20:09.173Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f73f1562dea7305ccad2"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 38,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:41:51.752Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:41:51.752Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f73f1562dea7305ccad5"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 81,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:41:51.798Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:41:51.798Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f7471562dea7305ccada"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 34,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:41:59.704Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:41:59.704Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f7471562dea7305ccadb"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 33,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:41:59.704Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:41:59.704Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f8f1c3eb3267d83ea17b"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 51,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:49:05.597Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:49:05.597Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f8f1c3eb3267d83ea17e"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 63,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:49:05.613Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:49:05.613Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965f8f1c3eb3267d83ea181"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 38,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:49:05.654Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:49:05.654Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fb58282c49bc7a4c4875"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 40,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:59:20.260Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:59:20.260Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fb58282c49bc7a4c4878"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 79,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:59:20.303Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:59:20.303Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fb58282c49bc7a4c487b"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 69,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T15:59:20.376Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T15:59:20.376Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fe2c282c49bc7a4c487e"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 26,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:11:24.821Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:11:24.821Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fe2c282c49bc7a4c4881"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 39,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:11:24.834Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:11:24.834Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fe2c282c49bc7a4c4884"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 21,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:11:24.905Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:11:24.905Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fea5282c49bc7a4c4885"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建认证操作",
+    "details": {
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 1,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:13:25.051Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:13:25.051Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fed69307bd34e2fda78c"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 33,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:14:14.983Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:14:14.983Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fed69307bd34e2fda78f"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 42,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:14:14.994Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:14:14.994Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fed79307bd34e2fda792"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "system_settings",
+    "action": "创建 /api/model-capabilities/recommend",
+    "details": {
+      "method": "POST",
+      "path": "/api/model-capabilities/recommend",
+      "status_code": 200,
+      "query_params": null
+    },
+    "success": true,
+    "error_message": null,
+    "duration_ms": 12,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:14:15.013Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:14:15.013Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6965fee79307bd34e2fda793"
+    },
+    "user_id": "admin",
+    "username": "admin",
+    "action_type": "stock_analysis",
+    "action": "创建单股分析任务",
+    "details": {
+      "method": "POST",
+      "path": "/api/analysis/single",
+      "status_code": 404,
+      "query_params": null
+    },
+    "success": false,
+    "error_message": "HTTP 404",
+    "duration_ms": 1,
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
+    "session_id": null,
+    "timestamp": {
+      "$date": "2026-01-13T16:14:31.387Z"
+    },
+    "created_at": {
+      "$date": "2026-01-13T16:14:31.387Z"
+    }
+  }
+]

@@ -1,0 +1,167 @@
+[
+  {
+    "_id": {
+      "$oid": "68a3ce0f016e91d6d8e9720e"
+    },
+    "data_source_name": "AKShare",
+    "market_category_id": "a_shares",
+    "priority": 2,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-08-19T01:06:23.193Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T13:49:03.070Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a3ce18016e91d6d8e9720f"
+    },
+    "data_source_name": "AKShare",
+    "market_category_id": "hk_stocks",
+    "priority": 2,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-08-19T01:06:32.023Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T04:50:33.966Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a3ce23016e91d6d8e97210"
+    },
+    "data_source_name": "Tushare",
+    "market_category_id": "a_shares",
+    "priority": 3,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-08-19T01:06:43.039Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-30T13:49:01.678Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68f8e66253fc06ae7404f9ed"
+    },
+    "data_source_name": "Finnhub",
+    "market_category_id": "us_stocks",
+    "priority": 0,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-10-22T14:12:50.541Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T04:50:14.949Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "690405788701eae6aa929437"
+    },
+    "data_source_name": "baostock",
+    "market_category_id": "a_shares",
+    "priority": 1,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-10-31T00:40:24.800Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-31T00:40:24.800Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6912b1922b8c5cbef38a6b85"
+    },
+    "data_source_name": "Alpha Vantage",
+    "market_category_id": "us_stocks",
+    "priority": 3,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-11-11T03:46:26.077Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T04:50:22.443Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6912c064ae36557ff249024a"
+    },
+    "data_source_name": "Yahoo Finance",
+    "market_category_id": "us_stocks",
+    "priority": 2,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-11-11T04:49:40.121Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T04:50:24.512Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6912c06dae36557ff249024c"
+    },
+    "data_source_name": "Yahoo Finance",
+    "market_category_id": "hk_stocks",
+    "priority": 1,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-11-11T04:49:49.572Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T04:50:37.534Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6913030d6033c5dcb1a0fe39"
+    },
+    "data_source_name": "alpha_vantage",
+    "market_category_id": "us_stocks",
+    "priority": 3,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-11-11T09:34:05.072Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T09:34:05.072Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691303326033c5dcb1a0fe3e"
+    },
+    "data_source_name": "yahoo_finance",
+    "market_category_id": "us_stocks",
+    "priority": 2,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-11-11T09:34:42.378Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T09:34:53.304Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691303326033c5dcb1a0fe3f"
+    },
+    "data_source_name": "yahoo_finance",
+    "market_category_id": "hk_stocks",
+    "priority": 1,
+    "enabled": true,
+    "created_at": {
+      "$date": "2025-11-11T09:34:42.384Z"
+    },
+    "updated_at": {
+      "$date": "2025-11-11T09:34:57.369Z"
+    }
+  }
+]

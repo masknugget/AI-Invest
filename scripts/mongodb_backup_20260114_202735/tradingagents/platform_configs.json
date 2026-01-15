@@ -1,0 +1,78 @@
+[
+  {
+    "_id": {
+      "$oid": "689d402220079eadb1442c68"
+    },
+    "config_type": "llm",
+    "provider": "deepseek",
+    "api_key": "",
+    "config_data": {
+      "model": "deepseek-chat",
+      "temperature": 0.7,
+      "max_tokens": 2000
+    },
+    "created_at": {
+      "$date": "2025-08-14T01:47:14.528Z"
+    },
+    "is_active": true,
+    "updated_at": {
+      "$date": "2025-08-14T01:47:14.528Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689d402220079eadb1442c69"
+    },
+    "config_type": "llm",
+    "provider": "dashscope",
+    "api_key": "",
+    "config_data": {
+      "model": "qwen-turbo",
+      "temperature": 0.7,
+      "max_tokens": 2000
+    },
+    "created_at": {
+      "$date": "2025-08-14T01:47:14.537Z"
+    },
+    "is_active": true,
+    "updated_at": {
+      "$date": "2025-08-14T01:47:14.537Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689d402220079eadb1442c6a"
+    },
+    "config_type": "data_source",
+    "provider": "tushare",
+    "api_key": "",
+    "config_data": {
+      "priority": 1
+    },
+    "created_at": {
+      "$date": "2025-08-14T01:47:14.541Z"
+    },
+    "is_active": true,
+    "updated_at": {
+      "$date": "2025-08-14T01:47:14.541Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "689d402220079eadb1442c6b"
+    },
+    "config_type": "data_source",
+    "provider": "finnhub",
+    "api_key": "",
+    "config_data": {
+      "priority": 2
+    },
+    "created_at": {
+      "$date": "2025-08-14T01:47:14.545Z"
+    },
+    "is_active": true,
+    "updated_at": {
+      "$date": "2025-08-14T01:47:14.545Z"
+    }
+  }
+]

@@ -1,0 +1,306 @@
+[
+  {
+    "_id": {
+      "$oid": "68a2eaa5f7c267f552a20dd4"
+    },
+    "name": "openai",
+    "display_name": "OpenAI",
+    "description": "OpenAI是人工智能领域的领先公司，提供GPT系列模型",
+    "website": "https://openai.com",
+    "api_doc_url": "https://platform.openai.com/docs",
+    "default_base_url": "https://api.openai.com/v1",
+    "is_active": false,
+    "supported_features": [
+      "chat",
+      "completion",
+      "embedding",
+      "image",
+      "vision",
+      "function_calling",
+      "streaming"
+    ],
+    "created_at": {
+      "$date": "2025-08-18T08:56:05.447Z"
+    },
+    "updated_at": {
+      "$date": "2025-08-18T11:22:13.672Z"
+    },
+    "api_key": "",
+    "api_secret": "",
+    "extra_config": {
+      "migrated_from": "environment"
+    },
+    "logo_url": null
+  },
+  {
+    "_id": {
+      "$oid": "68a2eaa5f7c267f552a20dd5"
+    },
+    "name": "anthropic",
+    "display_name": "Anthropic",
+    "description": "Anthropic专注于AI安全研究，提供Claude系列模型",
+    "website": "https://anthropic.com",
+    "api_doc_url": "https://docs.anthropic.com",
+    "default_base_url": "https://api.anthropic.com",
+    "is_active": false,
+    "supported_features": [
+      "chat",
+      "completion",
+      "function_calling",
+      "streaming"
+    ],
+    "created_at": {
+      "$date": "2025-08-18T08:56:05.449Z"
+    },
+    "updated_at": {
+      "$date": "2025-08-18T11:22:09.948Z"
+    },
+    "api_key": "",
+    "api_secret": "",
+    "extra_config": {
+      "migrated_from": "environment"
+    },
+    "logo_url": null
+  },
+  {
+    "_id": {
+      "$oid": "68a2eaa5f7c267f552a20dd6"
+    },
+    "name": "google",
+    "display_name": "Google AI",
+    "description": "Google的人工智能平台，提供Gemini系列模型",
+    "website": "https://ai.google.dev",
+    "api_doc_url": "https://ai.google.dev/docs",
+    "default_base_url": "https://ai.241207.xyz:4580/proxy/gemini/v1beta",
+    "is_active": true,
+    "supported_features": [
+      "chat",
+      "completion",
+      "embedding",
+      "vision",
+      "function_calling",
+      "streaming"
+    ],
+    "created_at": {
+      "$date": "2025-08-18T08:56:05.451Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-22T11:46:28.912Z"
+    },
+    "api_key": "",
+    "extra_config": {
+      "source": "database",
+      "migrated_at": {
+        "$date": "2025-08-18T12:31:27.795Z"
+      },
+      "has_api_key": "",
+      "has_api_secret": ""
+    },
+    "aggregator_type": null,
+    "api_secret": "",
+    "is_aggregator": false,
+    "logo_url": null,
+    "model_name_format": null
+  },
+  {
+    "_id": {
+      "$oid": "68a2eaa5f7c267f552a20dd8"
+    },
+    "name": "deepseek",
+    "display_name": "DeepSeek",
+    "description": "DeepSeek提供高性能的AI推理服务",
+    "website": "https://www.deepseek.com",
+    "api_doc_url": "https://platform.deepseek.com/api-docs",
+    "default_base_url": "https://api.deepseek.com",
+    "is_active": true,
+    "supported_features": [
+      "chat",
+      "completion",
+      "function_calling",
+      "streaming"
+    ],
+    "created_at": {
+      "$date": "2025-08-18T08:56:05.454Z"
+    },
+    "updated_at": {
+      "$date": "2025-08-18T12:31:27.797Z"
+    },
+    "api_key": "",
+    "extra_config": {
+      "source": "environment",
+      "migrated_at": {
+        "$date": "2025-08-18T12:31:27.797Z"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68a2eaa5f7c267f552a20dd9"
+    },
+    "name": "dashscope",
+    "display_name": "阿里云百炼",
+    "description": "阿里云百炼大模型服务平台，提供通义千问等模型",
+    "website": "https://bailian.console.aliyun.com",
+    "api_doc_url": "https://help.aliyun.com/zh/dashscope/",
+    "default_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "is_active": true,
+    "supported_features": [
+      "chat",
+      "completion",
+      "embedding",
+      "function_calling",
+      "streaming"
+    ],
+    "created_at": {
+      "$date": "2025-08-18T08:56:05.456Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-23T05:19:23.055Z"
+    },
+    "api_key": "",
+    "extra_config": {
+      "source": "environment",
+      "migrated_at": {
+        "$date": "2025-08-18T12:31:27.801Z"
+      },
+      "has_api_key": "",
+      "has_api_secret": ""
+    },
+    "aggregator_type": null,
+    "is_aggregator": false,
+    "logo_url": null,
+    "model_name_format": null,
+    "api_secret": ""
+  },
+  {
+    "_id": {
+      "$oid": "68a30fe08daa72627ead352d"
+    },
+    "name": "openrouter",
+    "api_key": "",
+    "is_active": true,
+    "extra_config": {
+      "source": "environment",
+      "migrated_at": {
+        "$date": "2025-08-18T12:31:27.806Z"
+      }
+    },
+    "created_at": {
+      "$date": "2025-08-18T11:34:56.318Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-12T07:27:43.154Z"
+    },
+    "display_name": "OpenRouter",
+    "description": "OpenRouter提供多种AI模型的统一API接口",
+    "website": "https://openrouter.ai",
+    "api_doc_url": "https://openrouter.ai/docs",
+    "default_base_url": "https://openrouter.ai/api/v1",
+    "supported_features": [
+      "chat",
+      "completion",
+      "function_calling",
+      "streaming"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "68a31d1f7145163a5777bf56"
+    },
+    "name": "qianfan",
+    "api_key": "",
+    "is_active": false,
+    "extra_config": {
+      "source": "environment",
+      "migrated_at": {
+        "$date": "2025-08-18T12:31:27.803Z"
+      }
+    },
+    "created_at": {
+      "$date": "2025-08-18T12:31:27.803Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-06T00:18:39.105Z"
+    },
+    "display_name": "百度千帆",
+    "description": "百度千帆大模型平台，提供文心一言等模型",
+    "website": "https://qianfan.cloud.baidu.com",
+    "api_doc_url": "https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html",
+    "default_base_url": "https://qianfan.baidubce.com/v2",
+    "supported_features": [
+      "chat",
+      "completion",
+      "function_calling",
+      "streaming"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "68eb4859d2856d69c0950ed5"
+    },
+    "name": "302ai",
+    "display_name": "302.AI",
+    "description": "支持支付宝",
+    "website": "https://302.ai",
+    "api_doc_url": "https://doc.302.ai/",
+    "logo_url": null,
+    "is_active": true,
+    "supported_features": [
+      "chat",
+      "completion",
+      "image",
+      "function_calling"
+    ],
+    "default_base_url": "https://api.302.ai/v1",
+    "api_key": "",
+    "api_secret": "",
+    "extra_config": {
+      "source": "environment",
+      "has_api_key": "",
+      "has_api_secret": ""
+    },
+    "is_aggregator": false,
+    "aggregator_type": null,
+    "model_name_format": null,
+    "created_at": {
+      "$date": "2025-10-12T06:12:02.140Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-23T00:15:06.748Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68f9dea2b011bd68cbf19ca0"
+    },
+    "name": "siliconflow",
+    "display_name": "硅基流动",
+    "description": "硅基流动",
+    "website": "",
+    "api_doc_url": "",
+    "logo_url": null,
+    "is_active": true,
+    "supported_features": [
+      "chat",
+      "completion",
+      "embedding",
+      "function_calling"
+    ],
+    "default_base_url": "https://api.siliconflow.cn/v1",
+    "api_key": "",
+    "api_secret": "",
+    "extra_config": {
+      "has_api_key": "",
+      "has_api_secret": ""
+    },
+    "is_aggregator": false,
+    "aggregator_type": null,
+    "model_name_format": null,
+    "created_at": {
+      "$date": "2025-10-23T07:52:02.557Z"
+    },
+    "updated_at": {
+      "$date": "2025-10-23T07:53:00.346Z"
+    }
+  }
+]

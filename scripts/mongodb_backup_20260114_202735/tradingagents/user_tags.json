@@ -1,0 +1,32 @@
+[
+  {
+    "_id": {
+      "$oid": "68d3db6f42a2a4ebb08664f2"
+    },
+    "user_id": "admin",
+    "name": "AI",
+    "color": "#409EFF",
+    "sort_order": 0,
+    "created_at": {
+      "$date": "2025-09-24T11:52:15.381Z"
+    },
+    "updated_at": {
+      "$date": "2025-09-24T11:52:15.381Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68d3e09a42a2a4ebb08664f7"
+    },
+    "user_id": "admin",
+    "name": "本周重点",
+    "color": "#52C41A",
+    "sort_order": 1,
+    "created_at": {
+      "$date": "2025-09-24T12:14:18.354Z"
+    },
+    "updated_at": {
+      "$date": "2025-09-24T12:14:18.354Z"
+    }
+  }
+]

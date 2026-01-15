@@ -1,0 +1,23 @@
+[
+  {
+    "_id": {
+      "$oid": "6943fbc1d9fb219fe4888836"
+    },
+    "data_type": "stock_basics",
+    "job": "stock_basics_multi_source",
+    "data_sources_used": [
+      "stock_list:akshare",
+      "daily_data:akshare"
+    ],
+    "errors": 0,
+    "finished_at": "2026-01-13T14:38:04.708430",
+    "inserted": 0,
+    "last_trade_date": "20260112",
+    "message": null,
+    "source_stats": {},
+    "started_at": "2026-01-13T14:37:43.831572",
+    "status": "success",
+    "total": 5470,
+    "updated": 5470
+  }
+]

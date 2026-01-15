@@ -1,0 +1,1290 @@
+[
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330aba"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-05",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-04T13:41:39.305Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-04T13:41:39.305Z"
+    },
+    "version": 1,
+    "open": 11.59,
+    "high": 11.6,
+    "low": 11.5,
+    "close": 11.52,
+    "pre_close": null,
+    "volume": 794926.0,
+    "amount": 918112474.29,
+    "change": -0.07,
+    "pct_chg": -0.6
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330abb"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-06",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "version": 1,
+    "open": 11.5,
+    "high": 11.58,
+    "low": 11.47,
+    "close": 11.51,
+    "pre_close": null,
+    "volume": 766585.0,
+    "amount": 882799461.59,
+    "change": -0.01,
+    "pct_chg": -0.09
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330abc"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-07",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "version": 1,
+    "open": 11.52,
+    "high": 11.58,
+    "low": 11.5,
+    "close": 11.55,
+    "pre_close": null,
+    "volume": 734851.0,
+    "amount": 848177983.52,
+    "change": 0.04,
+    "pct_chg": 0.35
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330abd"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-10",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "version": 1,
+    "open": 11.52,
+    "high": 11.64,
+    "low": 11.45,
+    "close": 11.63,
+    "pre_close": null,
+    "volume": 827208.0,
+    "amount": 957555600.77,
+    "change": 0.08,
+    "pct_chg": 0.69
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330abe"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-11",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-04T13:41:39.306Z"
+    },
+    "version": 1,
+    "open": 11.62,
+    "high": 11.69,
+    "low": 11.57,
+    "close": 11.67,
+    "pre_close": null,
+    "volume": 886509.0,
+    "amount": 1033284775.65,
+    "change": 0.04,
+    "pct_chg": 0.34
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330abf"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-12",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.800Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.800Z"
+    },
+    "version": 1,
+    "open": 11.7,
+    "high": 11.79,
+    "low": 11.65,
+    "close": 11.68,
+    "pre_close": null,
+    "volume": 1141325.0,
+    "amount": 1337963805.19,
+    "change": 0.01,
+    "pct_chg": 0.09
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac0"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-13",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "version": 1,
+    "open": 11.68,
+    "high": 11.72,
+    "low": 11.57,
+    "close": 11.7,
+    "pre_close": null,
+    "volume": 978991.0,
+    "amount": 1139765204.11,
+    "change": 0.02,
+    "pct_chg": 0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac1"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-14",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "version": 1,
+    "open": 11.67,
+    "high": 11.84,
+    "low": 11.66,
+    "close": 11.75,
+    "pre_close": null,
+    "volume": 1316995.0,
+    "amount": 1551867288.21,
+    "change": 0.05,
+    "pct_chg": 0.43
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac2"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-17",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "version": 1,
+    "open": 11.75,
+    "high": 11.75,
+    "low": 11.62,
+    "close": 11.67,
+    "pre_close": null,
+    "volume": 995233.0,
+    "amount": 1161416221.76,
+    "change": -0.08,
+    "pct_chg": -0.68
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac3"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-18",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "version": 1,
+    "open": 11.65,
+    "high": 11.69,
+    "low": 11.57,
+    "close": 11.59,
+    "pre_close": null,
+    "volume": 670077.0,
+    "amount": 778887577.92,
+    "change": -0.08,
+    "pct_chg": -0.69
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac4"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-19",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "version": 1,
+    "open": 11.58,
+    "high": 11.83,
+    "low": 11.57,
+    "close": 11.8,
+    "pre_close": null,
+    "volume": 1334996.0,
+    "amount": 1565428546.57,
+    "change": 0.21,
+    "pct_chg": 1.81
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac5"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-20",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.801Z"
+    },
+    "version": 1,
+    "open": 11.79,
+    "high": 11.99,
+    "low": 11.74,
+    "close": 11.85,
+    "pre_close": null,
+    "volume": 1637040.0,
+    "amount": 1948415939.65,
+    "change": 0.05,
+    "pct_chg": 0.42
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac6"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-21",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.8,
+    "high": 11.88,
+    "low": 11.66,
+    "close": 11.69,
+    "pre_close": null,
+    "volume": 1465359.0,
+    "amount": 1721871193.26,
+    "change": -0.16,
+    "pct_chg": -1.35
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac7"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-24",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.7,
+    "high": 11.73,
+    "low": 11.6,
+    "close": 11.6,
+    "pre_close": null,
+    "volume": 1117119.0,
+    "amount": 1302444629.51,
+    "change": -0.09,
+    "pct_chg": -0.77
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac8"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-25",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.61,
+    "high": 11.8,
+    "low": 11.58,
+    "close": 11.8,
+    "pre_close": null,
+    "volume": 1028081.0,
+    "amount": 1203879796.74,
+    "change": 0.2,
+    "pct_chg": 1.72
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ac9"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-26",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.81,
+    "high": 11.85,
+    "low": 11.65,
+    "close": 11.69,
+    "pre_close": null,
+    "volume": 821301.0,
+    "amount": 962935429.85,
+    "change": -0.11,
+    "pct_chg": -0.93
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330aca"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-27",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.66,
+    "high": 11.71,
+    "low": 11.58,
+    "close": 11.71,
+    "pre_close": null,
+    "volume": 1011847.0,
+    "amount": 1178308953.13,
+    "change": 0.02,
+    "pct_chg": 0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330acb"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-11-28",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.67,
+    "high": 11.68,
+    "low": 11.58,
+    "close": 11.61,
+    "pre_close": null,
+    "volume": 884358.0,
+    "amount": 1027933463.87,
+    "change": -0.1,
+    "pct_chg": -0.85
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330acc"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-01",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.6,
+    "high": 11.7,
+    "low": 11.53,
+    "close": 11.69,
+    "pre_close": null,
+    "volume": 1037323.0,
+    "amount": 1205480322.84,
+    "change": 0.08,
+    "pct_chg": 0.69
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330acd"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-02",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.802Z"
+    },
+    "version": 1,
+    "open": 11.68,
+    "high": 11.73,
+    "low": 11.59,
+    "close": 11.64,
+    "pre_close": null,
+    "volume": 768060.0,
+    "amount": 894720591.59,
+    "change": -0.05,
+    "pct_chg": -0.43
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ace"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-03",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.64,
+    "high": 11.7,
+    "low": 11.54,
+    "close": 11.55,
+    "pre_close": null,
+    "volume": 944601.0,
+    "amount": 1099167226.64,
+    "change": -0.09,
+    "pct_chg": -0.77
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330acf"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-04",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.55,
+    "high": 11.58,
+    "low": 11.46,
+    "close": 11.49,
+    "pre_close": null,
+    "volume": 886090.0,
+    "amount": 1019178990.3,
+    "change": -0.06,
+    "pct_chg": -0.52
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad0"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-05",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.49,
+    "high": 11.54,
+    "low": 11.4,
+    "close": 11.53,
+    "pre_close": null,
+    "volume": 890766.0,
+    "amount": 1022334911.54,
+    "change": 0.04,
+    "pct_chg": 0.35
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad1"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-08",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.49,
+    "high": 11.6,
+    "low": 11.48,
+    "close": 11.52,
+    "pre_close": null,
+    "volume": 855899.0,
+    "amount": 988510035.14,
+    "change": -0.01,
+    "pct_chg": -0.09
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad2"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-09",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.52,
+    "high": 11.54,
+    "low": 11.43,
+    "close": 11.43,
+    "pre_close": null,
+    "volume": 733957.0,
+    "amount": 842732358.15,
+    "change": -0.09,
+    "pct_chg": -0.78
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad3"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-10",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.44,
+    "high": 11.46,
+    "low": 11.29,
+    "close": 11.33,
+    "pre_close": null,
+    "volume": 1044065.0,
+    "amount": 1184087688.01,
+    "change": -0.1,
+    "pct_chg": -0.87
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad4"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-11",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.35,
+    "high": 11.39,
+    "low": 11.3,
+    "close": 11.37,
+    "pre_close": null,
+    "volume": 925261.0,
+    "amount": 1049906215.97,
+    "change": 0.04,
+    "pct_chg": 0.35
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad5"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-12",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.803Z"
+    },
+    "version": 1,
+    "open": 11.37,
+    "high": 11.43,
+    "low": 11.3,
+    "close": 11.35,
+    "pre_close": null,
+    "volume": 1191895.0,
+    "amount": 1357465371.22,
+    "change": -0.02,
+    "pct_chg": -0.18
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad6"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-15",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.34,
+    "high": 11.54,
+    "low": 11.33,
+    "close": 11.51,
+    "pre_close": null,
+    "volume": 940833.0,
+    "amount": 1080642231.19,
+    "change": 0.16,
+    "pct_chg": 1.41
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad7"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-16",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.49,
+    "high": 11.55,
+    "low": 11.44,
+    "close": 11.48,
+    "pre_close": null,
+    "volume": 647351.0,
+    "amount": 743389002.32,
+    "change": -0.03,
+    "pct_chg": -0.26
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad8"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-17",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.47,
+    "high": 11.58,
+    "low": 11.42,
+    "close": 11.53,
+    "pre_close": null,
+    "volume": 701495.0,
+    "amount": 807135164.41,
+    "change": 0.05,
+    "pct_chg": 0.44
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ad9"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-18",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.51,
+    "high": 11.65,
+    "low": 11.48,
+    "close": 11.64,
+    "pre_close": null,
+    "volume": 790467.0,
+    "amount": 916247610.59,
+    "change": 0.11,
+    "pct_chg": 0.95
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ada"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-19",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.63,
+    "high": 11.65,
+    "low": 11.58,
+    "close": 11.62,
+    "pre_close": null,
+    "volume": 649886.0,
+    "amount": 755106127.43,
+    "change": -0.02,
+    "pct_chg": -0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330adb"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-22",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.61,
+    "high": 11.61,
+    "low": 11.51,
+    "close": 11.52,
+    "pre_close": null,
+    "volume": 742369.0,
+    "amount": 857197057.46,
+    "change": -0.1,
+    "pct_chg": -0.86
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330adc"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-23",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.804Z"
+    },
+    "version": 1,
+    "open": 11.52,
+    "high": 11.6,
+    "low": 11.5,
+    "close": 11.56,
+    "pre_close": null,
+    "volume": 666266.0,
+    "amount": 770081939.85,
+    "change": 0.04,
+    "pct_chg": 0.35
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330add"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-24",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.55,
+    "high": 11.58,
+    "low": 11.49,
+    "close": 11.54,
+    "pre_close": null,
+    "volume": 505244.0,
+    "amount": 582458734.52,
+    "change": -0.02,
+    "pct_chg": -0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ade"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-25",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.54,
+    "high": 11.62,
+    "low": 11.52,
+    "close": 11.56,
+    "pre_close": null,
+    "volume": 547455.0,
+    "amount": 633772624.98,
+    "change": 0.02,
+    "pct_chg": 0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330adf"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-26",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.56,
+    "high": 11.59,
+    "low": 11.53,
+    "close": 11.54,
+    "pre_close": null,
+    "volume": 436340.0,
+    "amount": 504079280.05,
+    "change": -0.02,
+    "pct_chg": -0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ae0"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-29",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.54,
+    "high": 11.62,
+    "low": 11.5,
+    "close": 11.56,
+    "pre_close": null,
+    "volume": 648295.0,
+    "amount": 749082977.59,
+    "change": 0.02,
+    "pct_chg": 0.17
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ae1"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-30",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.53,
+    "high": 11.56,
+    "low": 11.45,
+    "close": 11.48,
+    "pre_close": null,
+    "volume": 582584.0,
+    "amount": 669409275.27,
+    "change": -0.08,
+    "pct_chg": -0.69
+  },
+  {
+    "_id": {
+      "$oid": "695a6e1380ee33a6f4330ae2"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2025-12-31",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.48,
+    "high": 11.49,
+    "low": 11.4,
+    "close": 11.41,
+    "pre_close": null,
+    "volume": 590620.0,
+    "amount": 675457357.45,
+    "change": -0.07,
+    "pct_chg": -0.61
+  },
+  {
+    "_id": {
+      "$oid": "6965de81858670440e834fae"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2026-01-05",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.42,
+    "high": 11.51,
+    "low": 11.41,
+    "close": 11.5,
+    "pre_close": null,
+    "volume": 875491.0,
+    "amount": 1003479224.05,
+    "change": 0.09,
+    "pct_chg": 0.79
+  },
+  {
+    "_id": {
+      "$oid": "6965de81858670440e834faf"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2026-01-06",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.805Z"
+    },
+    "version": 1,
+    "open": 11.5,
+    "high": 11.68,
+    "low": 11.48,
+    "close": 11.67,
+    "pre_close": null,
+    "volume": 1304648.0,
+    "amount": 1512911583.88,
+    "change": 0.17,
+    "pct_chg": 1.48
+  },
+  {
+    "_id": {
+      "$oid": "6965de81858670440e834fb0"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2026-01-07",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.806Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.806Z"
+    },
+    "version": 1,
+    "open": 11.66,
+    "high": 11.82,
+    "low": 11.62,
+    "close": 11.64,
+    "pre_close": null,
+    "volume": 966236.0,
+    "amount": 1131165699.04,
+    "change": -0.03,
+    "pct_chg": -0.26
+  },
+  {
+    "_id": {
+      "$oid": "6965de81858670440e834fb1"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2026-01-08",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.806Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.806Z"
+    },
+    "version": 1,
+    "open": 11.64,
+    "high": 11.65,
+    "low": 11.49,
+    "close": 11.51,
+    "pre_close": null,
+    "volume": 1100085.0,
+    "amount": 1268647294.7,
+    "change": -0.13,
+    "pct_chg": -1.12
+  },
+  {
+    "_id": {
+      "$oid": "6965de81858670440e834fb2"
+    },
+    "symbol": "000001",
+    "code": "000001",
+    "full_symbol": "000001.SZ",
+    "market": "CN",
+    "trade_date": "2026-01-09",
+    "period": "daily",
+    "data_source": "akshare",
+    "created_at": {
+      "$date": "2026-01-13T05:56:17.806Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-13T05:56:17.806Z"
+    },
+    "version": 1,
+    "open": 11.53,
+    "high": 11.53,
+    "low": 11.44,
+    "close": 11.46,
+    "pre_close": null,
+    "volume": 983390.0,
+    "amount": 1128076547.08,
+    "change": -0.05,
+    "pct_chg": -0.43
+  }
+]
