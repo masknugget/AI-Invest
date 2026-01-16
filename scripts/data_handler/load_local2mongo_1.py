@@ -43,9 +43,11 @@ rename_map = {
 df.rename(columns=rename_map, inplace=True)
 
 # 2. 类型转换
-date_cols = ['trade_date', 'ipo_date']
+date_cols = ['trade_date']
 for c in date_cols:
-    df[c] = pd.to_datetime(df[c], errors='coerce')
+    df[c] = pd.to_datetime(df[c].astype('str'))
+
+df['ipo_date'] = df['ipo_date'].astype('str')
 
 numeric_cols = ['total_shares', 'float_shares', 'total_assets', 'current_assets',
                 'fixed_assets', 'bps', 'eps', 'pe_ttm', 'pb',
