@@ -7,8 +7,13 @@ from langgraph.prebuilt import ToolNode
 
 from tradingagents.agents import *
 from tradingagents.agents.utils.agent_states import AgentState
+from tradingagents.agents.utils.agent_utils import Toolkit
 
 from .conditional_logic import ConditionalLogic
+
+# 导入统一日志系统
+from tradingagents.utils.logging_init import get_logger
+logger = get_logger("default")
 
 
 class GraphSetup:
@@ -18,6 +23,7 @@ class GraphSetup:
         self,
         quick_thinking_llm: ChatOpenAI,
         deep_thinking_llm: ChatOpenAI,
+        toolkit: Toolkit,
         tool_nodes: Dict[str, ToolNode],
         bull_memory,
         bear_memory,
@@ -25,10 +31,13 @@ class GraphSetup:
         invest_judge_memory,
         risk_manager_memory,
         conditional_logic: ConditionalLogic,
+        config: Dict[str, Any] = None,
+        react_llm = None,
     ):
         """Initialize with required components."""
         self.quick_thinking_llm = quick_thinking_llm
         self.deep_thinking_llm = deep_thinking_llm
+        self.toolkit = toolkit
         self.tool_nodes = tool_nodes
         self.bull_memory = bull_memory
         self.bear_memory = bear_memory
@@ -36,6 +45,8 @@ class GraphSetup:
         self.invest_judge_memory = invest_judge_memory
         self.risk_manager_memory = risk_manager_memory
         self.conditional_logic = conditional_logic
+        self.config = config or {}
+        self.react_llm = react_llm
 
     def setup_graph(
         self, selected_analysts=["market", "social", "news", "fundamentals"]
@@ -58,29 +69,69 @@ class GraphSetup:
         tool_nodes = {}
 
         if "market" in selected_analysts:
+            # 现在所有LLM都使用标准市场分析师（包括阿里百炼的OpenAI兼容适配器）
+            llm_provider = self.config.get("llm_provider", "").lower()
+
+            # 检查是否使用OpenAI兼容的阿里百炼适配器
+            using_dashscope_openai = (
+                "dashscope" in llm_provider and
+                hasattr(self.quick_thinking_llm, '__class__') and
+                'OpenAI' in self.quick_thinking_llm.__class__.__name__
+            )
+
+            if using_dashscope_openai:
+                logger.debug(f"📈 [DEBUG] 使用标准市场分析师（阿里百炼OpenAI兼容模式）")
+            elif "dashscope" in llm_provider or "阿里百炼" in self.config.get("llm_provider", ""):
+                logger.debug(f"📈 [DEBUG] 使用标准市场分析师（阿里百炼原生模式）")
+            elif "deepseek" in llm_provider:
+                logger.debug(f"📈 [DEBUG] 使用标准市场分析师（DeepSeek）")
+            else:
+                logger.debug(f"📈 [DEBUG] 使用标准市场分析师")
+
+            # 所有LLM都使用标准分析师
             analyst_nodes["market"] = create_market_analyst(
-                self.quick_thinking_llm
+                self.quick_thinking_llm, self.toolkit
             )
             delete_nodes["market"] = create_msg_delete()
             tool_nodes["market"] = self.tool_nodes["market"]
 
         if "social" in selected_analysts:
             analyst_nodes["social"] = create_social_media_analyst(
-                self.quick_thinking_llm
+                self.quick_thinking_llm, self.toolkit
             )
             delete_nodes["social"] = create_msg_delete()
             tool_nodes["social"] = self.tool_nodes["social"]
 
         if "news" in selected_analysts:
             analyst_nodes["news"] = create_news_analyst(
-                self.quick_thinking_llm
+                self.quick_thinking_llm, self.toolkit
             )
             delete_nodes["news"] = create_msg_delete()
             tool_nodes["news"] = self.tool_nodes["news"]
 
         if "fundamentals" in selected_analysts:
+            # 现在所有LLM都使用标准基本面分析师（包括阿里百炼的OpenAI兼容适配器）
+            llm_provider = self.config.get("llm_provider", "").lower()
+
+            # 检查是否使用OpenAI兼容的阿里百炼适配器
+            using_dashscope_openai = (
+                "dashscope" in llm_provider and
+                hasattr(self.quick_thinking_llm, '__class__') and
+                'OpenAI' in self.quick_thinking_llm.__class__.__name__
+            )
+
+            if using_dashscope_openai:
+                logger.debug(f"📊 [DEBUG] 使用标准基本面分析师（阿里百炼OpenAI兼容模式）")
+            elif "dashscope" in llm_provider or "阿里百炼" in self.config.get("llm_provider", ""):
+                logger.debug(f"📊 [DEBUG] 使用标准基本面分析师（阿里百炼原生模式）")
+            elif "deepseek" in llm_provider:
+                logger.debug(f"📊 [DEBUG] 使用标准基本面分析师（DeepSeek）")
+            else:
+                logger.debug(f"📊 [DEBUG] 使用标准基本面分析师")
+
+            # 所有LLM都使用标准分析师（包含强制工具调用机制）
             analyst_nodes["fundamentals"] = create_fundamentals_analyst(
-                self.quick_thinking_llm
+                self.quick_thinking_llm, self.toolkit
             )
             delete_nodes["fundamentals"] = create_msg_delete()
             tool_nodes["fundamentals"] = self.tool_nodes["fundamentals"]

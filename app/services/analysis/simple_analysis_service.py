@@ -28,10 +28,10 @@ from app.models.user import PyObjectId
 from app.models.notification import NotificationCreate
 from bson import ObjectId
 from app.core.database import get_mongo_db
-from app.services.config_service import ConfigService
+from app.services.config.config_service import ConfigService
 from app.services.memory_state_manager import get_memory_state_manager, TaskStatus
-from app.services.redis_progress_tracker import RedisProgressTracker, get_progress_by_id
-from app.services.progress_log_handler import register_analysis_tracker, unregister_analysis_tracker
+from app.services.queue.redis_progress_tracker import RedisProgressTracker, get_progress_by_id
+from app.services.queue.progress_log_handler import register_analysis_tracker, unregister_analysis_tracker
 
 # 股票基础信息获取（用于补充显示名称）
 try:
@@ -1016,7 +1016,7 @@ class SimpleAnalysisService:
             logger.error(f"❌ 后台分析任务失败: {task_id} - {e}")
 
             # 格式化错误信息为用户友好的提示
-            from ..utils.error_formatter import ErrorFormatter
+            from app.utils.error_formatter import ErrorFormatter
 
             # 收集上下文信息
             error_context = {}
@@ -1823,7 +1823,7 @@ class SimpleAnalysisService:
             logger.error(f"❌ [线程池] 分析执行失败: {task_id} - {e}")
 
             # 格式化错误信息为用户友好的提示
-            from ..utils.error_formatter import ErrorFormatter
+            from app.utils.error_formatter import ErrorFormatter
 
             # 收集上下文信息
             error_context = {}

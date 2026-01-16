@@ -6,6 +6,10 @@ from tradingagents.agents import *
 from langgraph.prebuilt import ToolNode
 from langgraph.graph import END, StateGraph, START, MessagesState
 
+# 导入统一日志系统
+from tradingagents.utils.logging_init import get_logger
+logger = get_logger("default")
+
 
 # Researcher team state
 class InvestDebateState(TypedDict):
@@ -60,6 +64,12 @@ class AgentState(MessagesState):
         str, "Report from the News Researcher of current world affairs"
     ]
     fundamentals_report: Annotated[str, "Report from the Fundamentals Researcher"]
+
+    # 🔧 死循环修复: 工具调用计数器
+    market_tool_call_count: Annotated[int, "Market analyst tool call counter"]
+    news_tool_call_count: Annotated[int, "News analyst tool call counter"]
+    sentiment_tool_call_count: Annotated[int, "Social media analyst tool call counter"]
+    fundamentals_tool_call_count: Annotated[int, "Fundamentals analyst tool call counter"]
 
     # researcher team discussion step
     investment_debate_state: Annotated[
