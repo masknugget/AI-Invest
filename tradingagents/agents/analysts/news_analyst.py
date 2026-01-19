@@ -9,6 +9,7 @@ from tradingagents.utils.tool_logging import log_analyst_module
 
 # 导入股票工具类
 from tradingagents.utils.stock_utils import StockUtils
+
 # 导入Google工具调用处理器
 from tradingagents.agents.utils.google_tool_handler import GoogleToolCallHandler
 
@@ -99,7 +100,7 @@ def create_news_analyst(llm, toolkit):
    # 创建统一新闻工具
         unified_news_tool = create_unified_news_tool(toolkit)
         unified_news_tool.name = "get_stock_news_unified"
-        
+
         tools = [unified_news_tool]
         logger.info(f"[新闻分析师] 已加载统一新闻工具: get_stock_news_unified")
 

@@ -107,7 +107,6 @@ def create_china_market_analyst(llm, toolkit):
         tools = [
             toolkit.get_china_stock_data,
             toolkit.get_china_market_overview,
-            toolkit.get_YFin_data,  # 备用数据源
         ]
         
         system_message = (

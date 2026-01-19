@@ -6,6 +6,7 @@
 import pandas as pd
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
+
 from tradingagents.db.document import (
     get_stock_data,
     get_stock_info,
