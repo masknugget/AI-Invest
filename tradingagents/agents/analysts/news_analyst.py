@@ -6,8 +6,7 @@ from datetime import datetime
 # 导入统一日志系统和分析模块日志装饰器
 from tradingagents.utils.logging_init import get_logger
 from tradingagents.utils.tool_logging import log_analyst_module
-# 导入统一新闻工具
-from tradingagents.tools.unified_news_tool import create_unified_news_tool
+
 # 导入股票工具类
 from tradingagents.utils.stock_utils import StockUtils
 # 导入Google工具调用处理器
