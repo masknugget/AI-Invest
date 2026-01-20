@@ -26,30 +26,6 @@ except ImportError:
 from tradingagents.utils.logging_manager import get_logger
 logger = get_logger('agents')
 
-# 尝试导入yfinance相关模块（支持新旧路径）
-try:
-    from .providers.us import YFinanceUtils, YFINANCE_AVAILABLE
-except ImportError:
-    try:
-        from .yfin_utils import YFinanceUtils
-        YFINANCE_AVAILABLE = True
-    except ImportError as e:
-        logger.warning(f"⚠️ yfinance模块不可用: {e}")
-        YFinanceUtils = None
-        YFINANCE_AVAILABLE = False
-
-# 导入技术指标模块（新路径）
-try:
-    from .technical import StockstatsUtils, STOCKSTATS_AVAILABLE
-except ImportError as e:
-    # 向后兼容：尝试从旧路径导入
-    try:
-        from .technical.stockstats import StockstatsUtils
-        STOCKSTATS_AVAILABLE = True
-    except ImportError as e:
-        logger.warning(f"⚠️ stockstats模块不可用: {e}")
-        StockstatsUtils = None
-        STOCKSTATS_AVAILABLE = False
 
 from .interface import (
 

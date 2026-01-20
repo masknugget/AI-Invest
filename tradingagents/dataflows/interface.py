@@ -14,7 +14,6 @@ from tradingagents.db.document import (
     get_market_news,
     get_china_stock_info,
     get_hk_stock_info,
-    get_us_stock_info
 )
 
 from tradingagents.config.config_manager import config_manager
@@ -132,50 +131,6 @@ def get_hk_stock_info_unified(symbol):
     """
     try:
         info = get_hk_stock_info(symbol)
-        return info if info else {}
-    except Exception:
-        return {}
-
-
-# ==================== 美股数据接口 ====================
-
-def get_us_stock_data_unified(symbol, start_date=None, end_date=None):
-    """
-    适配器：从 db/document.py 获取美股数据
-    返回字符串格式
-    """
-    try:
-        if not start_date or not end_date:
-            # 如果没有提供日期，使用最近30天
-            end_date = datetime.now().strftime("%Y-%m-%d")
-            start_date = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-
-        data = get_stock_data(symbol, start_date, end_date, "technical")
-
-        if not data:
-            return f"⚠️ 未找到 {symbol} 在 {start_date} 到 {end_date} 的数据"
-
-        df = pd.DataFrame(data)
-
-        output = f"## {symbol} 美股数据 ({start_date} 到 {end_date})\n\n"
-        output += f"共 {len(df)} 条记录\n\n"
-
-        if not df.empty:
-            output += df.to_string(index=False)
-
-        return output
-
-    except Exception as e:
-        return f"❌ 获取美股数据失败: {str(e)}"
-
-
-def get_us_stock_info_unified(symbol):
-    """
-    适配器：从 db/document.py 获取美股基本信息
-    返回字典格式
-    """
-    try:
-        info = get_us_stock_info(symbol)
         return info if info else {}
     except Exception:
         return {}
@@ -374,28 +329,6 @@ def get_stockstats_indicator(symbol, indicator, curr_date, online=False):
     return "暂不支持"
 
 
-def get_YFin_data_window(symbol, curr_date, look_back_days):
-    """YF数据适配器"""
-    try:
-        start_date = (datetime.strptime(curr_date, "%Y-%m-%d") -
-                      timedelta(days=look_back_days)).strftime("%Y-%m-%d")
-
-        return get_us_stock_data_unified(symbol, start_date, curr_date)
-
-    except Exception as e:
-        return f"❌ 获取YF数据失败: {str(e)}"
-
-
-def get_YFin_data(symbol, start_date, end_date):
-    """YF数据适配器"""
-    return get_us_stock_data_unified(symbol, start_date, end_date)
-
-
-def get_YFin_data_online(symbol, start_date, end_date):
-    """YF在线数据适配器"""
-    return get_us_stock_data_unified(symbol, start_date, end_date)
-
-
 # ==================== 配置函数（简化版） ====================
 
 def get_config():
@@ -423,8 +356,6 @@ def get_stock_data_by_market(symbol, start_date=None, end_date=None):
         return get_china_stock_data_unified(symbol, start_date, end_date)
     elif market == 'hk':
         return get_hk_stock_data_unified(symbol, start_date, end_date)
-    elif market == 'us':
-        return get_us_stock_data_unified(symbol, start_date, end_date)
     else:
         return f"⚠️ 无法识别市场类型: {symbol}"
 
