@@ -5,6 +5,8 @@ from pymongo import MongoClient, ASCENDING, DESCENDING
 from pymongo.collection import Collection
 from pymongo.database import Database
 
+from tradingagents.utils.indicators import add_all_indicators
+
 # -------------------- 参数 --------------------
 MONGO_URI = "mongodb://localhost:27017"
 
@@ -327,25 +329,89 @@ def _query_mongodb_market_news(
 
 # ==================== 原有的两个函数（保留向后兼容） ====================
 
-def get_stock_daily_technical(
-        symbol: str,
-        start_date: str,
-        end_date: str,
-) -> List[Dict[str, Any]]:
-    """
-    根据 symbol + 交易日期区间 查询日线数据（技术指标）
-    保留向后兼容
-    """
-    return get_stock_data(symbol, start_date, end_date, "technical")
+
+def convert_data(item):
+    return float(item.to_decimal())
 
 
 def get_stock_daily_basic(
         symbol: str,
         start_date: str,
         end_date: str,
-) -> List[Dict[str, Any]]:
+):
     """
     根据 symbol + 交易日期区间 查询日线数据（基础数据）
     保留向后兼容
     """
-    return get_stock_data(symbol, start_date, end_date, "basic")
+    data = get_stock_data(symbol, start_date, end_date, "technical")
+
+    df = pd.DataFrame(data)
+    df['close'] = df['close'].map(convert_data)
+    df = add_all_indicators(df)
+
+    col = ['trade_date', 'pb', 'pct_chg', 'pe_ttm', 'ps_ttm', ]
+    col_num = ['pb', 'pct_chg', 'pe_ttm', 'ps_ttm', ]
+    df[col_num] = df[col_num].round(2)
+    df = df.tail(60)
+    df_data = df.to_dict('list')
+
+    data = ["""
+    基本面指标数据：pb, pe_ttm, ps_ttm
+    pct_chg为涨幅
+    """]
+    for key in col:
+        value = df_data[key]
+        if key == 'trade_date':
+            value = [i.strftime("%Y%m%d") for i in value]
+        else:
+            value = [str(i) for i in value]
+        value_str = " ".join(value)
+        line_content = key + ": " + value_str
+        data.append(line_content)
+
+    content = "\n".join(data)
+    return content, df_data
+
+
+def get_stock_daily_technical(
+        symbol: str,
+        start_date: str,
+        end_date: str,
+):
+    """
+
+    :param symbol:
+    :param start_date:
+    :param end_date:
+    :return:
+    """
+    data = get_stock_data(symbol, start_date, end_date, "technical")
+    df = pd.DataFrame(data)
+    df['close'] = df['close'].map(convert_data)
+    df = add_all_indicators(df)
+
+    col = ['trade_date', 'ma5', 'ma10', 'ma20', 'ma60', 'rsi', 'macd_dif', 'macd_dea', 'macd', 'boll_mid', 'boll_upper',
+           'boll_lower']
+    col_num = ['ma5', 'ma10', 'ma20', 'ma60', 'rsi', 'macd_dif', 'macd_dea', 'macd', 'boll_mid', 'boll_upper',
+               'boll_lower']
+    df[col_num] = df[col_num].round(2)
+    df = df.tail(60)
+    df_data = df.to_dict('list')
+
+    tmp_data = ["""
+    技术指标数据，trade_date为日期, close为收盘价,
+    'ma5', 'ma10', 'ma20', 'ma60' 为均线系统
+    
+    """]
+    for key in col:
+        value = df_data[key]
+        if key == 'trade_date':
+            value = [i.strftime("%Y%m%d") for i in value]
+        else:
+            value = [str(i) for i in value]
+        value_str = " ".join(value)
+        line_content = key + ": " + value_str
+        tmp_data.append(line_content)
+
+    content = "\n".join(tmp_data)
+    return content, df_data

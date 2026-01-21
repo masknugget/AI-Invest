@@ -10,7 +10,7 @@ quick_thinking_llm = ChatDashScopeOpenAI(
     api_key="sk-12e56ecde21e49029ab895d80f357536",  # 🔥 传递 API Key
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",  # 传递 base_url
     temperature=0.1,
-    max_tokens=20000,
+    max_tokens=16000,
     request_timeout=500
 )
 

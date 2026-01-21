@@ -60,7 +60,7 @@ def get_china_stock_data_unified(ticker, start_date, end_date):
         return f"❌ 获取数据失败: {str(e)}"
 
 
-def get_china_stock_info_unified(ticker):
+def get_china_stock_info_unified(ticker) -> str:
     """
     适配器：从 db/document.py 获取 A 股基本信息
     返回字符串格式
@@ -190,7 +190,7 @@ def get_simfin_cashflow(ticker, freq, curr_date):
     return "暂不支持财务数据查询"
 
 
-def get_simfin_income_statements(ticker, freq, curr_date):
+def get_simfin_income_statements(ticker, freq, curr_date) -> str:
     """预留接口 - 暂无数据"""
     return "暂不支持财务数据查询"
 

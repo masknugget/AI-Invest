@@ -43,9 +43,7 @@ from .interface import (
     # Technical analysis functions
     get_stock_stats_indicators_window,
     get_stockstats_indicator,
-    # Market data functions
-    get_YFin_data_window,
-    get_YFin_data,
+
     # Unified China data functions (recommended)
     get_china_stock_data_unified,
     get_china_stock_info_unified,

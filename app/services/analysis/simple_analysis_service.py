@@ -855,47 +855,47 @@ class SimpleAnalysisService:
                         logger.warning(f"⚠️ 分析日期格式不正确，使用今天: {analysis_date}")
 
             # 🔥 使用异步版本，直接 await，避免事件循环冲突
-            validation_result = await prepare_stock_data_async(
-                stock_code=stock_code,
-                market_type=market_type,
-                period_days=30,
-                analysis_date=analysis_date
-            )
+            # validation_result = await prepare_stock_data_async(
+            #     stock_code=stock_code,
+            #     market_type=market_type,
+            #     period_days=30,
+            #     analysis_date=analysis_date
+            # )
 
-            if not validation_result.is_valid:
-                error_msg = f"❌ 股票代码验证失败: {validation_result.error_message}"
-                logger.error(error_msg)
-                logger.error(f"💡 建议: {validation_result.suggestion}")
-
-                # 构建用户友好的错误消息
-                user_friendly_error = (
-                    f"❌ 股票代码无效\n\n"
-                    f"{validation_result.error_message}\n\n"
-                    f"💡 {validation_result.suggestion}"
-                )
-
-                # 更新任务状态为失败
-                await self.memory_manager.update_task_status(
-                    task_id=task_id,
-                    status=AnalysisStatus.FAILED,
-                    progress=0,
-                    error_message=user_friendly_error
-                )
-
-                # 更新MongoDB状态
-                await self._update_task_status(
-                    task_id,
-                    AnalysisStatus.FAILED,
-                    0,
-                    error_message=user_friendly_error
-                )
-
-                return
-
-            logger.info(f"✅ 股票代码验证通过: {stock_code} - {validation_result.stock_name}")
-            logger.info(f"📊 市场类型: {validation_result.market_type}")
-            logger.info(f"📈 历史数据: {'有' if validation_result.has_historical_data else '无'}")
-            logger.info(f"📋 基本信息: {'有' if validation_result.has_basic_info else '无'}")
+            # if not validation_result.is_valid:
+            #     error_msg = f"❌ 股票代码验证失败: {validation_result.error_message}"
+            #     logger.error(error_msg)
+            #     logger.error(f"💡 建议: {validation_result.suggestion}")
+            #
+            #     # 构建用户友好的错误消息
+            #     user_friendly_error = (
+            #         f"❌ 股票代码无效\n\n"
+            #         f"{validation_result.error_message}\n\n"
+            #         f"💡 {validation_result.suggestion}"
+            #     )
+            #
+            #     # 更新任务状态为失败
+            #     await self.memory_manager.update_task_status(
+            #         task_id=task_id,
+            #         status=AnalysisStatus.FAILED,
+            #         progress=0,
+            #         error_message=user_friendly_error
+            #     )
+            #
+            #     # 更新MongoDB状态
+            #     await self._update_task_status(
+            #         task_id,
+            #         AnalysisStatus.FAILED,
+            #         0,
+            #         error_message=user_friendly_error
+            #     )
+            #
+            #     return
+            #
+            # logger.info(f"✅ 股票代码验证通过: {stock_code} - {validation_result.stock_name}")
+            # logger.info(f"📊 市场类型: {validation_result.market_type}")
+            # logger.info(f"📈 历史数据: {'有' if validation_result.has_historical_data else '无'}")
+            # logger.info(f"📋 基本信息: {'有' if validation_result.has_basic_info else '无'}")
 
             # 在线程池中创建Redis进度跟踪器（避免阻塞事件循环）
             def create_progress_tracker():

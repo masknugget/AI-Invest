@@ -28,6 +28,7 @@ from app.routers import config
 from app.routers import model_capabilities
 from app.routers import notifications as notifications_router
 from app.routers import websocket_notifications as websocket_notifications_router
+from app.routers import analysis
 
 
 def get_version() -> str:
@@ -295,6 +296,7 @@ app.include_router(notifications_router.router, prefix="/api", tags=["notificati
 # 🔥 WebSocket 通知模块（替代 SSE + Redis PubSub）
 app.include_router(websocket_notifications_router.router, prefix="/api", tags=["websocket"])
 
+app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
 
 
 @app.get("/")
