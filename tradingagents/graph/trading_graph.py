@@ -414,11 +414,6 @@ class TradingAgentsGraph:
         """
 
         # 添加详细的接收日志
-        logger.debug(f"🔍 [GRAPH DEBUG] ===== TradingAgentsGraph.propagate 接收参数 =====")
-        logger.debug(f"🔍 [GRAPH DEBUG] 接收到的company_name: '{company_name}' (类型: {type(company_name)})")
-        logger.debug(f"🔍 [GRAPH DEBUG] 接收到的trade_date: '{trade_date}' (类型: {type(trade_date)})")
-        logger.debug(f"🔍 [GRAPH DEBUG] 接收到的task_id: '{task_id}'")
-
         self.ticker = company_name
         logger.debug(f"🔍 [GRAPH DEBUG] 设置self.ticker: '{self.ticker}'")
 
@@ -442,8 +437,40 @@ class TradingAgentsGraph:
         # 根据是否有进度回调选择不同的stream_mode
         args = self.propagator.get_graph_args(use_progress_callback=bool(progress_callback))
 
-        if self.debug:
-            # Debug mode with tracing and progress updates
+
+        # Standard mode without tracing but with progress updates
+        if progress_callback:
+            # 使用 updates 模式以便获取节点级别的进度
+            trace = []
+            final_state = None
+            for chunk in self.graph.stream(init_agent_state, **args):
+                # 记录节点计时
+                for node_name in chunk.keys():
+                    if not node_name.startswith('__'):
+                        # 如果有上一个节点，记录其结束时间
+                        if current_node_name and current_node_start:
+                            elapsed = time.time() - current_node_start
+                            node_timings[current_node_name] = elapsed
+                            logger.info(f"⏱️ [{current_node_name}] 耗时: {elapsed:.2f}秒")
+                            logger.info(f"🔍 [TIMING] 节点切换: {current_node_name} → {node_name}")
+
+                        # 开始新节点计时
+                        current_node_name = node_name
+                        current_node_start = time.time()
+                        logger.info(f"🔍 [TIMING] 开始计时: {node_name}")
+                        break
+
+                self._send_progress_update(chunk, progress_callback)
+                # 累积状态更新
+                if final_state is None:
+                    final_state = init_agent_state.copy()
+                for node_name, node_update in chunk.items():
+                    if not node_name.startswith('__'):
+                        final_state.update(node_update)
+        else:
+            # 原有的invoke模式（也需要计时）
+            logger.info("⏱️ 使用 invoke 模式执行分析（无进度回调）")
+            # 使用stream模式以便计时，但不发送进度更新
             trace = []
             final_state = None
             for chunk in self.graph.stream(init_agent_state, **args):
@@ -461,86 +488,12 @@ class TradingAgentsGraph:
                         current_node_start = time.time()
                         break
 
-                # 在 updates 模式下，chunk 格式为 {node_name: state_update}
-                # 在 values 模式下，chunk 格式为完整的状态
-                if progress_callback and args.get("stream_mode") == "updates":
-                    # updates 模式：chunk = {"Market Analyst": {...}}
-                    self._send_progress_update(chunk, progress_callback)
-                    # 累积状态更新
-                    if final_state is None:
-                        final_state = init_agent_state.copy()
-                    for node_name, node_update in chunk.items():
-                        if not node_name.startswith('__'):
-                            final_state.update(node_update)
-                else:
-                    # values 模式：chunk = {"messages": [...], ...}
-                    if len(chunk.get("messages", [])) > 0:
-                        chunk["messages"][-1].pretty_print()
-                    trace.append(chunk)
-                    final_state = chunk
-
-            if not trace and final_state:
-                # updates 模式下，使用累积的状态
-                pass
-            elif trace:
-                final_state = trace[-1]
-        else:
-            # Standard mode without tracing but with progress updates
-            if progress_callback:
-                # 使用 updates 模式以便获取节点级别的进度
-                trace = []
-                final_state = None
-                for chunk in self.graph.stream(init_agent_state, **args):
-                    # 记录节点计时
-                    for node_name in chunk.keys():
-                        if not node_name.startswith('__'):
-                            # 如果有上一个节点，记录其结束时间
-                            if current_node_name and current_node_start:
-                                elapsed = time.time() - current_node_start
-                                node_timings[current_node_name] = elapsed
-                                logger.info(f"⏱️ [{current_node_name}] 耗时: {elapsed:.2f}秒")
-                                logger.info(f"🔍 [TIMING] 节点切换: {current_node_name} → {node_name}")
-
-                            # 开始新节点计时
-                            current_node_name = node_name
-                            current_node_start = time.time()
-                            logger.info(f"🔍 [TIMING] 开始计时: {node_name}")
-                            break
-
-                    self._send_progress_update(chunk, progress_callback)
-                    # 累积状态更新
-                    if final_state is None:
-                        final_state = init_agent_state.copy()
-                    for node_name, node_update in chunk.items():
-                        if not node_name.startswith('__'):
-                            final_state.update(node_update)
-            else:
-                # 原有的invoke模式（也需要计时）
-                logger.info("⏱️ 使用 invoke 模式执行分析（无进度回调）")
-                # 使用stream模式以便计时，但不发送进度更新
-                trace = []
-                final_state = None
-                for chunk in self.graph.stream(init_agent_state, **args):
-                    # 记录节点计时
-                    for node_name in chunk.keys():
-                        if not node_name.startswith('__'):
-                            # 如果有上一个节点，记录其结束时间
-                            if current_node_name and current_node_start:
-                                elapsed = time.time() - current_node_start
-                                node_timings[current_node_name] = elapsed
-                                logger.info(f"⏱️ [{current_node_name}] 耗时: {elapsed:.2f}秒")
-
-                            # 开始新节点计时
-                            current_node_name = node_name
-                            current_node_start = time.time()
-                            break
-
-                    # 累积状态更新
-                    if final_state is None:
-                        final_state = init_agent_state.copy()
-                    for node_name, node_update in chunk.items():
-                        if not node_name.startswith('__'):
-                            final_state.update(node_update)
+                # 累积状态更新
+                if final_state is None:
+                    final_state = init_agent_state.copy()
+                for node_name, node_update in chunk.items():
+                    if not node_name.startswith('__'):
+                        final_state.update({node_name: node_update})
 
         # 记录最后一个节点的时间
         if current_node_name and current_node_start:
@@ -549,46 +502,52 @@ class TradingAgentsGraph:
             logger.info(f"⏱️ [{current_node_name}] 耗时: {elapsed:.2f}秒")
 
         # 计算总时间
-        total_elapsed = time.time() - total_start_time
-
-        # 调试日志
-        logger.info(f"🔍 [TIMING DEBUG] 节点计时数量: {len(node_timings)}")
-        logger.info(f"🔍 [TIMING DEBUG] 总耗时: {total_elapsed:.2f}秒")
-        logger.info(f"🔍 [TIMING DEBUG] 节点列表: {list(node_timings.keys())}")
-
-        # 打印详细的时间统计
-        logger.info("🔍 [TIMING DEBUG] 准备调用 _print_timing_summary")
-        self._print_timing_summary(node_timings, total_elapsed)
-        logger.info("🔍 [TIMING DEBUG] _print_timing_summary 调用完成")
-
-        # 构建性能数据
-        performance_data = self._build_performance_data(node_timings, total_elapsed)
-
-        # 将性能数据添加到状态中
-        final_state['performance_metrics'] = performance_data
-
-        # Store current state for reflection
-        self.curr_state = final_state
-
-        # Log state
-        self._log_state(trade_date, final_state)
-
-        # 获取模型信息
-        model_info = ""
-        try:
-            if hasattr(self.deep_thinking_llm, 'model_name'):
-                model_info = f"{self.deep_thinking_llm.__class__.__name__}:{self.deep_thinking_llm.model_name}"
-            else:
-                model_info = self.deep_thinking_llm.__class__.__name__
-        except Exception:
-            model_info = "Unknown"
-
-        # 处理决策并添加模型信息
-        decision = self.process_signal(final_state["final_trade_decision"], company_name)
-        decision['model_info'] = model_info
+        # total_elapsed = time.time() - total_start_time
+        #
+        # # 调试日志
+        # logger.info(f"🔍 [TIMING DEBUG] 节点计时数量: {len(node_timings)}")
+        # logger.info(f"🔍 [TIMING DEBUG] 总耗时: {total_elapsed:.2f}秒")
+        # logger.info(f"🔍 [TIMING DEBUG] 节点列表: {list(node_timings.keys())}")
+        #
+        # # 打印详细的时间统计
+        # logger.info("🔍 [TIMING DEBUG] 准备调用 _print_timing_summary")
+        # self._print_timing_summary(node_timings, total_elapsed)
+        # logger.info("🔍 [TIMING DEBUG] _print_timing_summary 调用完成")
+        #
+        # # 构建性能数据
+        # performance_data = self._build_performance_data(node_timings, total_elapsed)
+        #
+        # # 将性能数据添加到状态中
+        # final_state['performance_metrics'] = performance_data
+        #
+        # # Store current state for reflection
+        # self.curr_state = final_state
+        #
+        # # Log state
+        # # self._log_state(trade_date, final_state)
+        #
+        # # 获取模型信息
+        # model_info = ""
+        # try:
+        #     if hasattr(self.deep_thinking_llm, 'model_name'):
+        #         model_info = f"{self.deep_thinking_llm.__class__.__name__}:{self.deep_thinking_llm.model_name}"
+        #     else:
+        #         model_info = self.deep_thinking_llm.__class__.__name__
+        # except Exception:
+        #     model_info = "Unknown"
+        #
+        # # 处理决策并添加模型信息
+        # decision = self.process_signal(final_state["final_trade_decision"], company_name)
+        # decision['model_info'] = model_info
 
         # Return decision and processed signal
-        return final_state, decision
+        # return final_state, decision
+        if isinstance(final_state, dict):
+            if 'investment_debate_state' in final_state:
+                del final_state['investment_debate_state']
+            if 'risk_debate_state' in final_state:
+                del final_state['risk_debate_state']
+        return final_state, ""
 
     def _send_progress_update(self, chunk, progress_callback):
         """发送进度更新到回调函数

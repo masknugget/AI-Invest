@@ -7,6 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import AIMessage, ToolMessage
 
 from tradingagents.db.document import get_company_name, get_stock_daily_basic
+from tradingagents.utils.stock_utils import unified_code
 # 导入分析模块日志装饰器
 from tradingagents.utils.tool_logging import log_analyst_module
 
@@ -32,7 +33,7 @@ def create_fundamentals_analyst(llm, toolkit):
 
         current_date = state["trade_date"]
         ticker = state["company_of_interest"]
-
+        ticker = unified_code(ticker)
         # 🔧 基本面分析数据范围：固定获取10天数据（处理周末/节假日/数据延迟）
         # 参考文档：docs/ANALYST_DATA_CONFIGURATION.md
         # 基本面分析主要依赖财务数据（PE、PB、ROE等），只需要当前股价
