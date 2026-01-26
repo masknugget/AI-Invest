@@ -22,6 +22,7 @@ from tradingagents.agents.utils.google_tool_handler import GoogleToolCallHandler
 
 
 def create_fundamentals_analyst(llm, toolkit):
+    llm = llm.get_llm()
     @log_analyst_module("fundamentals")
     def fundamentals_analyst_node(state):
         logger.debug(f"📊 [DEBUG] ===== 基本面分析师节点开始 =====")
@@ -72,29 +73,7 @@ def create_fundamentals_analyst(llm, toolkit):
         # 对于A股，它会自动获取价格数据和基本面数据，无需LLM调用多个工具
         logger.info(f"📊 [基本面分析师] 使用统一基本面分析工具，自动识别股票类型")
 
-        # 检测阿里百炼模型并创建新实例
-        if hasattr(llm, '__class__') and 'DashScope' in llm.__class__.__name__:
-            logger.debug(f"📊 [DEBUG] 检测到阿里百炼模型，创建新实例以避免工具缓存")
-            from tradingagents.llm_adapters import ChatDashScopeOpenAI
-
-            # 获取原始 LLM 的 base_url 和 api_key
-            original_base_url = getattr(llm, 'openai_api_base', None)
-            original_api_key = getattr(llm, 'openai_api_key', None)
-
-            fresh_llm = ChatDashScopeOpenAI(
-                model=llm.model_name,
-                api_key=original_api_key,  # 🔥 传递原始 LLM 的 API Key
-                base_url=original_base_url if original_base_url else None,  # 传递 base_url
-                temperature=llm.temperature,
-                max_tokens=getattr(llm, 'max_tokens', 2000)
-            )
-
-            if original_base_url:
-                logger.debug(f"📊 [DEBUG] 新实例使用原始 base_url: {original_base_url}")
-            if original_api_key:
-                logger.debug(f"📊 [DEBUG] 新实例使用原始 API Key（来自数据库配置）")
-        else:
-            fresh_llm = llm
+        fresh_llm = llm
 
         # 添加详细日志
         logger.info(f"📊 [基本面分析师] LLM类型: {fresh_llm.__class__.__name__}")
@@ -140,6 +119,12 @@ def create_fundamentals_analyst(llm, toolkit):
             logger.debug(f"📊 [DEBUG] 统一工具调用异常: {e}")
 
         currency_info = f"{market_info['currency_name']}（{market_info['currency_symbol']}）"
+        language = state.get("language", "zh-CN")
+
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
 
         # 生成基于真实数据的分析报告
         analysis_prompt = f"""基于以下真实数据，对{company_name}（股票代码：{ticker}）进行详细的基本面分析：
@@ -157,7 +142,8 @@ def create_fundamentals_analyst(llm, toolkit):
         - 基于提供的真实数据进行分析
         - 正确使用公司名称"{company_name}"和股票代码"{ticker}"
         - 价格使用{currency_info}
-        - 投资建议使用中文
+        - 投资建议使用{language}
+        - 使用{language}撰写
         - 分析要详细且专业"""
 
         try:

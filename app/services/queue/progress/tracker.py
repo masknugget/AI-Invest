@@ -46,11 +46,12 @@ def safe_serialize(data):
 class RedisProgressTracker:
     """Redis进度跟踪器"""
 
-    def __init__(self, task_id: str, analysts: List[str], research_depth: str, llm_provider: str):
+    def __init__(self, task_id: str, analysts: List[str], research_depth: str, llm_provider: str, language: str = 'cn'):
         self.task_id = task_id
         self.analysts = analysts
         self.research_depth = research_depth
         self.llm_provider = llm_provider
+        self.language = language
 
         # Redis连接
         self.redis_client = None
@@ -74,7 +75,7 @@ class RedisProgressTracker:
         }
 
         # 生成分析步骤
-        self.analysis_steps = self._generate_dynamic_steps()
+        self.analysis_steps = self._generate_dynamic_steps(self.language)
         self.progress_data['total_steps'] = len(self.analysis_steps)
         self.progress_data['steps'] = [asdict(step) for step in self.analysis_steps]
 
@@ -130,46 +131,126 @@ class RedisProgressTracker:
             logger.warning(f"📊 [Redis进度] Redis连接失败，使用文件存储: {e}")
             return False
 
-    def _generate_dynamic_steps(self) -> List[AnalysisStep]:
-        """根据分析师数量和研究深度动态生成分析步骤"""
+    def _generate_dynamic_steps(self, language: str = 'cn') -> List[AnalysisStep]:
+        """根据分析师数量和研究深度动态生成分析步骤
+        
+        Args:
+            language: 语言类型，'cn' 表示中文，'english' 表示英文
+        """
+        # 中英文翻译映射
+        translations = {
+            'cn': {
+                'prep_phase': "📋 准备阶段",
+                'env_check': "🔧 环境检查",
+                'cost_est': "💰 成本估算",
+                'param_setup': "⚙️ 参数设置",
+                'engine_start': "🚀 启动引擎",
+                'bull_researcher': "🐂 看涨研究员",
+                'bear_researcher': "🐻 看跌研究员",
+                'debate_round': "🎯 研究辩论 第{}轮",
+                'research_manager': "👔 研究经理",
+                'trader_decision': "💼 交易员决策",
+                'aggressive_risk': "🔥 激进风险评估",
+                'conservative_risk': "🛡️ 保守风险评估",
+                'neutral_risk': "⚖️ 中性风险评估",
+                'risk_manager': "🎯 风险经理",
+                'signal_process': "📡 信号处理",
+                'generate_report': "📊 生成报告",
+                'prep_desc': "验证股票代码，检查数据源可用性",
+                'env_desc': "检查API密钥配置，确保数据获取正常",
+                'cost_desc': "根据分析深度预估API调用成本",
+                'param_desc': "配置分析参数和AI模型选择",
+                'engine_desc': "初始化AI分析引擎，准备开始分析",
+                'bull_desc': "基于分析师报告构建买入论据",
+                'bear_desc': "识别潜在风险和问题",
+                'debate_desc': "多头空头研究员深度辩论",
+                'manager_desc': "综合辩论结果，形成研究共识",
+                'trader_desc': "基于研究结果制定具体交易策略",
+                'aggressive_desc': "从激进角度评估投资风险",
+                'conservative_desc': "从保守角度评估投资风险",
+                'neutral_desc': "从中性角度评估投资风险",
+                'risk_manager_desc': "综合风险评估，制定风险控制策略",
+                'signal_desc': "处理所有分析结果，生成交易信号",
+                'report_desc': "整理分析结果，生成完整报告"
+            },
+            'english': {
+                'prep_phase': "📋 Preparation Phase",
+                'env_check': "🔧 Environment Check",
+                'cost_est': "💰 Cost Estimation",
+                'param_setup': "⚙️ Parameter Setup",
+                'engine_start': "🚀 Engine Startup",
+                'bull_researcher': "🐂 Bull Researcher",
+                'bear_researcher': "🐻 Bear Researcher",
+                'debate_round': "🎯 Research Debate Round {}",
+                'research_manager': "👔 Research Manager",
+                'trader_decision': "💼 Trader Decision",
+                'aggressive_risk': "🔥 Aggressive Risk Assessment",
+                'conservative_risk': "🛡️ Conservative Risk Assessment",
+                'neutral_risk': "⚖️ Neutral Risk Assessment",
+                'risk_manager': "🎯 Risk Manager",
+                'signal_process': "📡 Signal Processing",
+                'generate_report': "📊 Generate Report",
+                'prep_desc': "Verify stock code and check data source availability",
+                'env_desc': "Check API key configuration and ensure normal data access",
+                'cost_desc': "Estimate API call costs based on analysis depth",
+                'param_desc': "Configure analysis parameters and AI model selection",
+                'engine_desc': "Initialize AI analysis engine, ready to start analysis",
+                'bull_desc': "Build buy arguments based on analyst reports",
+                'bear_desc': "Identify potential risks and issues",
+                'debate_desc': "In-depth debate between bull and bear researchers",
+                'manager_desc': "Synthesize debate results and form research consensus",
+                'trader_desc': "Develop specific trading strategies based on research results",
+                'aggressive_desc': "Assess investment risks from aggressive perspective",
+                'conservative_desc': "Assess investment risks from conservative perspective",
+                'neutral_desc': "Assess investment risks from neutral perspective",
+                'risk_manager_desc': "Synthesize risk assessment and develop risk control strategies",
+                'signal_desc': "Process all analysis results and generate trading signals",
+                'report_desc': "Organize analysis results and generate comprehensive report"
+            }
+        }
+        
+        # 获取对应语言的翻译
+        trans = translations.get(language, translations['cn'])
+        
         steps: List[AnalysisStep] = []
         # 1) 基础准备阶段 (10%)
         steps.extend([
-            AnalysisStep("📋 准备阶段", "验证股票代码，检查数据源可用性", "pending", 0.03),
-            AnalysisStep("🔧 环境检查", "检查API密钥配置，确保数据获取正常", "pending", 0.02),
-            AnalysisStep("💰 成本估算", "根据分析深度预估API调用成本", "pending", 0.01),
-            AnalysisStep("⚙️ 参数设置", "配置分析参数和AI模型选择", "pending", 0.02),
-            AnalysisStep("🚀 启动引擎", "初始化AI分析引擎，准备开始分析", "pending", 0.02),
+            AnalysisStep(trans['prep_phase'], trans['prep_desc'], "pending", 0.03),
+            AnalysisStep(trans['env_check'], trans['env_desc'], "pending", 0.02),
+            AnalysisStep(trans['cost_est'], trans['cost_desc'], "pending", 0.01),
+            AnalysisStep(trans['param_setup'], trans['param_desc'], "pending", 0.02),
+            AnalysisStep(trans['engine_start'], trans['engine_desc'], "pending", 0.02),
         ])
         # 2) 分析师团队阶段 (35%) - 并行
         analyst_weight = 0.35 / max(len(self.analysts), 1)
         for analyst in self.analysts:
-            info = self._get_analyst_step_info(analyst)
+            info = self._get_analyst_step_info(analyst, language)
             steps.append(AnalysisStep(info["name"], info["description"], "pending", analyst_weight))
         # 3) 研究团队辩论阶段 (25%)
         rounds = self._get_debate_rounds()
         debate_weight = 0.25 / (3 + rounds)
         steps.extend([
-            AnalysisStep("🐂 看涨研究员", "基于分析师报告构建买入论据", "pending", debate_weight),
-            AnalysisStep("🐻 看跌研究员", "识别潜在风险和问题", "pending", debate_weight),
+            AnalysisStep(trans['bull_researcher'], trans['bull_desc'], "pending", debate_weight),
+            AnalysisStep(trans['bear_researcher'], trans['bear_desc'], "pending", debate_weight),
         ])
         for i in range(rounds):
-            steps.append(AnalysisStep(f"🎯 研究辩论 第{i+1}轮", "多头空头研究员深度辩论", "pending", debate_weight))
-        steps.append(AnalysisStep("👔 研究经理", "综合辩论结果，形成研究共识", "pending", debate_weight))
+            debate_name = trans['debate_round'].format(i+1)
+            steps.append(AnalysisStep(debate_name, trans['debate_desc'], "pending", debate_weight))
+        steps.append(AnalysisStep(trans['research_manager'], trans['manager_desc'], "pending", debate_weight))
         # 4) 交易团队阶段 (8%)
-        steps.append(AnalysisStep("💼 交易员决策", "基于研究结果制定具体交易策略", "pending", 0.08))
+        steps.append(AnalysisStep(trans['trader_decision'], trans['trader_desc'], "pending", 0.08))
         # 5) 风险管理团队阶段 (15%)
         risk_weight = 0.15 / 4
         steps.extend([
-            AnalysisStep("🔥 激进风险评估", "从激进角度评估投资风险", "pending", risk_weight),
-            AnalysisStep("🛡️ 保守风险评估", "从保守角度评估投资风险", "pending", risk_weight),
-            AnalysisStep("⚖️ 中性风险评估", "从中性角度评估投资风险", "pending", risk_weight),
-            AnalysisStep("🎯 风险经理", "综合风险评估，制定风险控制策略", "pending", risk_weight),
+            AnalysisStep(trans['aggressive_risk'], trans['aggressive_desc'], "pending", risk_weight),
+            AnalysisStep(trans['conservative_risk'], trans['conservative_desc'], "pending", risk_weight),
+            AnalysisStep(trans['neutral_risk'], trans['neutral_desc'], "pending", risk_weight),
+            AnalysisStep(trans['risk_manager'], trans['risk_manager_desc'], "pending", risk_weight),
         ])
         # 6) 最终决策阶段 (7%)
         steps.extend([
-            AnalysisStep("📡 信号处理", "处理所有分析结果，生成交易信号", "pending", 0.04),
-            AnalysisStep("📊 生成报告", "整理分析结果，生成完整报告", "pending", 0.03),
+            AnalysisStep(trans['signal_process'], trans['signal_desc'], "pending", 0.04),
+            AnalysisStep(trans['generate_report'], trans['report_desc'], "pending", 0.03),
         ])
         return steps
 
@@ -181,15 +262,33 @@ class RedisProgressTracker:
             return 2
         return 3
 
-    def _get_analyst_step_info(self, analyst: str) -> Dict[str, str]:
-        """获取分析师步骤信息（名称与描述）"""
-        mapping = {
-            'market': {"name": "📊 市场分析师", "description": "分析股价走势、成交量、技术指标等市场表现"},
-            'fundamentals': {"name": "💼 基本面分析师", "description": "分析公司财务状况、盈利能力、成长性等基本面"},
-            'news': {"name": "📰 新闻分析师", "description": "分析相关新闻、公告、行业动态对股价的影响"},
-            'social': {"name": "💬 社交媒体分析师", "description": "分析社交媒体讨论、网络热度、散户情绪等"},
-        }
-        return mapping.get(analyst, {"name": f"🔍 {analyst}分析师", "description": f"进行{analyst}相关的专业分析"})
+    def _get_analyst_step_info(self, analyst: str, language: str = 'cn') -> Dict[str, str]:
+        """获取分析师步骤信息（名称与描述）
+        
+        Args:
+            analyst: 分析师类型
+            language: 语言类型，'cn' 表示中文，'english' 表示英文
+        """
+        if language == 'english':
+            mapping = {
+                'market': {"name": "📊 Market Analyst", "description": "Analyze stock price trends, trading volume, technical indicators and other market performance"},
+                'fundamentals': {"name": "💼 Fundamentals Analyst", "description": "Analyze company financial status, profitability, growth potential and other fundamentals"},
+                'news': {"name": "📰 News Analyst", "description": "Analyze the impact of relevant news, announcements, and industry trends on stock prices"},
+                'social': {"name": "💬 Social Media Analyst", "description": "Analyze social media discussions, online popularity, retail investor sentiment, etc."},
+            }
+            default_name = f"🔍 {analyst.title()} Analyst"
+            default_desc = f"Conduct professional analysis related to {analyst}"
+        else:
+            mapping = {
+                'market': {"name": "📊 市场分析师", "description": "分析股价走势、成交量、技术指标等市场表现"},
+                'fundamentals': {"name": "💼 基本面分析师", "description": "分析公司财务状况、盈利能力、成长性等基本面"},
+                'news': {"name": "📰 新闻分析师", "description": "分析相关新闻、公告、行业动态对股价的影响"},
+                'social': {"name": "💬 社交媒体分析师", "description": "分析社交媒体讨论、网络热度、散户情绪等"},
+            }
+            default_name = f"🔍 {analyst}分析师"
+            default_desc = f"进行{analyst}相关的专业分析"
+        
+        return mapping.get(analyst, {"name": default_name, "description": default_desc})
 
     def _estimate_step_time(self, step: AnalysisStep) -> float:
         """估算步骤执行时间（秒）"""

@@ -204,6 +204,7 @@ class AnalysisService:
             # 获取TradingAgents实例
             trading_graph = self._get_trading_graph(config)
 
+            language = task.parameters.language or "zh-CN"
             # 执行分析
             from datetime import timezone
             start_time = datetime.now(timezone.utc)
@@ -214,7 +215,7 @@ class AnalysisService:
                 progress_tracker.update_progress(message)
 
             # 调用现有的分析方法（同步调用，传递进度回调）
-            _, decision = trading_graph.propagate(task.symbol, analysis_date, progress_callback)
+            _, decision = trading_graph.propagate(task.symbol, analysis_date, language, progress_callback)
 
             execution_time = (datetime.now(timezone.utc) - start_time).total_seconds()
 

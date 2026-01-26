@@ -19,7 +19,7 @@ from tradingagents.agents.utils.google_tool_handler import GoogleToolCallHandler
 
 
 def create_market_analyst(llm, toolkit):
-
+    llm = llm.get_llm()
     def market_analyst_node(state):
         logger.debug(f"📈 [DEBUG] ===== 市场分析师节点开始 =====")
 
@@ -50,6 +50,13 @@ def create_market_analyst(llm, toolkit):
         result_str, result_data = get_stock_daily_technical(symbol=ticker, start_date='2025-01-01', end_date='2025-10-01')
 
         data_price = result_data.get("close")[-1]
+
+        language = state.get("language", "zh-CN")
+
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
 
         # try:
         # 基于工具结果生成完整分析报告
@@ -163,12 +170,13 @@ def create_market_analyst(llm, toolkit):
         - 包含具体的技术指标数值和专业分析
         - 提供明确的投资建议和风险提示
         - 报告长度不少于800字
-        - 使用中文撰写
+        - 使用{language}撰写
         - 使用表格展示数据时，确保格式规范"""
 
 
         # 构建完整的消息序列
         messages = state["messages"] + [HumanMessage(content=result_str[:5000])] + [HumanMessage(content=analysis_prompt)]
+
 
         # 生成最终分析报告
         final_result = llm.invoke(messages)
