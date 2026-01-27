@@ -46,7 +46,7 @@ def safe_serialize(data):
 class RedisProgressTracker:
     """Redis进度跟踪器"""
 
-    def __init__(self, task_id: str, analysts: List[str], research_depth: str, llm_provider: str, language: str = 'cn'):
+    def __init__(self, task_id: str, analysts: List[str], research_depth: str, llm_provider: str, language: str = 'zh-CN'):
         self.task_id = task_id
         self.analysts = analysts
         self.research_depth = research_depth
@@ -131,7 +131,7 @@ class RedisProgressTracker:
             logger.warning(f"📊 [Redis进度] Redis连接失败，使用文件存储: {e}")
             return False
 
-    def _generate_dynamic_steps(self, language: str = 'cn') -> List[AnalysisStep]:
+    def _generate_dynamic_steps(self, language: str = 'zh-CN') -> List[AnalysisStep]:
         """根据分析师数量和研究深度动态生成分析步骤
         
         Args:
@@ -139,7 +139,7 @@ class RedisProgressTracker:
         """
         # 中英文翻译映射
         translations = {
-            'cn': {
+            'zh-CN': {
                 'prep_phase': "📋 准备阶段",
                 'env_check': "🔧 环境检查",
                 'cost_est': "💰 成本估算",
@@ -173,7 +173,7 @@ class RedisProgressTracker:
                 'signal_desc': "处理所有分析结果，生成交易信号",
                 'report_desc': "整理分析结果，生成完整报告"
             },
-            'english': {
+            'en-US': {
                 'prep_phase': "📋 Preparation Phase",
                 'env_check': "🔧 Environment Check",
                 'cost_est': "💰 Cost Estimation",
@@ -210,7 +210,7 @@ class RedisProgressTracker:
         }
         
         # 获取对应语言的翻译
-        trans = translations.get(language, translations['cn'])
+        trans = translations.get(language, translations['en-US'])
         
         steps: List[AnalysisStep] = []
         # 1) 基础准备阶段 (10%)

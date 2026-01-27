@@ -21,10 +21,11 @@ from tradingagents.agents.utils.google_tool_handler import GoogleToolCallHandler
 
 
 
-def create_fundamentals_analyst(llm, toolkit):
-    llm = llm.get_llm()
+def create_fundamentals_analyst(llm_model, toolkit):
+
     @log_analyst_module("fundamentals")
     def fundamentals_analyst_node(state):
+        llm = llm_model.get_llm()
         logger.debug(f"📊 [DEBUG] ===== 基本面分析师节点开始 =====")
 
         # 🔧 工具调用计数器 - 防止无限循环

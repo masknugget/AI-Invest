@@ -7,7 +7,7 @@ import os
 print("=" * 60)
 print("开始导入技术面数据到MongoDB...")
 
-file_path = r'G:\git_data\AI-Invest\data\技术面_合并.csv'
+file_path = r'G:\vibe\cleandata\data\技术面_合并.csv'
 
 # 检查文件是否存在
 if not os.path.exists(file_path):

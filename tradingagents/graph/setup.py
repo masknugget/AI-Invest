@@ -63,6 +63,8 @@ class GraphSetup:
         if len(selected_analysts) == 0:
             raise ValueError("Trading Agents Graph Setup Error: no analysts selected!")
 
+        # 去重，避免无法
+        selected_analysts = list(dict.fromkeys(selected_analysts))
         # Create analyst nodes
         analyst_nodes = {}
         delete_nodes = {}

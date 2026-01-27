@@ -826,6 +826,7 @@ class SimpleAnalysisService:
             traceback.print_exc()
 
         progress_tracker = None
+        language = request.parameters.language
         try:
             logger.info(f"🚀 开始后台执行分析任务: {task_id}")
 
@@ -863,7 +864,8 @@ class SimpleAnalysisService:
                     task_id=task_id,
                     analysts=request.parameters.selected_analysts or ["market", "fundamentals"],
                     research_depth=request.parameters.research_depth or "标准",
-                    llm_provider="dashscope"
+                    llm_provider="dashscope",
+                    language=language
                 )
                 logger.info(f"✅ [线程] 进度跟踪器创建完成: {task_id}")
                 return tracker
@@ -1029,7 +1031,7 @@ class SimpleAnalysisService:
         # 🔧 使用共享线程池，支持多个任务并发执行
         # 不再每次创建新的线程池，避免串行执行
         loop = asyncio.get_event_loop()
-        logger.info(f"🚀 [线程池] 提交分析任务到共享线程池: {task_id} - {request.stock_code}")
+        logger.info(f"🚀 [线程池] 提交分析任务到共享线程池: {task_id} - {request.symbol}")
         result = await loop.run_in_executor(
             self._thread_pool,  # 使用共享线程池
             self._run_analysis_sync,

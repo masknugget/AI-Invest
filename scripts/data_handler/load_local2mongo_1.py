@@ -2,7 +2,7 @@ import pandas as pd
 from pymongo import MongoClient, ASCENDING, UpdateOne
 from datetime import datetime
 
-file_path = r'G:\git_data\AI-Invest\data\基本面_合并.xlsx'  # 或者 csv
+file_path = r'G:\vibe\cleandata\data\基本面_合并.xlsx'  # 或者 csv
 df = pd.read_excel(file_path)  # csv 就用 read_csv
 
 

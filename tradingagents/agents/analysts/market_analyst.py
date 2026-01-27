@@ -18,11 +18,11 @@ from tradingagents.agents.utils.google_tool_handler import GoogleToolCallHandler
 
 
 
-def create_market_analyst(llm, toolkit):
-    llm = llm.get_llm()
+def create_market_analyst(llm_model, toolkit):
+
     def market_analyst_node(state):
         logger.debug(f"📈 [DEBUG] ===== 市场分析师节点开始 =====")
-
+        llm = llm_model.get_llm()
         # 🔧 工具调用计数器 - 防止无限循环
         tool_call_count = state.get("market_tool_call_count", 0)
         max_tool_calls = 3  # 最大工具调用次数
@@ -170,7 +170,7 @@ def create_market_analyst(llm, toolkit):
         - 包含具体的技术指标数值和专业分析
         - 提供明确的投资建议和风险提示
         - 报告长度不少于800字
-        - 使用{language}撰写
+        - 使用{language}撰写,全部使用{language}
         - 使用表格展示数据时，确保格式规范"""
 
 

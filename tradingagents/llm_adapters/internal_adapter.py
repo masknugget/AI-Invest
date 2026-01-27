@@ -138,9 +138,8 @@ class ChatDashScopeOpenAI(ChatOpenAI):
         return result
 
 
-
 def create_dashscope_openai_llm(
-    model: str = "qwen-plus-latest",
+    model: str = "qwen-plus",
     api_key: Optional[str] = None,
     temperature: float = 0.1,
     max_tokens: int = 2000,
@@ -150,7 +149,7 @@ def create_dashscope_openai_llm(
 
     return ChatDashScopeOpenAI(
         model=model,
-        api_key=api_key,
+        api_key="sk-12e56ecde21e49029ab895d80f357536",
         temperature=temperature,
         max_tokens=max_tokens,
         **kwargs
@@ -169,5 +168,5 @@ class InternalLLM:
         else:
             jwt = get_jwt()
             cache['jwt'] = jwt
-        llm = create_dashscope_openai_llm(jwt=jwt)
+        llm = create_dashscope_openai_llm()
         return llm

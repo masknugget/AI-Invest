@@ -10,7 +10,7 @@ import time
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
-from tradingagents.llm_adapters import ChatDashScopeOpenAI, ChatGoogleOpenAI
+
 
 from langgraph.prebuilt import ToolNode
 
@@ -23,7 +23,7 @@ from tradingagents.utils.logging_init import get_logger
 
 # 导入日志模块
 from tradingagents.utils.logging_manager import get_logger
-from ..llm_adapters.dashscope_openai_adapter import InternalLLM
+from ..llm_adapters.internal_adapter import InternalLLM
 
 logger = get_logger('agents')
 from tradingagents.agents.utils.agent_states import (
@@ -323,7 +323,7 @@ class TradingAgentsGraph:
         #     model_info = "Unknown"
         #
         # # 处理决策并添加模型信息
-        # decision = self.process_signal(final_state["final_trade_decision"], company_name)
+        decision = self.process_signal(final_state["final_trade_decision"], company_name)
         # decision['model_info'] = model_info
 
         # Return decision and processed signal

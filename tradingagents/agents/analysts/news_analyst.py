@@ -18,11 +18,10 @@ logger = get_logger("default")
 from tradingagents.utils.stock_utils import unified_code
 
 
-def create_news_analyst(llm, toolkit):
-    llm = llm.get_llm()
+def create_news_analyst(llm_model, toolkit):
     def news_analyst_node(state):
         logger.debug(f"📈 [DEBUG] ===== 新闻分析师节点开始 =====")
-
+        llm = llm_model.get_llm()
         # 🔧 工具调用计数器 - 防止无限循环
         tool_call_count = state.get("news_tool_call_count", 0)
         max_tool_calls = 3

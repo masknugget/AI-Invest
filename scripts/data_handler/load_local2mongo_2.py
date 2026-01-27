@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 
 # Excel文件路径
-file_path = r'G:\git_data\AI-Invest\data\事件数据.xlsx'  # 请根据实际文件路径修改
+file_path = r'G:\vibe\cleandata\data\事件数据.xlsx'  # 请根据实际文件路径修改
 
 print("=" * 60)
 print("开始导入事件数据到MongoDB...")
