@@ -6,7 +6,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_research_manager(llm, memory):
+def create_research_manager(llm_model, memory):
     def research_manager_node(state) -> dict:
         history = state["investment_debate_state"].get("history", "")
         market_research_report = state["market_report"]
@@ -15,6 +15,12 @@ def create_research_manager(llm, memory):
         fundamentals_report = state["fundamentals_report"]
 
         investment_debate_state = state["investment_debate_state"]
+        language = state.get("language", "en-US")
+
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
 
         curr_situation = f"{market_research_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
 
@@ -65,7 +71,7 @@ def create_research_manager(llm, memory):
 辩论历史：
 {history}
 
-请用中文撰写所有分析内容和建议。"""
+请用{language}撰写所有分析内容和建议。"""
 
         # 📊 统计 prompt 大小
         prompt_length = len(prompt)
@@ -79,6 +85,7 @@ def create_research_manager(llm, memory):
         # ⏱️ 记录开始时间
         start_time = time.time()
 
+        llm = llm_model.get_llm()
         response = llm.invoke(prompt)
 
         # ⏱️ 记录结束时间

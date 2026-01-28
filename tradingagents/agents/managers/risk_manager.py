@@ -6,7 +6,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_risk_manager(llm, memory):
+def create_risk_manager(llm_model, memory):
     def risk_manager_node(state) -> dict:
 
         company_name = state["company_of_interest"]
@@ -18,6 +18,13 @@ def create_risk_manager(llm, memory):
         fundamentals_report = state["news_report"]
         sentiment_report = state["sentiment_report"]
         trader_plan = state["investment_plan"]
+
+        language = state.get("language", "en-US")
+
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
 
         curr_situation = f"{market_research_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
 
@@ -43,7 +50,7 @@ def create_risk_manager(llm, memory):
 交付成果：
 - 明确且可操作的建议：买入、卖出或持有。
 - 基于辩论和过去反思的详细推理。
-
+- 使用{language}进行输出
 ---
 
 **分析师辩论历史：**
@@ -77,6 +84,7 @@ def create_risk_manager(llm, memory):
                 # ⏱️ 记录开始时间
                 start_time = time.time()
 
+                llm = llm_model.get_llm()
                 response = llm.invoke(prompt)
 
                 # ⏱️ 记录结束时间

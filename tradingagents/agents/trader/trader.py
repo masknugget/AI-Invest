@@ -7,7 +7,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_trader(llm, memory):
+def create_trader(llm_model, memory):
     def trader_node(state, name):
         company_name = state["company_of_interest"]
         investment_plan = state["investment_plan"]
@@ -15,7 +15,12 @@ def create_trader(llm, memory):
         sentiment_report = state["sentiment_report"]
         news_report = state["news_report"]
         fundamentals_report = state["fundamentals_report"]
+        language = state.get("language", "en-US")
 
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
         # 使用统一的股票类型检测
         from tradingagents.utils.stock_utils import StockUtils
         market_info = StockUtils.get_market_info(company_name)
@@ -100,6 +105,7 @@ def create_trader(llm, memory):
         logger.debug(f"💰 [DEBUG] 准备调用LLM，系统提示包含货币: {currency}")
         logger.debug(f"💰 [DEBUG] 系统提示中的关键部分: 目标价格({currency})")
 
+        llm = llm_model.get_llm()
         result = llm.invoke(messages)
 
         logger.debug(f"💰 [DEBUG] LLM调用完成")

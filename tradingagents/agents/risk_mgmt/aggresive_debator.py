@@ -6,7 +6,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_risky_debator(llm):
+def create_risky_debator(llm_model):
     def risky_node(state) -> dict:
         risk_debate_state = state["risk_debate_state"]
         history = risk_debate_state.get("history", "")
@@ -21,7 +21,12 @@ def create_risky_debator(llm):
         fundamentals_report = state["fundamentals_report"]
 
         trader_decision = state["trader_investment_plan"]
+        language = state.get("language", "en-US")
 
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
         # 📊 记录输入数据长度
         logger.info(f"📊 [Risky Analyst] 输入数据长度统计:")
         logger.info(f"  - market_report: {len(market_research_report):,} 字符")
@@ -41,7 +46,7 @@ def create_risky_debator(llm):
 {trader_decision}
 
 您的任务是通过质疑和批评保守和中性立场来为交易员的决策创建一个令人信服的案例，证明为什么您的高回报视角提供了最佳的前进道路。将以下来源的见解纳入您的论点：
-
+使用{language}进行撰写
 市场研究报告：{market_research_report}
 社交媒体情绪报告：{sentiment_report}
 最新世界事务报告：{news_report}
@@ -54,6 +59,8 @@ def create_risky_debator(llm):
         import time
         llm_start_time = time.time()
 
+
+        llm = llm_model.get_llm()
         response = llm.invoke(prompt)
 
         llm_elapsed = time.time() - llm_start_time

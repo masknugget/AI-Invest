@@ -7,7 +7,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_safe_debator(llm):
+def create_safe_debator(llm_model):
     def safe_node(state) -> dict:
         risk_debate_state = state["risk_debate_state"]
         history = risk_debate_state.get("history", "")
@@ -22,7 +22,12 @@ def create_safe_debator(llm):
         fundamentals_report = state["fundamentals_report"]
 
         trader_decision = state["trader_investment_plan"]
+        language = state.get("language", "en-US")
 
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
         # 📊 记录输入数据长度
         logger.info(f"📊 [Safe Analyst] 输入数据长度统计:")
         logger.info(f"  - market_report: {len(market_research_report):,} 字符")
@@ -42,7 +47,7 @@ def create_safe_debator(llm):
 {trader_decision}
 
 您的任务是积极反驳激进和中性分析师的论点，突出他们的观点可能忽视的潜在威胁或未能优先考虑可持续性的地方。直接回应他们的观点，利用以下数据来源为交易员决策的低风险方法调整建立令人信服的案例：
-
+使用{language}进行撰写
 市场研究报告：{market_research_report}
 社交媒体情绪报告：{sentiment_report}
 最新世界事务报告：{news_report}
@@ -54,6 +59,7 @@ def create_safe_debator(llm):
         logger.info(f"⏱️ [Safe Analyst] 开始调用LLM...")
         llm_start_time = time.time()
 
+        llm = llm_model.get_llm()
         response = llm.invoke(prompt)
 
         llm_elapsed = time.time() - llm_start_time

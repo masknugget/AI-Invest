@@ -29,8 +29,14 @@ def create_news_analyst(llm_model, toolkit):
 
         current_date = state["trade_date"]
         ticker = state["company_of_interest"]
+        language = state.get("language", "en-US")
 
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
         ticker = unified_code(ticker)
+
         logger.debug(f"📈 [DEBUG] 输入参数: ticker={ticker}, date={current_date}")
         logger.debug(f"📈 [DEBUG] 当前状态中的消息数量: {len(state.get('messages', []))}")
 
@@ -40,23 +46,25 @@ def create_news_analyst(llm_model, toolkit):
 
         # 计算日期范围（获取最近30天的新闻）
         end_date = datetime.strptime(current_date, "%Y-%m-%d")
-        start_date = end_date - timedelta(days=30)
+        start_date = end_date - timedelta(days=180)
         start_date_str = start_date.strftime("%Y-%m-%d")
         end_date_str = end_date.strftime("%Y-%m-%d")
 
         # 从数据库获取新闻数据
         logger.debug(f"📈 [DEBUG] 获取新闻数据: {ticker}, {start_date_str} to {end_date_str}")
-        news_data = get_stock_news(ticker, start_date_str, end_date_str)
+
+        symbol = 'code.' + ticker.split('.')[0]
+        news_data = get_stock_news(symbol, start_date_str, end_date_str)
         logger.debug(f"📈 [DEBUG] 获取到 {len(news_data)} 条新闻")
 
         # 将新闻数据格式化为字符串
         if news_data:
             news_str = f"找到 {len(news_data)} 条关于 {company_name}（{ticker}）的新闻:\n\n"
             for i, news in enumerate(news_data[:10], 1):
-                title = news.get('title', '无标题')
-                date = news.get('date', '')
+                title = news.get('event_type', '无标题')
+                date = news.get('trade_date', '')
                 source = news.get('source', '未知来源')
-                content = news.get('content', '')
+                content = news.get('event_detail', '')
                 news_str += f"{i}. {title}\n"
                 news_str += f"   日期: {date}, 来源: {source}\n"
                 if content:
@@ -115,11 +123,12 @@ def create_news_analyst(llm_model, toolkit):
 🎯 聚焦新闻内容本身的解读，不涉及技术指标分析
 
 输出格式要求：
-1. 必须包含详细的中文分析报告
+1. 必须包含详细的报告
 2. 报告末尾附上Markdown表格总结关键发现
 3. 报告长度不少于800字
 4. 提供明确的投资建议和风险提示
 5. 使用标准的Markdown标题格式（#、##、###）
+6. 全部使用{language}撰写报告
 """
 
         # 构建完整的消息序列

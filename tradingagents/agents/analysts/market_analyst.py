@@ -51,7 +51,7 @@ def create_market_analyst(llm_model, toolkit):
 
         data_price = result_data.get("close")[-1]
 
-        language = state.get("language", "zh-CN")
+        language = state.get("language", "en-US")
 
         if language == "zh-CN":
             language = "中文"

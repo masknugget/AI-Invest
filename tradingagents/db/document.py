@@ -264,7 +264,7 @@ def _query_mongodb_news(
         start_dt = datetime.strptime(start_date, "%Y-%m-%d")
         end_dt = datetime.strptime(end_date, "%Y-%m-%d")
 
-        coll: Collection = client["stock_db"]["stock_news"]
+        coll: Collection = client["stock_db"]["stock_events"]
 
         filter_dict = {
             "$or": [
@@ -272,7 +272,7 @@ def _query_mongodb_news(
                 {"stock": symbol},
                 {"ticker": symbol}
             ],
-            "date": {"$gte": start_dt, "$lte": end_dt},
+            "trade_date": {"$gte": start_dt, "$lte": end_dt},
         }
 
         cursor = coll.find(filter_dict).sort("date", DESCENDING)

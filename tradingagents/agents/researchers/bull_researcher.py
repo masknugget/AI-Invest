@@ -2,6 +2,7 @@ from langchain_core.messages import AIMessage
 import time
 import json
 
+from tradingagents.db.document import get_company_name
 # 导入统一日志系统
 from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
@@ -23,66 +24,16 @@ def create_bull_researcher(llm, memory):
 
         # 使用统一的股票类型检测
         ticker = state.get('company_of_interest', 'Unknown')
-        from tradingagents.utils.stock_utils import StockUtils
-        market_info = StockUtils.get_market_info(ticker)
-        is_china = market_info['is_china']
 
-        # 获取公司名称
-        def _get_company_name(ticker_code: str, market_info_dict: dict) -> str:
-            """根据股票代码获取公司名称"""
-            try:
-                if market_info_dict['is_china']:
-                    from tradingagents.dataflows.interface import get_china_stock_info_unified
-                    stock_info = get_china_stock_info_unified(ticker_code)
-                    if stock_info and "股票名称:" in stock_info:
-                        name = stock_info.split("股票名称:")[1].split("\n")[0].strip()
-                        logger.info(f"✅ [多头研究员] 成功获取中国股票名称: {ticker_code} -> {name}")
-                        return name
-                    else:
-                        # 降级方案
-                        try:
-                            from tradingagents.dataflows.data_source_manager import get_china_stock_info_unified as get_info_dict
-                            info_dict = get_info_dict(ticker_code)
-                            if info_dict and info_dict.get('name'):
-                                name = info_dict['name']
-                                logger.info(f"✅ [多头研究员] 降级方案成功获取股票名称: {ticker_code} -> {name}")
-                                return name
-                        except Exception as e:
-                            logger.error(f"❌ [多头研究员] 降级方案也失败: {e}")
-                elif market_info_dict['is_hk']:
-                    try:
-                        from tradingagents.dataflows.providers.hk.improved_hk import get_hk_company_name_improved
-                        name = get_hk_company_name_improved(ticker_code)
-                        return name
-                    except Exception:
-                        clean_ticker = ticker_code.replace('.HK', '').replace('.hk', '')
-                        return f"港股{clean_ticker}"
-                elif market_info_dict['is_us']:
-                    us_stock_names = {
-                        'AAPL': '苹果公司', 'TSLA': '特斯拉', 'NVDA': '英伟达',
-                        'MSFT': '微软', 'GOOGL': '谷歌', 'AMZN': '亚马逊',
-                        'META': 'Meta', 'NFLX': '奈飞'
-                    }
-                    return us_stock_names.get(ticker_code.upper(), f"美股{ticker_code}")
-            except Exception as e:
-                logger.error(f"❌ [多头研究员] 获取公司名称失败: {e}")
-            return f"股票代码{ticker_code}"
+        language = state.get("language", "en-US")
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
 
-        company_name = _get_company_name(ticker, market_info)
-        is_hk = market_info['is_hk']
-        is_us = market_info['is_us']
-
-        currency = market_info['currency_name']
-        currency_symbol = market_info['currency_symbol']
+        company_name = get_company_name(ticker)
 
         logger.debug(f"🐂 [DEBUG] 接收到的报告:")
-        logger.debug(f"🐂 [DEBUG] - 市场报告长度: {len(market_research_report)}")
-        logger.debug(f"🐂 [DEBUG] - 情绪报告长度: {len(sentiment_report)}")
-        logger.debug(f"🐂 [DEBUG] - 新闻报告长度: {len(news_report)}")
-        logger.debug(f"🐂 [DEBUG] - 基本面报告长度: {len(fundamentals_report)}")
-        logger.debug(f"🐂 [DEBUG] - 基本面报告前200字符: {fundamentals_report[:200]}...")
-        logger.debug(f"🐂 [DEBUG] - 股票代码: {ticker}, 公司名称: {company_name}, 类型: {market_info['market_name']}, 货币: {currency}")
-        logger.debug(f"🐂 [DEBUG] - 市场详情: 中国A股={is_china}, 港股={is_hk}, 美股={is_us}")
 
         curr_situation = f"{market_research_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
 
@@ -99,7 +50,7 @@ def create_bull_researcher(llm, memory):
 
         prompt = f"""你是一位看涨分析师，负责为股票 {company_name}（股票代码：{ticker}）的投资建立强有力的论证。
 
-⚠️ 重要提醒：当前分析的是 {'中国A股' if is_china else '海外股票'}，所有价格和估值请使用 {currency}（{currency_symbol}）作为单位。
+⚠️ 重要提醒：当前分析的是股票，所有价格和估值。
 ⚠️ 在你的分析中，请始终使用公司名称"{company_name}"而不是股票代码"{ticker}"来称呼这家公司。
 
 你的任务是构建基于证据的强有力案例，强调增长潜力、竞争优势和积极的市场指标。利用提供的研究和数据来解决担忧并有效反驳看跌论点。
@@ -122,7 +73,7 @@ def create_bull_researcher(llm, memory):
 
 请使用这些信息提供令人信服的看涨论点，反驳看跌担忧，并参与动态辩论，展示看涨立场的优势。你还必须处理反思并从过去的经验教训和错误中学习。
 
-请确保所有回答都使用中文。
+请确保所有回答都使用{language}。
 """
 
         response = llm.invoke(prompt)

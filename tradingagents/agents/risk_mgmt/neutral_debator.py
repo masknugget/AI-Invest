@@ -6,7 +6,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_neutral_debator(llm):
+def create_neutral_debator(llm_model):
     def neutral_node(state) -> dict:
         risk_debate_state = state["risk_debate_state"]
         history = risk_debate_state.get("history", "")
@@ -21,7 +21,12 @@ def create_neutral_debator(llm):
         fundamentals_report = state["fundamentals_report"]
 
         trader_decision = state["trader_investment_plan"]
+        language = state.get("language", "en-US")
 
+        if language == "zh-CN":
+            language = "中文"
+        else:
+            language = "英文"
         # 📊 记录所有输入数据的长度，用于性能分析
         logger.info(f"📊 [Neutral Analyst] 输入数据长度统计:")
         logger.info(f"  - market_report: {len(market_research_report):,} 字符 (~{len(market_research_report)//4:,} tokens)")
@@ -45,7 +50,7 @@ def create_neutral_debator(llm):
 {trader_decision}
 
 您的任务是挑战激进和安全分析师，指出每种观点可能过于乐观或过于谨慎的地方。使用以下数据来源的见解来支持调整交易员决策的温和、可持续策略：
-
+使用{language}进行撰写
 市场研究报告：{market_research_report}
 社交媒体情绪报告：{sentiment_report}
 最新世界事务报告：{news_report}
@@ -57,6 +62,8 @@ def create_neutral_debator(llm):
         logger.info(f"⏱️ [Neutral Analyst] 开始调用LLM...")
         llm_start_time = time.time()
 
+
+        llm = llm_model.get_llm()
         response = llm.invoke(prompt)
 
         llm_elapsed = time.time() - llm_start_time
