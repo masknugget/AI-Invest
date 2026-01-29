@@ -8,7 +8,7 @@ from tradingagents.utils.logging_init import get_logger
 logger = get_logger("default")
 
 
-def create_bull_researcher(llm, memory):
+def create_bull_researcher(llm_model, memory):
     def bull_node(state) -> dict:
         logger.debug(f"🐂 [DEBUG] ===== 看涨研究员节点开始 =====")
 
@@ -75,7 +75,7 @@ def create_bull_researcher(llm, memory):
 
 请确保所有回答都使用{language}。
 """
-
+        llm = llm_model.get_llm()
         response = llm.invoke(prompt)
 
         argument = f"Bull Analyst: {response.content}"

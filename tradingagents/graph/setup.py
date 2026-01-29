@@ -204,7 +204,7 @@ class GraphSetup:
                 workflow.add_edge(current_clear, next_analyst)
             else:
                 workflow.add_edge(current_clear, "Bull Researcher")
-                # workflow.add_edge(current_clear, END)
+                # workflow.add_edge(current_clear, 'Risky Analyst')
 
         # Add remaining edges
         workflow.add_conditional_edges(

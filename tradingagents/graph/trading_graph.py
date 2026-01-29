@@ -323,7 +323,7 @@ class TradingAgentsGraph:
         #     model_info = "Unknown"
         #
         # # 处理决策并添加模型信息
-        decision = self.process_signal(final_state["final_trade_decision"], company_name)
+        decision = self.process_signal(final_state["final_trade_decision"], company_name, language)
         # decision['model_info'] = model_info
 
         # Return decision and processed signal
@@ -333,7 +333,7 @@ class TradingAgentsGraph:
                 del final_state['investment_debate_state']
             if 'risk_debate_state' in final_state:
                 del final_state['risk_debate_state']
-        return final_state, ""
+        return final_state, decision
 
     def _send_progress_update(self, chunk, progress_callback):
         """发送进度更新到回调函数
@@ -671,6 +671,6 @@ class TradingAgentsGraph:
             self.curr_state, returns_losses, self.risk_manager_memory
         )
 
-    def process_signal(self, full_signal, stock_symbol=None):
+    def process_signal(self, full_signal, stock_symbol=None, language='en-US'):
         """Process a signal to extract the core decision."""
-        return self.signal_processor.process_signal(full_signal, stock_symbol)
+        return self.signal_processor.process_signal(full_signal, stock_symbol, language)
