@@ -203,53 +203,53 @@ class GraphSetup:
                 next_analyst = f"{selected_analysts[i+1].capitalize()} Analyst"
                 workflow.add_edge(current_clear, next_analyst)
             else:
-                workflow.add_edge(current_clear, "Bull Researcher")
+                workflow.add_edge(current_clear, "Research Manager")
                 # workflow.add_edge(current_clear, 'Risky Analyst')
 
         # Add remaining edges
-        workflow.add_conditional_edges(
-            "Bull Researcher",
-            self.conditional_logic.should_continue_debate,
-            {
-                "Bear Researcher": "Bear Researcher",
-                "Research Manager": "Research Manager",
-            },
-        )
-        workflow.add_conditional_edges(
-            "Bear Researcher",
-            self.conditional_logic.should_continue_debate,
-            {
-                "Bull Researcher": "Bull Researcher",
-                "Research Manager": "Research Manager",
-            },
-        )
-        workflow.add_edge("Research Manager", "Trader")
-        workflow.add_edge("Trader", "Risky Analyst")
-        workflow.add_conditional_edges(
-            "Risky Analyst",
-            self.conditional_logic.should_continue_risk_analysis,
-            {
-                "Safe Analyst": "Safe Analyst",
-                "Risk Judge": "Risk Judge",
-            },
-        )
-        workflow.add_conditional_edges(
-            "Safe Analyst",
-            self.conditional_logic.should_continue_risk_analysis,
-            {
-                "Neutral Analyst": "Neutral Analyst",
-                "Risk Judge": "Risk Judge",
-            },
-        )
-        workflow.add_conditional_edges(
-            "Neutral Analyst",
-            self.conditional_logic.should_continue_risk_analysis,
-            {
-                "Risky Analyst": "Risky Analyst",
-                "Risk Judge": "Risk Judge",
-            },
-        )
-
+        # workflow.add_conditional_edges(
+        #     "Bull Researcher",
+        #     self.conditional_logic.should_continue_debate,
+        #     {
+        #         "Bear Researcher": "Bear Researcher",
+        #         "Research Manager": "Research Manager",
+        #     },
+        # )
+        # workflow.add_conditional_edges(
+        #     "Bear Researcher",
+        #     self.conditional_logic.should_continue_debate,
+        #     {
+        #         "Bull Researcher": "Bull Researcher",
+        #         "Research Manager": "Research Manager",
+        #     },
+        # )
+        # workflow.add_edge("Research Manager", "Trader")
+        # workflow.add_edge("Trader", "Risky Analyst")
+        # workflow.add_conditional_edges(
+        #     "Risky Analyst",
+        #     self.conditional_logic.should_continue_risk_analysis,
+        #     {
+        #         "Safe Analyst": "Safe Analyst",
+        #         "Risk Judge": "Risk Judge",
+        #     },
+        # )
+        # workflow.add_conditional_edges(
+        #     "Safe Analyst",
+        #     self.conditional_logic.should_continue_risk_analysis,
+        #     {
+        #         "Neutral Analyst": "Neutral Analyst",
+        #         "Risk Judge": "Risk Judge",
+        #     },
+        # )
+        # workflow.add_conditional_edges(
+        #     "Neutral Analyst",
+        #     self.conditional_logic.should_continue_risk_analysis,
+        #     {
+        #         "Risky Analyst": "Risky Analyst",
+        #         "Risk Judge": "Risk Judge",
+        #     },
+        # )
+        workflow.add_edge("Research Manager", "Risk Judge")
         workflow.add_edge("Risk Judge", END)
 
         # Compile and return

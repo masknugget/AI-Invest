@@ -25,7 +25,7 @@ def create_fundamentals_analyst(llm_model, toolkit):
 
     @log_analyst_module("fundamentals")
     def fundamentals_analyst_node(state):
-        llm = llm_model.get_llm()
+
         logger.debug(f"📊 [DEBUG] ===== 基本面分析师节点开始 =====")
 
         # 🔧 工具调用计数器 - 防止无限循环
@@ -73,7 +73,7 @@ def create_fundamentals_analyst(llm_model, toolkit):
         # 该工具内部会自动识别股票类型（A股/港股/美股）并调用相应的数据源
         # 对于A股，它会自动获取价格数据和基本面数据，无需LLM调用多个工具
         logger.info(f"📊 [基本面分析师] 使用统一基本面分析工具，自动识别股票类型")
-
+        llm = llm_model.get_llm()
         fresh_llm = llm
 
         # 添加详细日志

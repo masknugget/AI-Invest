@@ -12,15 +12,15 @@ def create_bull_researcher(llm_model, memory):
     def bull_node(state) -> dict:
         logger.debug(f"🐂 [DEBUG] ===== 看涨研究员节点开始 =====")
 
-        investment_debate_state = state["investment_debate_state"]
+        investment_debate_state = state.get("investment_debate_state", {})
         history = investment_debate_state.get("history", "")
         bull_history = investment_debate_state.get("bull_history", "")
 
         current_response = investment_debate_state.get("current_response", "")
-        market_research_report = state["market_report"]
-        sentiment_report = state["sentiment_report"]
-        news_report = state["news_report"]
-        fundamentals_report = state["fundamentals_report"]
+        market_research_report = state.get("market_report", "")
+        sentiment_report = state.get("sentiment_report", "")
+        news_report = state.get("news_report", "")
+        fundamentals_report = state.get("fundamentals_report", "")
 
         # 使用统一的股票类型检测
         ticker = state.get('company_of_interest', 'Unknown')
@@ -80,7 +80,7 @@ def create_bull_researcher(llm_model, memory):
 
         argument = f"Bull Analyst: {response.content}"
 
-        new_count = investment_debate_state["count"] + 1
+        new_count = investment_debate_state.get("count", 0) + 1
         logger.info(f"🐂 [多头研究员] 发言完成，计数: {investment_debate_state['count']} -> {new_count}")
 
         new_investment_debate_state = {

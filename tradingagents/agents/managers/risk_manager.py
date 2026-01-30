@@ -9,15 +9,15 @@ logger = get_logger("default")
 def create_risk_manager(llm_model, memory):
     def risk_manager_node(state) -> dict:
 
-        company_name = state["company_of_interest"]
+        company_name = state.get("company_of_interest", "")
 
-        history = state["risk_debate_state"]["history"]
-        risk_debate_state = state["risk_debate_state"]
-        market_research_report = state["market_report"]
-        news_report = state["news_report"]
-        fundamentals_report = state["news_report"]
-        sentiment_report = state["sentiment_report"]
-        trader_plan = state["investment_plan"]
+        risk_debate_state = state.get("risk_debate_state", {})
+        history = risk_debate_state.get("history", "")
+        market_research_report = state.get("market_report", "")
+        news_report = state.get("news_report", "")
+        fundamentals_report = state.get("fundamentals_report", "")
+        sentiment_report = state.get("sentiment_report", "")
+        trader_plan = state.get("investment_plan", "")
 
         language = state.get("language", "en-US")
 
@@ -150,15 +150,15 @@ def create_risk_manager(llm_model, memory):
 
         new_risk_debate_state = {
             "judge_decision": response_content,
-            "history": risk_debate_state["history"],
-            "risky_history": risk_debate_state["risky_history"],
-            "safe_history": risk_debate_state["safe_history"],
-            "neutral_history": risk_debate_state["neutral_history"],
+            "history": risk_debate_state.get("history", ""),
+            "risky_history": risk_debate_state.get("risky_history", ""),
+            "safe_history": risk_debate_state.get("safe_history", ""),
+            "neutral_history": risk_debate_state.get("neutral_history", ""),
             "latest_speaker": "Judge",
-            "current_risky_response": risk_debate_state["current_risky_response"],
-            "current_safe_response": risk_debate_state["current_safe_response"],
-            "current_neutral_response": risk_debate_state["current_neutral_response"],
-            "count": risk_debate_state["count"],
+            "current_risky_response": risk_debate_state.get("current_risky_response", ""),
+            "current_safe_response": risk_debate_state.get("current_safe_response", ""),
+            "current_neutral_response": risk_debate_state.get("current_neutral_response", ""),
+            "count": risk_debate_state.get("count", 0),
         }
 
         logger.info(f"📋 [Risk Manager] 最终决策生成完成，内容长度: {len(response_content)} 字符")

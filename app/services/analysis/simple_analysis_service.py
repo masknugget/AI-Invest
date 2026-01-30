@@ -1257,6 +1257,41 @@ class SimpleAnalysisService:
             import threading
             import time
 
+            _map_language = {
+                "zh-CN": {
+                    "market": "市场分析师正在分析",
+                    "fundamentals": "基本面分析师正在分析",
+                    "news": "新闻分析师正在分析",
+                    "social": "社交媒体分析师正在分析",
+                    "bull": "看涨研究员构建论据",
+                    "bear": "看跌研究员识别风险",
+                    "debate": "研究辩论 轮次",
+                    "consensus": "研究经理形成共识",
+                    "trader": "交易员制定策略",
+                    "risk_aggressive": "激进风险评估",
+                    "risk_conservative": "保守风险评估",
+                    "risk_neutral": "中性风险评估",
+                    "risk_manager": "风险经理制定策略",
+                    "signal": "信号处理",
+                },
+                "en-US": {
+                    "market": "Market analyst is analyzing",
+                    "fundamentals": "Fundamentals analyst is analyzing",
+                    "news": "News analyst is analyzing",
+                    "social": "Social media analyst is analyzing",
+                    "bull": "Bull researcher is constructing arguments",
+                    "bear": "Bear researcher is identifying risks",
+                    "debate": "Research debate round",
+                    "consensus": "Research manager is forming consensus",
+                    "trader": "Trader is formulating strategy",
+                    "risk_aggressive": "Aggressive risk assessment",
+                    "risk_conservative": "Conservative risk assessment",
+                    "risk_neutral": "Neutral risk assessment",
+                    "risk_manager": "Risk manager is formulating strategy",
+                    "signal": "Signal processing",
+                },
+            }
+
             def simulate_progress():
                 """模拟TradingAgents内部进度"""
                 try:
@@ -1270,20 +1305,20 @@ class SimpleAnalysisService:
                     for i, analyst in enumerate(analysts):
                         time.sleep(15)  # 每个分析师大约15秒
                         if analyst == "market":
-                            progress_tracker.update_progress("📊 市场分析师正在分析")
+                            progress_tracker.update_progress(_map_language["market"])
                         elif analyst == "fundamentals":
-                            progress_tracker.update_progress("💼 基本面分析师正在分析")
+                            progress_tracker.update_progress(_map_language["fundamentals"])
                         elif analyst == "news":
-                            progress_tracker.update_progress("📰 新闻分析师正在分析")
+                            progress_tracker.update_progress(_map_language["news"])
                         elif analyst == "social":
-                            progress_tracker.update_progress("💬 社交媒体分析师正在分析")
+                            progress_tracker.update_progress(_map_language["social"])
 
                     # 研究团队阶段
                     time.sleep(10)
-                    progress_tracker.update_progress("🐂 看涨研究员构建论据")
+                    progress_tracker.update_progress(_map_language["bull"])
 
                     time.sleep(8)
-                    progress_tracker.update_progress("🐻 看跌研究员识别风险")
+                    progress_tracker.update_progress(_map_language["bear"])
 
                     # 辩论阶段 - 根据5个级别确定辩论轮次
                     research_depth = request.parameters.research_depth if request.parameters else "标准"
@@ -1302,31 +1337,31 @@ class SimpleAnalysisService:
 
                     for round_num in range(debate_rounds):
                         time.sleep(12)
-                        progress_tracker.update_progress(f"🎯 研究辩论 第{round_num+1}轮")
+                        progress_tracker.update_progress(f"{_map_language["debate"]} {round_num+1}")
 
                     time.sleep(8)
-                    progress_tracker.update_progress("👔 研究经理形成共识")
+                    progress_tracker.update_progress(_map_language["consensus"])
 
                     # 交易员阶段
                     time.sleep(10)
-                    progress_tracker.update_progress("💼 交易员制定策略")
+                    progress_tracker.update_progress(_map_language["trader"])
 
                     # 风险管理阶段
                     time.sleep(8)
-                    progress_tracker.update_progress("🔥 激进风险评估")
+                    progress_tracker.update_progress(_map_language["risk_aggressive"])
 
                     time.sleep(6)
-                    progress_tracker.update_progress("🛡️ 保守风险评估")
+                    progress_tracker.update_progress(_map_language["risk_conservative"])
 
                     time.sleep(6)
-                    progress_tracker.update_progress("⚖️ 中性风险评估")
+                    progress_tracker.update_progress(_map_language["risk_neutral"])
 
                     time.sleep(8)
-                    progress_tracker.update_progress("🎯 风险经理制定策略")
+                    progress_tracker.update_progress(_map_language["risk_manager"])
 
                     # 最终阶段
                     time.sleep(5)
-                    progress_tracker.update_progress("📡 信号处理")
+                    progress_tracker.update_progress(_map_language["signal"])
 
                 except Exception as e:
                     logger.warning(f"⚠️ 进度模拟失败: {e}")

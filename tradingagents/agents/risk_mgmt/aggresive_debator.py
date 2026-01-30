@@ -8,19 +8,19 @@ logger = get_logger("default")
 
 def create_risky_debator(llm_model):
     def risky_node(state) -> dict:
-        risk_debate_state = state["risk_debate_state"]
+        risk_debate_state = state.get("risk_debate_state", {})
         history = risk_debate_state.get("history", "")
         risky_history = risk_debate_state.get("risky_history", "")
 
         current_safe_response = risk_debate_state.get("current_safe_response", "")
         current_neutral_response = risk_debate_state.get("current_neutral_response", "")
 
-        market_research_report = state["market_report"]
-        sentiment_report = state["sentiment_report"]
-        news_report = state["news_report"]
-        fundamentals_report = state["fundamentals_report"]
+        market_research_report = state.get("market_report", "")
+        sentiment_report = state.get("sentiment_report", "")
+        news_report = state.get("news_report", "")
+        fundamentals_report = state.get("fundamentals_report", "")
 
-        trader_decision = state["trader_investment_plan"]
+        trader_decision = state.get("trader_investment_plan", "")
         language = state.get("language", "en-US")
 
         if language == "zh-CN":
@@ -68,7 +68,7 @@ def create_risky_debator(llm_model):
 
         argument = f"Risky Analyst: {response.content}"
 
-        new_count = risk_debate_state["count"] + 1
+        new_count = risk_debate_state.get("count", 0) + 1
         logger.info(f"🔥 [激进风险分析师] 发言完成，计数: {risk_debate_state['count']} -> {new_count}")
 
         new_risk_debate_state = {

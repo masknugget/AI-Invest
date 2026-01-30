@@ -8,13 +8,13 @@ logger = get_logger("default")
 
 def create_research_manager(llm_model, memory):
     def research_manager_node(state) -> dict:
-        history = state["investment_debate_state"].get("history", "")
-        market_research_report = state["market_report"]
-        sentiment_report = state["sentiment_report"]
-        news_report = state["news_report"]
-        fundamentals_report = state["fundamentals_report"]
+        history = state.get("investment_debate_state", {}).get("history", "")
+        market_research_report = state.get("market_report", "")
+        sentiment_report = state.get("sentiment_report", "")
+        news_report = state.get("news_report", "")
+        fundamentals_report = state.get("fundamentals_report", "")
 
-        investment_debate_state = state["investment_debate_state"]
+        investment_debate_state = state.get("investment_debate_state", {})
         language = state.get("language", "en-US")
 
         if language == "zh-CN":
@@ -104,7 +104,7 @@ def create_research_manager(llm_model, memory):
             "bear_history": investment_debate_state.get("bear_history", ""),
             "bull_history": investment_debate_state.get("bull_history", ""),
             "current_response": response.content,
-            "count": investment_debate_state["count"],
+            "count": investment_debate_state.get("count", 0),
         }
 
         return {

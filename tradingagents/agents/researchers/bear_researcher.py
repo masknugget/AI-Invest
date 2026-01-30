@@ -10,15 +10,15 @@ logger = get_logger("default")
 
 def create_bear_researcher(llm_model, memory):
     def bear_node(state) -> dict:
-        investment_debate_state = state["investment_debate_state"]
+        investment_debate_state = state.get("investment_debate_state", {})
         history = investment_debate_state.get("history", "")
         bear_history = investment_debate_state.get("bear_history", "")
 
         current_response = investment_debate_state.get("current_response", "")
-        market_research_report = state["market_report"]
-        sentiment_report = state["sentiment_report"]
-        news_report = state["news_report"]
-        fundamentals_report = state["fundamentals_report"]
+        market_research_report = state.get("market_report", "")
+        sentiment_report = state.get("sentiment_report", "")
+        news_report = state.get("news_report", "")
+        fundamentals_report = state.get("fundamentals_report", "")
 
         # 使用统一的股票类型检测
         ticker = state.get('company_of_interest', 'Unknown')
@@ -79,7 +79,7 @@ def create_bear_researcher(llm_model, memory):
 
         argument = f"Bear Analyst: {response.content}"
 
-        new_count = investment_debate_state["count"] + 1
+        new_count = investment_debate_state.get("count", 0) + 1
         logger.info(f"🐻 [空头研究员] 发言完成，计数: {investment_debate_state['count']} -> {new_count}")
 
         new_investment_debate_state = {
