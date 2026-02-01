@@ -29,6 +29,8 @@ from app.routers import model_capabilities
 from app.routers import notifications as notifications_router
 from app.routers import websocket_notifications as websocket_notifications_router
 from app.routers import analysis
+from app.routers import chat_bot
+
 
 
 def get_version() -> str:
@@ -297,6 +299,7 @@ app.include_router(notifications_router.router, prefix="/api", tags=["notificati
 app.include_router(websocket_notifications_router.router, prefix="/api", tags=["websocket"])
 
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
+app.include_router(chat_bot.router, prefix="/api/chatbot", tags=["chatbot"])
 
 
 @app.get("/")
