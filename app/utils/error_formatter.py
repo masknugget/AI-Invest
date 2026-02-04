@@ -60,7 +60,7 @@ class ErrorFormatter:
         
         Args:
             error_message: 原始错误信息
-            context: 上下文信息（可选），包含 llm_provider, model, data_source 等
+            context: 上下文信息（可选），包含 llm_provider, model, data_source, language 等
             
         Returns:
             {
@@ -73,11 +73,14 @@ class ErrorFormatter:
         """
         context = context or {}
         
+        # 获取语言设置，默认中文
+        language = context.get('language', 'zh-CN')
+        
         # 分类错误
         category, provider_or_source = cls._categorize_error(error_message, context)
         
         # 生成友好提示
-        return cls._generate_friendly_message(category, provider_or_source, error_message, context)
+        return cls._generate_friendly_message(category, provider_or_source, error_message, context, language)
     
     @classmethod
     def _categorize_error(cls, error_message: str, context: Dict) -> Tuple[ErrorCategory, Optional[str]]:
@@ -198,9 +201,16 @@ class ErrorFormatter:
         category: ErrorCategory, 
         provider_or_source: Optional[str],
         original_error: str,
-        context: Dict
+        context: Dict,
+        language = 'en-US'
     ) -> Dict[str, str]:
-        """生成用户友好的错误信息"""
+        """
+        生成用户友好的错误信息
+        当en-US的时候错误信息为英文
+        当zh-CN的时候为中文
+        """
+        
+        is_english = language == 'en-US'
         
         # 获取友好的厂商/数据源名称
         friendly_name = None
@@ -211,198 +221,394 @@ class ErrorFormatter:
         
         # 根据类别生成消息
         if category == ErrorCategory.LLM_API_KEY:
-            return {
-                "category": "大模型配置错误",
-                "title": f"❌ {friendly_name or '大模型'} API Key 无效",
-                "message": f"{friendly_name or '大模型'} 的 API Key 无效或未配置。",
-                "suggestion": (
-                    "请检查以下几点：\n"
-                    f"1. 在「系统设置 → 大模型配置」中检查 {friendly_name or '该模型'} 的 API Key 是否正确\n"
-                    "2. 确认 API Key 是否已激活且有效\n"
-                    "3. 尝试重新生成 API Key 并更新配置\n"
-                    "4. 或者切换到其他可用的大模型"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "LLM Configuration Error",
+                    "title": f"❌ {friendly_name or 'LLM'} API Key Invalid",
+                    "message": f"The API Key for {friendly_name or 'the LLM'} is invalid or not configured.",
+                    "suggestion": (
+                        "Please check the following:\n"
+                        f"1. Verify the API Key in 'System Settings → LLM Configuration' for {friendly_name or 'this model'}\n"
+                        "2. Ensure the API Key is activated and valid\n"
+                        "3. Try regenerating the API Key and updating the configuration\n"
+                        "4. Or switch to another available LLM"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "大模型配置错误",
+                    "title": f"❌ {friendly_name or '大模型'} API Key 无效",
+                    "message": f"{friendly_name or '大模型'} 的 API Key 无效或未配置。",
+                    "suggestion": (
+                        "请检查以下几点：\n"
+                        f"1. 在「系统设置 → 大模型配置」中检查 {friendly_name or '该模型'} 的 API Key 是否正确\n"
+                        "2. 确认 API Key 是否已激活且有效\n"
+                        "3. 尝试重新生成 API Key 并更新配置\n"
+                        "4. 或者切换到其他可用的大模型"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.LLM_QUOTA:
-            return {
-                "category": "大模型配额不足",
-                "title": f"⚠️ {friendly_name or '大模型'} 配额不足或限流",
-                "message": f"{friendly_name or '大模型'} 的调用配额已用完或触发了限流。",
-                "suggestion": (
-                    "请尝试以下解决方案：\n"
-                    f"1. 检查 {friendly_name or '该模型'} 账户余额和配额\n"
-                    "2. 等待一段时间后重试（可能是限流）\n"
-                    "3. 升级账户套餐以获取更多配额\n"
-                    "4. 切换到其他可用的大模型"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "LLM Quota Exceeded",
+                    "title": f"⚠️ {friendly_name or 'LLM'} Quota Exceeded or Rate Limited",
+                    "message": f"API quota has been exhausted or rate limit triggered for {friendly_name or 'the LLM'}.",
+                    "suggestion": (
+                        "Please try the following solutions:\n"
+                        f"1. Check {friendly_name or 'this model'} account balance and quota\n"
+                        "2. Wait for a while before retrying (may be rate limiting)\n"
+                        "3. Upgrade your account plan for more quota\n"
+                        "4. Switch to another available LLM"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "大模型配额不足",
+                    "title": f"⚠️ {friendly_name or '大模型'} 配额不足或限流",
+                    "message": f"{friendly_name or '大模型'} 的调用配额已用完或触发了限流。",
+                    "suggestion": (
+                        "请尝试以下解决方案：\n"
+                        f"1. 检查 {friendly_name or '该模型'} 账户余额和配额\n"
+                        "2. 等待一段时间后重试（可能是限流）\n"
+                        "3. 升级账户套餐以获取更多配额\n"
+                        "4. 切换到其他可用的大模型"
+                    ),
+                    "technical_detail": original_error
+                }
 
         elif category == ErrorCategory.LLM_CONTENT_FILTER:
-            return {
-                "category": "内容审核失败",
-                "title": f"🚫 {friendly_name or '大模型'} 内容审核未通过",
-                "message": f"{friendly_name or '大模型'} 检测到输入内容可能包含不适当的内容，拒绝处理请求。",
-                "suggestion": (
-                    "这通常是由于分析内容中包含了敏感词汇或不当表述。建议：\n"
-                    "1. 这可能是股票新闻或财报中包含了敏感词汇（如政治、暴力等）\n"
-                    "2. 尝试切换到其他大模型（如 DeepSeek、Google Gemini）\n"
-                    "3. 如果是阿里百炼，可以尝试使用 qwen-max 或 qwen-plus 模型\n"
-                    "4. 联系技术支持报告此问题，我们会优化内容过滤逻辑\n"
-                    "\n"
-                    "💡 提示：不同大模型的内容审核策略不同，切换模型通常可以解决此问题。"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Content Filter Failed",
+                    "title": f"🚫 {friendly_name or 'LLM'} Content Filter Rejected",
+                    "message": f"{friendly_name or 'The LLM'} detected potentially inappropriate content in the input and rejected the request.",
+                    "suggestion": (
+                        "This usually occurs when the analysis content contains sensitive words or inappropriate expressions. Suggestions:\n"
+                        "1. Stock news or financial reports may contain sensitive words (e.g., political, violent, etc.)\n"
+                        "2. Try switching to another LLM (e.g., DeepSeek, Google Gemini)\n"
+                        "3. For Ali Bailian, try using qwen-max or qwen-plus models\n"
+                        "4. Contact technical support to report this issue - we will optimize content filtering logic\n"
+                        "\n"
+                        "💡 Tip: Different LLMs have different content review policies, switching models usually resolves this issue."
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "内容审核失败",
+                    "title": f"🚫 {friendly_name or '大模型'} 内容审核未通过",
+                    "message": f"{friendly_name or '大模型'} 检测到输入内容可能包含不适当的内容，拒绝处理请求。",
+                    "suggestion": (
+                        "这通常是由于分析内容中包含了敏感词汇或不当表述。建议：\n"
+                        "1. 这可能是股票新闻或财报中包含了敏感词汇（如政治、暴力等）\n"
+                        "2. 尝试切换到其他大模型（如 DeepSeek、Google Gemini）\n"
+                        "3. 如果是阿里百炼，可以尝试使用 qwen-max 或 qwen-plus 模型\n"
+                        "4. 联系技术支持报告此问题，我们会优化内容过滤逻辑\n"
+                        "\n"
+                        "💡 提示：不同大模型的内容审核策略不同，切换模型通常可以解决此问题。"
+                    ),
+                    "technical_detail": original_error
+                }
 
         elif category == ErrorCategory.LLM_NETWORK:
-            return {
-                "category": "大模型网络错误",
-                "title": f"🌐 无法连接到 {friendly_name or '大模型'}",
-                "message": f"连接 {friendly_name or '大模型'} 服务时网络超时或连接失败。",
-                "suggestion": (
-                    "请检查以下几点：\n"
-                    "1. 检查网络连接是否正常\n"
-                    f"2. {friendly_name or '该服务'} 可能需要科学上网（如 Google Gemini）\n"
-                    "3. 检查防火墙或代理设置\n"
-                    "4. 稍后重试或切换到其他大模型"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "LLM Network Error",
+                    "title": f"🌐 Cannot Connect to {friendly_name or 'LLM'}",
+                    "message": f"Network timeout or connection failure when connecting to {friendly_name or 'the LLM'} service.",
+                    "suggestion": (
+                        "Please check the following:\n"
+                        "1. Check if network connection is normal\n"
+                        f"2. {friendly_name or 'The service'} may require VPN (e.g., Google Gemini)\n"
+                        "3. Check firewall or proxy settings\n"
+                        "4. Retry later or switch to another LLM"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "大模型网络错误",
+                    "title": f"🌐 无法连接到 {friendly_name or '大模型'}",
+                    "message": f"连接 {friendly_name or '大模型'} 服务时网络超时或连接失败。",
+                    "suggestion": (
+                        "请检查以下几点：\n"
+                        "1. 检查网络连接是否正常\n"
+                        f"2. {friendly_name or '该服务'} 可能需要科学上网（如 Google Gemini）\n"
+                        "3. 检查防火墙或代理设置\n"
+                        "4. 稍后重试或切换到其他大模型"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.LLM_OTHER:
-            return {
-                "category": "大模型调用错误",
-                "title": f"❌ {friendly_name or '大模型'} 调用失败",
-                "message": f"调用 {friendly_name or '大模型'} 时发生错误。",
-                "suggestion": (
-                    "建议：\n"
-                    "1. 检查模型配置是否正确\n"
-                    "2. 查看技术细节了解具体错误\n"
-                    "3. 尝试切换到其他大模型\n"
-                    "4. 如问题持续，请联系技术支持"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "LLM Invocation Error",
+                    "title": f"❌ {friendly_name or 'LLM'} Call Failed",
+                    "message": f"An error occurred while calling {friendly_name or 'the LLM'}.",
+                    "suggestion": (
+                        "Suggestions:\n"
+                        "1. Check if the model configuration is correct\n"
+                        "2. View technical details for specific error\n"
+                        "3. Try switching to another LLM\n"
+                        "4. If the issue persists, please contact technical support"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "大模型调用错误",
+                    "title": f"❌ {friendly_name or '大模型'} 调用失败",
+                    "message": f"调用 {friendly_name or '大模型'} 时发生错误。",
+                    "suggestion": (
+                        "建议：\n"
+                        "1. 检查模型配置是否正确\n"
+                        "2. 查看技术细节了解具体错误\n"
+                        "3. 尝试切换到其他大模型\n"
+                        "4. 如问题持续，请联系技术支持"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.DATA_SOURCE_API_KEY:
-            return {
-                "category": "数据源配置错误",
-                "title": f"❌ {friendly_name or '数据源'} Token/API Key 无效",
-                "message": f"{friendly_name or '数据源'} 的 Token 或 API Key 无效或未配置。",
-                "suggestion": (
-                    "请检查以下几点：\n"
-                    f"1. 在「系统设置 → 数据源配置」中检查 {friendly_name or '该数据源'} 的配置\n"
-                    "2. 确认 Token/API Key 是否正确且有效\n"
-                    "3. 检查账户是否已激活\n"
-                    "4. 系统会自动尝试使用备用数据源"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Data Source Configuration Error",
+                    "title": f"❌ {friendly_name or 'Data Source'} Token/API Key Invalid",
+                    "message": f"Token or API Key for {friendly_name or 'the data source'} is invalid or not configured.",
+                    "suggestion": (
+                        "Please check the following:\n"
+                        f"1. Check {friendly_name or 'this data source'} configuration in 'System Settings → Data Source Configuration'\n"
+                        "2. Confirm Token/API Key is correct and valid\n"
+                        "3. Verify account is activated\n"
+                        "4. System will automatically try using backup data source"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "数据源配置错误",
+                    "title": f"❌ {friendly_name or '数据源'} Token/API Key 无效",
+                    "message": f"{friendly_name or '数据源'} 的 Token 或 API Key 无效或未配置。",
+                    "suggestion": (
+                        "请检查以下几点：\n"
+                        f"1. 在「系统设置 → 数据源配置」中检查 {friendly_name or '该数据源'} 的配置\n"
+                        "2. 确认 Token/API Key 是否正确且有效\n"
+                        "3. 检查账户是否已激活\n"
+                        "4. 系统会自动尝试使用备用数据源"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.DATA_SOURCE_NOT_FOUND:
-            return {
-                "category": "数据获取失败",
-                "title": f"📊 {friendly_name or '数据源'} 未找到数据",
-                "message": f"从 {friendly_name or '数据源'} 获取股票数据失败，可能是股票代码不存在或数据暂未更新。",
-                "suggestion": (
-                    "建议：\n"
-                    "1. 检查股票代码是否正确\n"
-                    "2. 确认该股票是否已上市\n"
-                    "3. 系统会自动尝试使用其他数据源\n"
-                    "4. 如果是新股，可能需要等待数据更新"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Data Retrieval Failed",
+                    "title": f"📊 {friendly_name or 'Data Source'} No Data Found",
+                    "message": f"Failed to retrieve stock data from {friendly_name or 'the data source'}. Stock code may not exist or data not yet updated.",
+                    "suggestion": (
+                        "Suggestions:\n"
+                        "1. Verify stock code is correct\n"
+                        "2. Confirm if the stock is listed\n"
+                        "3. System will automatically try using other data sources\n"
+                        "4. For new stocks, may need to wait for data update"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "数据获取失败",
+                    "title": f"📊 {friendly_name or '数据源'} 未找到数据",
+                    "message": f"从 {friendly_name or '数据源'} 获取股票数据失败，可能是股票代码不存在或数据暂未更新。",
+                    "suggestion": (
+                        "建议：\n"
+                        "1. 检查股票代码是否正确\n"
+                        "2. 确认该股票是否已上市\n"
+                        "3. 系统会自动尝试使用其他数据源\n"
+                        "4. 如果是新股，可能需要等待数据更新"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.DATA_SOURCE_NETWORK:
-            return {
-                "category": "数据源网络错误",
-                "title": f"🌐 无法连接到 {friendly_name or '数据源'}",
-                "message": f"连接 {friendly_name or '数据源'} 时网络超时或连接失败。",
-                "suggestion": (
-                    "请检查：\n"
-                    "1. 网络连接是否正常\n"
-                    "2. 数据源服务是否可用\n"
-                    "3. 系统会自动尝试使用备用数据源\n"
-                    "4. 稍后重试"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Data Source Network Error",
+                    "title": f"🌐 Cannot Connect to {friendly_name or 'Data Source'}",
+                    "message": f"Network timeout or connection failure when connecting to {friendly_name or 'the data source'}.",
+                    "suggestion": (
+                        "Please check:\n"
+                        "1. Network connection is normal\n"
+                        "2. Data source service is available\n"
+                        "3. System will automatically try using backup data source\n"
+                        "4. Retry later"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "数据源网络错误",
+                    "title": f"🌐 无法连接到 {friendly_name or '数据源'}",
+                    "message": f"连接 {friendly_name or '数据源'} 时网络超时或连接失败。",
+                    "suggestion": (
+                        "请检查：\n"
+                        "1. 网络连接是否正常\n"
+                        "2. 数据源服务是否可用\n"
+                        "3. 系统会自动尝试使用备用数据源\n"
+                        "4. 稍后重试"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.DATA_SOURCE_OTHER:
-            return {
-                "category": "数据源错误",
-                "title": f"❌ {friendly_name or '数据源'} 调用失败",
-                "message": f"从 {friendly_name or '数据源'} 获取数据时发生错误。",
-                "suggestion": (
-                    "建议：\n"
-                    "1. 系统会自动尝试使用备用数据源\n"
-                    "2. 查看技术细节了解具体错误\n"
-                    "3. 稍后重试\n"
-                    "4. 如问题持续，请联系技术支持"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Data Source Error",
+                    "title": f"❌ {friendly_name or 'Data Source'} Call Failed",
+                    "message": f"An error occurred while retrieving data from {friendly_name or 'the data source'}.",
+                    "suggestion": (
+                        "Suggestions:\n"
+                        "1. System will automatically try using backup data source\n"
+                        "2. View technical details for specific error\n"
+                        "3. Retry later\n"
+                        "4. If the issue persists, please contact technical support"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "数据源错误",
+                    "title": f"❌ {friendly_name or '数据源'} 调用失败",
+                    "message": f"从 {friendly_name or '数据源'} 获取数据时发生错误。",
+                    "suggestion": (
+                        "建议：\n"
+                        "1. 系统会自动尝试使用备用数据源\n"
+                        "2. 查看技术细节了解具体错误\n"
+                        "3. 稍后重试\n"
+                        "4. 如问题持续，请联系技术支持"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.STOCK_CODE_INVALID:
-            return {
-                "category": "股票代码错误",
-                "title": "❌ 股票代码无效",
-                "message": "输入的股票代码格式不正确或不存在。",
-                "suggestion": (
-                    "请检查：\n"
-                    "1. A股代码格式：6位数字（如 000001、600000）\n"
-                    "2. 港股代码格式：5位数字（如 00700）\n"
-                    "3. 美股代码格式：股票代码（如 AAPL、TSLA）\n"
-                    "4. 确认股票是否已上市"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Stock Code Error",
+                    "title": "❌ Stock Code Invalid",
+                    "message": "The stock code format is incorrect or does not exist.",
+                    "suggestion": (
+                        "Please check:\n"
+                        "1. A-share code format: 6-digit number (e.g., 000001, 600000)\n"
+                        "2. Hong Kong stock code format: 5-digit number (e.g., 00700)\n"
+                        "3. US stock code format: stock symbol (e.g., AAPL, TSLA)\n"
+                        "4. Confirm if the stock is listed"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "股票代码错误",
+                    "title": "❌ 股票代码无效",
+                    "message": "输入的股票代码格式不正确或不存在。",
+                    "suggestion": (
+                        "请检查：\n"
+                        "1. A股代码格式：6位数字（如 000001、600000）\n"
+                        "2. 港股代码格式：5位数字（如 00700）\n"
+                        "3. 美股代码格式：股票代码（如 AAPL、TSLA）\n"
+                        "4. 确认股票是否已上市"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.NETWORK:
-            return {
-                "category": "网络连接错误",
-                "title": "🌐 网络连接失败",
-                "message": "网络连接超时或无法访问服务。",
-                "suggestion": (
-                    "请检查：\n"
-                    "1. 网络连接是否正常\n"
-                    "2. 服务器是否可访问\n"
-                    "3. 防火墙或代理设置\n"
-                    "4. 稍后重试"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Network Connection Error",
+                    "title": "🌐 Network Connection Failed",
+                    "message": "Network timeout or cannot access service.",
+                    "suggestion": (
+                        "Please check:\n"
+                        "1. Network connection is normal\n"
+                        "2. Server is accessible\n"
+                        "3. Firewall or proxy settings\n"
+                        "4. Retry later"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "网络连接错误",
+                    "title": "🌐 网络连接失败",
+                    "message": "网络连接超时或无法访问服务。",
+                    "suggestion": (
+                        "请检查：\n"
+                        "1. 网络连接是否正常\n"
+                        "2. 服务器是否可访问\n"
+                        "3. 防火墙或代理设置\n"
+                        "4. 稍后重试"
+                    ),
+                    "technical_detail": original_error
+                }
         
         elif category == ErrorCategory.SYSTEM:
-            return {
-                "category": "系统错误",
-                "title": "⚠️ 系统内部错误",
-                "message": "系统处理请求时发生内部错误。",
-                "suggestion": (
-                    "建议：\n"
-                    "1. 稍后重试\n"
-                    "2. 如问题持续，请联系技术支持\n"
-                    "3. 提供技术细节以便排查问题"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "System Error",
+                    "title": "⚠️ Internal System Error",
+                    "message": "An internal error occurred while processing the request.",
+                    "suggestion": (
+                        "Suggestions:\n"
+                        "1. Retry later\n"
+                        "2. If the issue persists, please contact technical support\n"
+                        "3. Provide technical details for troubleshooting"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "系统错误",
+                    "title": "⚠️ 系统内部错误",
+                    "message": "系统处理请求时发生内部错误。",
+                    "suggestion": (
+                        "建议：\n"
+                        "1. 稍后重试\n"
+                        "2. 如问题持续，请联系技术支持\n"
+                        "3. 提供技术细节以便排查问题"
+                    ),
+                    "technical_detail": original_error
+                }
         
         else:  # UNKNOWN
-            return {
-                "category": "未知错误",
-                "title": "❌ 分析失败",
-                "message": "分析过程中发生错误。",
-                "suggestion": (
-                    "建议：\n"
-                    "1. 检查输入参数是否正确\n"
-                    "2. 查看技术细节了解具体错误\n"
-                    "3. 稍后重试\n"
-                    "4. 如问题持续，请联系技术支持"
-                ),
-                "technical_detail": original_error
-            }
+            if is_english:
+                return {
+                    "category": "Unknown Error",
+                    "title": "❌ Analysis Failed",
+                    "message": "An error occurred during analysis.",
+                    "suggestion": (
+                        "Suggestions:\n"
+                        "1. Verify input parameters are correct\n"
+                        "2. View technical details for specific error\n"
+                        "3. Retry later\n"
+                        "4. If the issue persists, please contact technical support"
+                    ),
+                    "technical_detail": original_error
+                }
+            else:
+                return {
+                    "category": "未知错误",
+                    "title": "❌ 分析失败",
+                    "message": "分析过程中发生错误。",
+                    "suggestion": (
+                        "建议：\n"
+                        "1. 检查输入参数是否正确\n"
+                        "2. 查看技术细节了解具体错误\n"
+                        "3. 稍后重试\n"
+                        "4. 如问题持续，请联系技术支持"
+                    ),
+                    "technical_detail": original_error
+                }
 
