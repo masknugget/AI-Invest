@@ -49,6 +49,34 @@ def detect_market(symbol: str) -> str:
     return 'unknown'
 
 
+def log_chat_history(data: Dict[str, Any]) -> None:
+    """
+    保存ChatTracker的to_dict()数据到MongoDB
+    
+    Args:
+        data: ChatTracker.to_dict()返回的字典，包含用户对话历史
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['chat_history']
+        coll = db['chat_history']
+        log_entry = {
+            "timestamp": datetime.now(),
+            "user_id": data.get("user_id"),
+            "chat_id": data.get("chat_id"),
+            "conversation_id": data.get("conversation_id"),
+            "messages": data.get("messages", []),
+            "user_query": data.get("user_query", ""),
+            "content": data.get("content", ""),
+            "create_datetime": data.get("create_datetime"),
+        }
+        coll.insert_one(log_entry)
+    except Exception as e:
+        print(f"保存对话日志失败: {e}")
+    finally:
+        client.close()
+
+
 # ==================== 统一数据入口 ====================
 
 def get_stock_data(
@@ -253,8 +281,8 @@ def _query_mongodb_news(
 
     Args:
         symbol: 股票代码
-        start_date: 开始日期
-        end_date: 结束日期
+        start_date: 开始日期，格式：YYYY-MM-DD
+        end_date: 结束日期，格式：YYYY-MM-DD
 
     Returns:
         List[Dict]: 新闻列表

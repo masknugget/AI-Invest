@@ -7,7 +7,7 @@ from tradingagents.db.document import get_stock_daily_basic, get_stock_informati
 
 # 导入prompts模块
 from app.services.chatbot.prompts import p_fundamentals_analyst, p_market_analyst, p_news_analyst
-
+from tradingagents.utils.stock_utils import unified_code
 
 
 def search_stock_information(
@@ -26,8 +26,8 @@ def search_stock_information(
     Returns:
         股票信息字典，包含代码、名称、价格、指标等
     """
+    stock_code = unified_code(stock_code)
     result_dt = get_stock_information(stock_code, "2025-01-16", "2025-06-16")
-
     result_str = f"""
 股票代码: {result_dt["symbol"]}
 收盘价: {result_dt["close"]}

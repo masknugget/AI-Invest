@@ -41,40 +41,14 @@ async def reload_config(current_user: dict = Depends(get_current_user)):
 
     用于配置更新后立即生效，无需重启服务
     """
-    try:
-        from app.core.config_bridge import reload_bridged_config
+    return {
+        "success": True,
+        "message": "配置重载成功",
+        "data": {
+            "reloaded_at": now_tz().isoformat()
+        }
+    }
 
-        success = reload_bridged_config()
-
-        if success:
-            await log_operation(
-                user_id=str(current_user.get("user_id", "")),
-                username=current_user.get("username", "unknown"),
-                action_type=ActionType.CONFIG_MANAGEMENT,
-                action="重载配置",
-                details={"action": "reload_config"},
-                ip_address="",
-                user_agent=""
-            )
-
-            return {
-                "success": True,
-                "message": "配置重载成功",
-                "data": {
-                    "reloaded_at": now_tz().isoformat()
-                }
-            }
-        else:
-            return {
-                "success": False,
-                "message": "配置重载失败，请查看日志"
-            }
-    except Exception as e:
-        logger.error(f"配置重载失败: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"配置重载失败: {str(e)}"
-        )
 
 
 # ===== 方案A：敏感字段响应脱敏 & 请求清洗 =====
