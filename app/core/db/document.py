@@ -69,10 +69,175 @@ def log_chat_history(data: Dict[str, Any]) -> None:
             "user_query": data.get("user_query", ""),
             "content": data.get("content", ""),
             "create_datetime": data.get("create_datetime"),
+            "title": data.get("title"),
         }
         coll.insert_one(log_entry)
     except Exception as e:
         print(f"保存对话日志失败: {e}")
+    finally:
+        client.close()
+
+
+def get_chat_history(
+    user_id: Union[str, int],
+    conversation_id = None
+) -> List[Dict[str, Any]]:
+    """
+    通过 user_id 和 conversation_id 查找 chat_history，按照 create_datetime 升序排序返回列表
+    
+    Args:
+        user_id: 用户ID
+        conversation_id: 对话ID
+        
+    Returns:
+        List[Dict]: 聊天记录列表，按创建时间升序排列
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['chat_history']
+        coll = db['chat_history']
+        
+        if user_id is None:
+            return []
+
+        if conversation_id is None:
+            filter_dict = {
+                "user_id": user_id,
+            }
+        else:
+            filter_dict = {
+                "user_id": user_id,
+                "conversation_id": conversation_id,
+            }
+        cursor = coll.find(filter_dict).sort("create_datetime", ASCENDING)
+        records = [{k: v for k, v in doc.items() if k != "_id"} for doc in cursor]
+        
+        return records
+    except Exception as e:
+        print(f"查询对话历史失败: {e}")
+        return []
+    finally:
+        client.close()
+
+
+def del_user_conversation(
+    user_id: Union[str, int],
+    conversation_id: str
+) -> bool:
+    """
+    删除指定用户的特定会话
+    
+    Args:
+        user_id: 用户ID
+        conversation_id: 对话ID
+        
+    Returns:
+        bool: 删除是否成功
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['chat_history']
+        coll = db['chat_history']
+        
+        if not user_id or not conversation_id:
+            return False
+        
+        filter_dict = {
+            "user_id": user_id,
+            "conversation_id": conversation_id
+        }
+        
+        result = coll.delete_many(filter_dict)
+        return result.deleted_count > 0
+    except Exception as e:
+        print(f"删除对话失败: {e}")
+        return False
+    finally:
+        client.close()
+
+
+def update_conversation_title(
+    user_id: Union[str, int],
+    conversation_id: str,
+    title: str
+) -> bool:
+    """
+    更新指定会话的标题（修改create_datetime最小的记录）
+    
+    Args:
+        user_id: 用户ID
+        conversation_id: 对话ID
+        title: 新标题
+        
+    Returns:
+        bool: 更新是否成功
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['chat_history']
+        coll = db['chat_history']
+        
+        if not user_id or not conversation_id:
+            return False
+        
+        filter_dict = {
+            "user_id": user_id,
+            "conversation_id": conversation_id
+        }
+        
+        result = coll.find_one_and_update(
+            filter_dict,
+            {"$set": {"title": title}},
+            sort=[("create_datetime", ASCENDING)],
+            return_document=True
+        )
+        
+        return result is not None
+    except Exception as e:
+        print(f"更新会话标题失败: {e}")
+        return False
+    finally:
+        client.close()
+
+
+def get_symbol(
+        symbol_name: str,
+) -> Optional[Dict[str, Any]]:
+    """
+    查询股票信息，支持通过symbol或name进行OR查询
+    
+    Args:
+        symbol_name: 股票代码或名称
+        
+    Returns:
+        Dict: 股票基本信息，如果找不到返回None
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['stock_db']
+        col = db['stock_daily_basic']
+        
+        # 使用OR查询，匹配symbol或name任一字段
+        filter_dict = {
+            "$or": [
+                {"symbol": symbol_name},
+                {"name": symbol_name}
+            ]
+        }
+        
+        result = col.find_one(filter_dict, {"_id": 0})
+        
+        if result is None:
+            # 如果没找到，返回空信息结构
+            return {
+                "symbol": "",
+                "name": "",
+            }
+        
+        return result
+    except Exception as e:
+        print(f"查询股票信息失败: {e}")
+        return None
     finally:
         client.close()
 

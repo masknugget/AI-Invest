@@ -13,7 +13,7 @@ class ChatTracker:
         self.create_datetime: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.stock_symbol: Optional[str] = None
         self.model: Optional[str] = None
-        self.tokens_used: Optional[int] = None
+        self.title = ""
 
     def add_content(self, content: str):
         """
@@ -35,6 +35,6 @@ class ChatTracker:
             "create_datetime": self.create_datetime,
             "stock_symbol": self.stock_symbol,
             "model": self.model,
-            "tokens_used": self.tokens_used,
+            "title": self.user_query,
         }
 

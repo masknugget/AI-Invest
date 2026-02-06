@@ -4,6 +4,7 @@ from tradingagents.db.document import get_stock_daily_basic, get_company_name
 
 def prompt_fundamentals_analyst(
     ticker: str,
+    language: str = "zh-CN",
     start_date: str = "2025-01-01",
     end_date: str = "2025-10-31"
 ) -> str:
@@ -26,7 +27,7 @@ def prompt_fundamentals_analyst(
         combined_data = f"统一基本面分析工具调用失败({type(e).__name__}): {e}"
 
     company_name = get_company_name(ticker)
-    language_name = "中文"
+
     currency_info = "元"
 
     analysis_prompt = f"""请基于以下财务数据，简要分析{company_name}（{ticker}）的基本面：
@@ -55,7 +56,7 @@ def prompt_fundamentals_analyst(
 **要求**：
 - 基于实际数据，简洁分析
 - 引用关键财务指标
-- 使用{language_name}撰写
+- 使用{language}撰写
 - Markdown格式输出"""
 
 
