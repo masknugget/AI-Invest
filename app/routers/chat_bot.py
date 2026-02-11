@@ -10,7 +10,7 @@ from collections import defaultdict
 from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter, HTTPException, Header, Depends, status, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from app.services.chatbot.chatbot_service import chat
@@ -67,7 +67,7 @@ logger = get_logger('chat_bot')
 @router.post("/chat/completions")
 async def chat_completions(
         request: ChatCompletionRequest,
-        x_conversation_id: Optional[str] = Header(default="", alias="x-conversation-id"),
+        x_conversation_id: Optional[str] = Header(default="", alias="x_conversation_id"),
         # user: dict = Depends(get_current_user)
 ):
     if not request.messages:
@@ -90,10 +90,15 @@ async def chat_completions(
     if request.stream:
         return StreamingResponse(
             stream_response(request_id, user_query, conversation_id, user_id),
-            media_type="text/event-stream"
+            media_type="text/event-stream",
+            headers={"x-conversation-id": conversation_id}
         )
     else:
-        return await non_stream_response(request_id, user_query, conversation_id, user_id)
+        response_data = await non_stream_response(request_id, user_query, conversation_id, user_id)
+        return JSONResponse(
+            content=response_data,
+            headers={"x-conversation-id": conversation_id}
+        )
 
 
 @router.get("/listChat", response_model=ChatHistoryResponse, status_code=status.HTTP_200_OK)
@@ -333,6 +338,5 @@ async def non_stream_response(request_id: str, user_query: str, conversation_id:
             "prompt_tokens": 0,
             "completion_tokens": 0,
             "total_tokens": 0
-        },
-        "headers": {"x-conversation-id": conversation_id}
+        }
     }

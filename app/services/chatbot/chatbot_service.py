@@ -67,7 +67,10 @@ def chat(
             if tool_func:
                 try:
                     tool_data = tool_func(**arguments)
-                    system_content = f"请根据以下股票信息回答用户问题:\n\n{tool_data}"
+                    if tool_data is None:
+                        system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
+                    else:
+                        system_content = f"请根据以下股票信息回答用户问题:\n\n{tool_data}"
                     
                     json_data = {
                         "model": model_used,
@@ -81,19 +84,43 @@ def chat(
                     }
                     yield from post_stream(json_data, tracker)
                 except Exception as e:
-                    yield f"工具调用出错: {str(e)}"
+                    system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
+                    json_data = {
+                        "model": model_used,
+                        "temperature": 0.7,
+                        "max_tokens": 2000,
+                        "stream": True,
+                        "messages": [
+                            {"role": "system", "content": system_content},
+                            {"role": "user", "content": user_query}
+                        ]
+                    }
+                    yield from post_stream(json_data, tracker)
             else:
-                yield f"未找到工具函数: {function_name}"
+                system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
+                json_data = {
+                    "model": model_used,
+                    "temperature": 0.7,
+                    "max_tokens": 2000,
+                    "stream": True,
+                    "messages": [
+                        {"role": "system", "content": system_content},
+                        {"role": "user", "content": user_query}
+                    ]
+                }
+                yield from post_stream(json_data, tracker)
         elif function_name == "analyze_stock_by_type":
             # 调用工具进行股票分析
             tool_func = getattr(tools, function_name, None)
             if tool_func:
                 try:
                     tool_data = tool_func(**arguments)
-                    if isinstance(tool_data, dict) and tool_data.get("status") == "success":
+                    if tool_data is None:
+                        system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
+                    elif isinstance(tool_data, dict) and tool_data.get("status") == "success":
                         system_content = tool_data.get("prompt", "")
                     else:
-                        system_content = f"数据获取失败: {tool_data.get('error', '未知错误')}"
+                        system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
                     
                     json_data = {
                         "model": model_used,
@@ -107,9 +134,31 @@ def chat(
                     }
                     yield from post_stream(json_data, tracker)
                 except Exception as e:
-                    yield f"工具调用出错: {str(e)}"
+                    system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
+                    json_data = {
+                        "model": model_used,
+                        "temperature": 0.7,
+                        "max_tokens": 2000,
+                        "stream": True,
+                        "messages": [
+                            {"role": "system", "content": system_content},
+                            {"role": "user", "content": user_query}
+                        ]
+                    }
+                    yield from post_stream(json_data, tracker)
             else:
-                yield f"未找到工具函数: {function_name}"
+                system_content = "你是一位专业的投资助手。当前用户询问的问题暂时无法获取相关数据，请礼貌地告知用户：这个问题暂时无法回答，建议用户换个问题或稍后再试。"
+                json_data = {
+                    "model": model_used,
+                    "temperature": 0.7,
+                    "max_tokens": 2000,
+                    "stream": True,
+                    "messages": [
+                        {"role": "system", "content": system_content},
+                        {"role": "user", "content": user_query}
+                    ]
+                }
+                yield from post_stream(json_data, tracker)
         else:
             # 未知函数名，默认直接对话
             system_content = "You are a helpful assistant."

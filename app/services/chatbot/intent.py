@@ -1,3 +1,5 @@
+from langchain_core.output_parsers import JsonOutputParser
+
 from app.services.chatbot.llm_direct_call import post
 from app.services.chatbot.prompts.p_intent import wrap_intent
 from app.services.chatbot.tools import get_tools_json
@@ -29,9 +31,12 @@ def parse_intent_from_llm_response(llm_response: dict) -> dict:
             }
         
         content = llm_response["choices"][0]["message"]["content"]
-        
-        function_data = json.loads(content)
-        
+
+        json_p = JsonOutputParser()
+
+        # function_data = json.loads(content)
+        function_data = json_p.parse(content)
+
         function_name = function_data.get("name")
         arguments = function_data.get("arguments", {})
         
@@ -93,6 +98,12 @@ def recognition_intent(
     result = post(json_data)
     data_json = result.json()
     parsed_result = parse_intent_from_llm_response(data_json)
+
+
+    if 'parsed_result' in parsed_result:
+        parsed_result = parsed_result['parsed_result']
+        if "function_call" in parsed_result:
+            parsed_result = parsed_result['function_call']
     return parsed_result
 
 

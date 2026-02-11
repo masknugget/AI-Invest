@@ -1,6 +1,10 @@
+from langchain_core.output_parsers import JsonOutputParser
+
 from app.core.db.document import get_chat_history
 from app.services.chatbot.chatbot_service import chat
 
+
+JsonOutputParser
 for user_query in [
     "你是谁",
     "平安银行的股价是多少",
