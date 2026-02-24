@@ -985,6 +985,8 @@ class SimpleAnalysisService:
                     error_context['model'] = request.parameters.quick_model
                 if hasattr(request.parameters, 'deep_model'):
                     error_context['model'] = request.parameters.deep_model
+                if hasattr(request.parameters, 'language'):
+                    error_context['language'] = request.parameters.language
 
             # 格式化错误
             formatted_error = ErrorFormatter.format_error(str(e), error_context)
@@ -1828,6 +1830,8 @@ class SimpleAnalysisService:
                     error_context['model'] = request.parameters.quick_model
                 if hasattr(request.parameters, 'deep_model'):
                     error_context['model'] = request.parameters.deep_model
+                if hasattr(request.parameters, 'language'):
+                    error_context['language'] = request.parameters.language
 
             # 格式化错误
             formatted_error = ErrorFormatter.format_error(str(e), error_context)

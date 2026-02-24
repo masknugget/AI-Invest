@@ -119,7 +119,7 @@ def get_stock_info(symbol: str) -> Optional[Dict[str, Any]]:
         client.close()
 
 
-def get_company_name(ticker: str):
+def get_company_name(ticker: str) -> str:
     client = MongoClient(MONGO_URI)
     coll: Collection = client["stock_db"]["stock_daily_basic"]
     info = coll.find_one({"symbol": ticker}, {"_id": 0})
@@ -128,6 +128,17 @@ def get_company_name(ticker: str):
         company_name = info["name"]
         return company_name
     return ticker
+
+
+def get_company_code(name: str):
+    client = MongoClient(MONGO_URI)
+    coll: Collection = client["stock_db"]["stock_daily_basic"]
+    info = coll.find_one({"name": name}, {"_id": 0})
+
+    if info is not None:
+        company_name = info["symbol"]
+        return company_name
+    return name
 
 
 def get_stock_news(
@@ -332,6 +343,20 @@ def _query_mongodb_market_news(
 
 def convert_data(item):
     return float(item.to_decimal())
+
+
+def get_stock_information(symbol: str, start_date, end_date) -> Dict:
+    data = get_stock_data(symbol, start_date, end_date, "technical")
+    if len(data) != 0:
+        data = data[-1]
+
+    return {
+        "symbol": symbol,
+        "close": convert_data(data.get("close")),
+        "pb": convert_data(data.get("pb")),
+        "pe": convert_data(data.get("pe")),
+        "ps": convert_data(data.get("ps")),
+    }
 
 
 def get_stock_daily_basic(
