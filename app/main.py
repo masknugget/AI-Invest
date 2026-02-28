@@ -30,6 +30,7 @@ from app.routers import notifications as notifications_router
 from app.routers import websocket_notifications as websocket_notifications_router
 from app.routers import analysis
 from app.routers import chat_bot
+from app.routers import search as search_router
 
 
 
@@ -300,6 +301,7 @@ app.include_router(websocket_notifications_router.router, prefix="/api", tags=["
 
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
 app.include_router(chat_bot.router, prefix="/api/chatbot", tags=["chatbot"])
+app.include_router(search_router.router, prefix="/api", tags=["search"])
 
 
 @app.get("/")

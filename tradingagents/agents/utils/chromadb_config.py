@@ -7,6 +7,13 @@ import platform
 import chromadb
 from chromadb.config import Settings
 
+# -------------------- 默认配置 --------------------
+# ChromaDB 默认持久化路径（相对于项目根目录）
+DEFAULT_CHROMA_PERSIST_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+    "data", "chromadb"
+)
+
 
 def is_windows_11() -> bool:
     """
@@ -121,11 +128,48 @@ def get_optimal_chromadb_client():
         return chromadb.Client(settings)
 
 
+def get_persistent_chromadb_client(persist_directory: str):
+    """
+    获取持久化 ChromaDB 客户端
+    
+    Args:
+        persist_directory: 数据持久化目录路径
+        
+    Returns:
+        chromadb.Client: ChromaDB 客户端实例
+    """
+    # 确保目录存在
+    os.makedirs(persist_directory, exist_ok=True)
+    
+    settings = Settings(
+        allow_reset=True,
+        anonymized_telemetry=False,
+        is_persistent=True,
+        persist_directory=persist_directory
+    )
+    
+    return chromadb.Client(settings)
+
+
+def get_default_chromadb_client():
+    """
+    获取默认 ChromaDB 客户端（使用默认持久化路径）
+    这是推荐的默认客户端，数据会自动保存到 ./data/chromadb/
+    
+    Returns:
+        chromadb.Client: ChromaDB 客户端实例
+    """
+    return get_persistent_chromadb_client(DEFAULT_CHROMA_PERSIST_DIR)
+
+
 # 导出配置
 __all__ = [
     'get_optimal_chromadb_client',
     'get_win10_chromadb_client',
     'get_win11_chromadb_client',
+    'get_persistent_chromadb_client',
+    'get_default_chromadb_client',
+    'DEFAULT_CHROMA_PERSIST_DIR',
     'is_windows_11'
 ]
 
