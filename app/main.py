@@ -31,6 +31,7 @@ from app.routers import websocket_notifications as websocket_notifications_route
 from app.routers import analysis
 from app.routers import chat_bot
 from app.routers import search as search_router
+from app.routers import recommendation as recommendation_router
 
 
 
@@ -191,7 +192,15 @@ async def lifespan(app: FastAPI):
     #     raise
 
     await init_db()
-
+    
+    # 初始化推荐批处理调度器（生产环境）
+    if settings.is_production:
+        try:
+            from app.worker.batch_recommendation_worker import init_batch_recommendation_scheduler
+            init_batch_recommendation_scheduler(hour=2, minute=0)
+            logger.info("✅ 推荐批处理调度器已启动")
+        except Exception as e:
+            logger.warning(f"⚠️ 推荐批处理调度器启动失败: {e}")
 
     # 显示配置摘要
     await _print_config_summary(logger)
@@ -302,6 +311,7 @@ app.include_router(websocket_notifications_router.router, prefix="/api", tags=["
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
 app.include_router(chat_bot.router, prefix="/api/chatbot", tags=["chatbot"])
 app.include_router(search_router.router, prefix="/api", tags=["search"])
+app.include_router(recommendation_router.router, prefix="/api/v1", tags=["recommendations"])
 
 
 @app.get("/")

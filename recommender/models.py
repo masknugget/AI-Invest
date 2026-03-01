@@ -59,6 +59,7 @@ class StockRecommendation:
     suitable_for: List[str] = field(default_factory=list)  # ["价值投资", "股息投资"]
     
     # 推荐理由（针对不同风格的简短理由）
+    reason: str = ""  # 通用推荐理由（50字以内）
     reason_for_value: str = ""  # 价值投资理由
     reason_for_growth: str = ""  # 成长投资理由
     reason_for_dividend: str = ""  # 股息投资理由
@@ -80,6 +81,10 @@ class StockRecommendation:
             "recommendation": self.recommendation,
             "risk_level": self.risk_level,
             "suitable_for": self.suitable_for,
+            "reason": self.reason,
+            "reason_for_value": self.reason_for_value,
+            "reason_for_growth": self.reason_for_growth,
+            "reason_for_dividend": self.reason_for_dividend,
         }
 
 

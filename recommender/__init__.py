@@ -46,13 +46,22 @@ from recommender.models import (
 )
 
 from recommender.batch_generator import (
-    BatchRecommendationGenerator,
     run_daily_batch,
+    generate_daily_recommendations,
+    process_batch,
+    get_stocks_by_symbols,
 )
 
 from recommender.recommendation_service import (
     RecommendationService,
     quick_recommend,
+)
+
+from recommender.engine import (
+    SimpleRecommender,
+    recommend_for_user,
+    StockBrief,
+    Recommendation,
 )
 
 __all__ = [
@@ -64,12 +73,20 @@ __all__ = [
     "InvestmentStyle",
     
     # 离线批处理
-    "BatchRecommendationGenerator",
     "run_daily_batch",
+    "generate_daily_recommendations",
+    "process_batch",
+    "get_stocks_by_symbols",
     
     # 在线服务
     "RecommendationService",
     "quick_recommend",
+    
+    # 简化推荐引擎
+    "SimpleRecommender",
+    "recommend_for_user",
+    "StockBrief",
+    "Recommendation",
 ]
 
 __version__ = "1.0.0"

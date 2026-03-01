@@ -43,7 +43,6 @@ def _init_db(db_name: str = "stock_db") -> tuple[MongoClient, Database]:
 # ==================== 股票列表获取 ====================
 
 def get_all_stocks(
-    market: Optional[str] = None,
     industry: Optional[str] = None,
     fields: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
@@ -51,7 +50,6 @@ def get_all_stocks(
     获取所有股票基本信息列表
     
     Args:
-        market: 市场筛选，可选 'cn'(A股), 'hk'(港股), 'us'(美股)
         industry: 行业筛选，如 '银行', '科技' 等
         fields: 指定返回的字段列表，None 返回所有字段
         
@@ -59,9 +57,6 @@ def get_all_stocks(
         List[Dict]: 股票基本信息列表
         
     Example:
-        >>> # 获取所有A股
-        >>> cn_stocks = get_all_stocks(market='cn')
-        >>> 
         >>> # 获取所有科技行业股票
         >>> tech_stocks = get_all_stocks(industry='科技')
         >>> 
@@ -74,8 +69,6 @@ def get_all_stocks(
         
         # 构建查询条件
         filter_dict = {}
-        if market:
-            filter_dict["market"] = market
         if industry:
             filter_dict["industry"] = {"$regex": industry, "$options": "i"}
         
@@ -93,13 +86,13 @@ def get_all_stocks(
 
 def get_all_symbols(market: Optional[str] = None) -> List[str]:
     """
-    获取所有股票代码列表（轻量级查询）
+    获取所有股票代码列表（轻量级查询，自动去重）
     
     Args:
         market: 市场筛选，可选 'cn', 'hk', 'us'
         
     Returns:
-        List[str]: 股票代码列表
+        List[str]: 去重后的股票代码列表
     """
     client, db = _init_db()
     try:
@@ -109,8 +102,9 @@ def get_all_symbols(market: Optional[str] = None) -> List[str]:
         if market:
             filter_dict["market"] = market
         
-        cursor = coll.find(filter_dict, {"symbol": 1, "_id": 0})
-        return [doc["symbol"] for doc in cursor if "symbol" in doc]
+        # 使用 distinct 方法在数据库层面去重
+        symbols = coll.distinct("symbol", filter_dict)
+        return [str(s) for s in symbols if s]
     finally:
         client.close()
 

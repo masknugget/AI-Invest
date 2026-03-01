@@ -6,12 +6,42 @@
 import json
 import logging
 from typing import List, Optional
-from datetime import datetime, timedelta
+
 
 from tradingagents.llm_adapters.embeddings import create_dashscope_embeddings
 
-from recommender.models import UserProfile, StockBrief, Recommendation, RiskLevel, InvestmentStyle
-from recommender.stock_scanner import get_all_stocks, get_all_symbols
+from recommender.models import UserProfile, RiskLevel
+from recommender.stock_scanner import get_all_stocks
+from dataclasses import dataclass
+
+
+@dataclass
+class StockBrief:
+    """股票简要信息"""
+    symbol: str
+    name: str
+    industry: str
+    pe: Optional[float] = None
+    pb: Optional[float] = None
+    roe: Optional[float] = None
+    dividend_yield: Optional[float] = None
+    market_cap: Optional[float] = None
+
+
+@dataclass  
+class Recommendation:
+    """推荐结果"""
+    symbol: str
+    name: str
+    score: float
+    reason: str
+    risk_level: str
+    suggested_holding_period: str
+    tags: List[str] = None
+    
+    def __post_init__(self):
+        if self.tags is None:
+            self.tags = []
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +63,6 @@ class SimpleRecommender:
     def recommend(
         self,
         user: UserProfile,
-        market: str = "cn",
         top_k: int = 5
     ) -> List[Recommendation]:
         """
@@ -41,16 +70,15 @@ class SimpleRecommender:
         
         Args:
             user: 用户画像
-            market: 市场
             top_k: 推荐数量
             
         Returns:
             推荐列表
         """
-        logger.info(f"为用户 {user.user_id} 生成推荐: {user.style.value}")
+        logger.info(f"为用户 {user.user_id} 生成推荐")
         
         # 1. 获取并筛选候选
-        candidates = self._get_candidates(user, market, max_candidates=50)
+        candidates = self._get_candidates(user, max_candidates=50)
         if not candidates:
             logger.warning("没有符合条件的候选股票")
             return []
@@ -66,24 +94,19 @@ class SimpleRecommender:
     def _get_candidates(
         self,
         user: UserProfile,
-        market: str,
         max_candidates: int = 50
     ) -> List[StockBrief]:
         """获取符合条件的候选股票"""
         
         # 获取所有股票基础数据
         stocks = get_all_stocks(
-            market=market,
             fields=["symbol", "name", "industry", "pe_ttm", "pb", 
                    "roe", "dv_ttm", "total_mv"]
         )
         
         candidates = []
         for s in stocks:
-            # 跳过排除行业
             industry = s.get("industry", "")
-            if industry in user.excluded_industries:
-                continue
             
             # 基本面过滤
             pe = self._to_float(s.get("pe_ttm"))
@@ -136,28 +159,8 @@ class SimpleRecommender:
             if dividend < user.min_dividend_yield:
                 return False
         
-        # 根据投资风格默认条件
-        if user.style == InvestmentStyle.VALUE:
-            # 价值投资：PE<30, PB<5, ROE>5%
-            if pe is not None and pe > 30:
-                return False
-            if pb is not None and pb > 5:
-                return False
-            if roe is not None and roe < 5:
-                return False
-                
-        elif user.style == InvestmentStyle.GROWTH:
-            # 成长投资：允许高PE，但ROE>8%
-            if roe is not None and roe < 8:
-                return False
-                
-        elif user.style == InvestmentStyle.DIVIDEND:
-            # 股息投资：股息率>2%
-            if dividend is not None and dividend < 0.02:
-                return False
-        
         # 保守型：过滤小市值
-        if user.risk_level == RiskLevel.CONSERVATIVE:
+        if user.risk_level == "低" or user.risk_level == RiskLevel.LOW.value:
             if market_cap is not None and market_cap < 100:  # 100亿
                 return False
         
@@ -196,16 +199,16 @@ class SimpleRecommender:
         # 构建候选股票列表
         stocks_text = "\n".join([
             f"{i+1}. {s.name}({s.symbol}) - {s.industry} "
-            f"PE:{s.pe:.1f if s.pe else 'N/A'} "
-            f"PB:{s.pb:.1f if s.pb else 'N/A'} "
-            f"ROE:{s.roe:.1f if s.roe else 'N/A'}% "
-            f"股息:{s.dividend_yield:.1f if s.dividend_yield else 'N/A'}%"
+            f"PE:{f'{s.pe:.1f}' if s.pe else 'N/A'} "
+            f"PB:{f'{s.pb:.1f}' if s.pb else 'N/A'} "
+            f"ROE:{f'{s.roe:.1f}' if s.roe else 'N/A'}% "
+            f"股息:{f'{s.dividend_yield:.1f}' if s.dividend_yield else 'N/A'}%"
             for i, s in enumerate(candidates)
         ])
         
         prompt = f"""作为专业投资顾问，请根据用户的个人画像，从以下候选股票中推荐最合适的{top_k}只。
 
-{user.to_prompt_context()}
+{self._user_to_prompt_context(user)}
 
 候选股票列表:
 {stocks_text}
@@ -254,6 +257,20 @@ class SimpleRecommender:
         
         return response.choices[0].message.content
     
+    def _user_to_prompt_context(self, user: UserProfile) -> str:
+        """将用户画像转换为提示词上下文"""
+        context = f"""用户画像:
+- 风险等级: {user.risk_level}
+- 偏好投资风格: {', '.join(user.preferred_styles) if user.preferred_styles else '未指定'}
+- 偏好行业: {', '.join(user.preferred_industries) if user.preferred_industries else '未指定'}"""
+        
+        if user.max_pe:
+            context += f"\n- PE上限: {user.max_pe}"
+        if user.min_dividend_yield:
+            context += f"\n- 股息率下限: {user.min_dividend_yield}%"
+        
+        return context
+    
     def _parse_response(self, response: str) -> List[Recommendation]:
         """解析LLM响应"""
         try:
@@ -301,8 +318,7 @@ class SimpleRecommender:
 # 便捷函数
 def recommend_for_user(
     user_id: str,
-    risk_level: str = "稳健型",
-    style: str = "价值投资",
+    risk_level: str = "中",
     top_k: int = 5
 ) -> List[Recommendation]:
     """
@@ -310,27 +326,12 @@ def recommend_for_user(
     
     Args:
         user_id: 用户ID
-        risk_level: 风险等级 (保守型/稳健型/激进型)
-        style: 投资风格 (价值投资/成长投资/股息投资/趋势投资)
+        risk_level: 风险等级 (低/中/高)
         top_k: 推荐数量
     """
-    # 解析参数
-    risk_map = {
-        "保守型": RiskLevel.CONSERVATIVE,
-        "稳健型": RiskLevel.MODERATE,
-        "激进型": RiskLevel.AGGRESSIVE,
-    }
-    style_map = {
-        "价值投资": InvestmentStyle.VALUE,
-        "成长投资": InvestmentStyle.GROWTH,
-        "股息投资": InvestmentStyle.DIVIDEND,
-        "趋势投资": InvestmentStyle.MOMENTUM,
-    }
-    
     user = UserProfile(
         user_id=user_id,
-        risk_level=risk_map.get(risk_level, RiskLevel.MODERATE),
-        style=style_map.get(style, InvestmentStyle.VALUE)
+        risk_level=risk_level
     )
     
     engine = SimpleRecommender()

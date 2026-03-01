@@ -99,6 +99,7 @@ class RecommendationService:
                     recommendation=doc.get("recommendation", "持有"),
                     risk_level=doc.get("risk_level", "中"),
                     suitable_for=doc.get("suitable_for", []),
+                    reason=doc.get("reason", ""),
                     reason_for_value=doc.get("reason_for_value", ""),
                     reason_for_growth=doc.get("reason_for_growth", ""),
                     reason_for_dividend=doc.get("reason_for_dividend", ""),
@@ -229,6 +230,10 @@ class RecommendationService:
                     return stock.reason_for_growth
                 elif style == "股息投资" and stock.reason_for_dividend:
                     return stock.reason_for_dividend
+        
+        # 如果有通用的推荐理由，优先使用
+        if stock.reason:
+            return stock.reason
         
         # 默认返回非空的理由
         for reason in [stock.reason_for_value, stock.reason_for_growth, stock.reason_for_dividend]:
