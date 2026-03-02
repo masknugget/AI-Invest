@@ -7,7 +7,9 @@ import logging
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
 
-from app.core.database import get_db
+from pymongo import MongoClient
+
+from app.core.db.document import _init_db
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,8 @@ class UserProfileService:
     HISTORY_COLLECTION = "user_recommendation_history"
     
     def __init__(self):
-        self.db = get_db()
+        client, db = _init_db()
+        self.db = db
         self.collection = self.db[self.COLLECTION_NAME]
         self.history_collection = self.db[self.HISTORY_COLLECTION]
         logger.info("UserProfileService 初始化完成")

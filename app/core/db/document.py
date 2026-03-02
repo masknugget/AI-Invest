@@ -7,8 +7,30 @@ from pymongo.database import Database
 
 from tradingagents.utils.indicators import add_all_indicators
 
-# -------------------- 参数 --------------------
+
+# -------------------- 配置 --------------------
 MONGO_URI = "mongodb://localhost:27017"
+DEFAULT_BATCH_SIZE = 100  # 默认每批处理的股票数量
+MAX_WORKERS = 4  # 默认并发线程数
+
+
+# ==================== 核心工具函数 ====================
+
+def _init_db(db_name: str = "stock_db") -> tuple[MongoClient, Database]:
+    """
+    初始化 MongoDB 连接
+
+    Args:
+        db_name: 数据库名称，默认为 'stock_db'
+
+    Returns:
+        tuple: (client, db) - MongoClient 实例和 Database 实例
+    """
+    client = MongoClient(MONGO_URI)
+    db = client[db_name]
+    return client, db
+
+
 
 
 # ==================== 市场识别函数 ====================

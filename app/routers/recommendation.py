@@ -192,85 +192,85 @@ async def get_latest_recommendation_date(
 
 # ==================== 推荐历史接口 ====================
 
-@router.post("/view/{symbol}", response_model=dict)
-async def record_recommendation_view(
-    symbol: str,
-    date: Optional[str] = Query(default=None, description="推荐数据日期"),
-    current_user: dict = Depends(get_current_user),
-):
-    """
-    记录用户查看了某只股票的推荐
-    
-    用于去重和生成推荐历史
-    """
-    try:
-        profile_service = get_user_profile_service()
-        
-        # 获取当前推荐日期
-        if date is None:
-            rec_service = get_recommendation_service()
-            date = rec_service._get_latest_date()
-        
-        await profile_service.record_view(
-            user_id=str(current_user["id"]),
-            symbol=symbol,
-            recommendation_date=date or datetime.now().strftime("%Y-%m-%d")
-        )
-        
-        return success_response(message="已记录查看")
-    except Exception as e:
-        logger.error(f"记录查看失败: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/history", response_model=dict)
-async def get_recommendation_history(
-    skip: int = Query(default=0, ge=0, description="跳过数量"),
-    limit: int = Query(default=20, ge=1, le=100, description="返回数量"),
-    current_user: dict = Depends(get_current_user),
-):
-    """
-    获取用户的推荐查看历史
-    
-    按时间倒序返回用户查看过的推荐记录
-    """
-    try:
-        profile_service = get_user_profile_service()
-        
-        history = await profile_service.get_recommendation_history(
-            user_id=str(current_user["id"]),
-            skip=skip,
-            limit=limit
-        )
-        
-        return success_response(data={
-            "total": len(history),
-            "skip": skip,
-            "history": history
-        })
-    except Exception as e:
-        logger.error(f"获取推荐历史失败: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.delete("/history", response_model=dict)
-async def clear_recommendation_history(
-    current_user: dict = Depends(get_current_user),
-):
-    """
-    清空用户的推荐历史
-    
-    清空后，之前的推荐可能再次出现在列表中
-    """
-    try:
-        profile_service = get_user_profile_service()
-        
-        success = await profile_service.clear_history(str(current_user["id"]))
-        
-        if success:
-            return success_response(message="推荐历史已清空")
-        else:
-            return success_response(message="没有可清空的历史记录")
-    except Exception as e:
-        logger.error(f"清空推荐历史失败: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+# @router.post("/view/{symbol}", response_model=dict)
+# async def record_recommendation_view(
+#     symbol: str,
+#     date: Optional[str] = Query(default=None, description="推荐数据日期"),
+#     current_user: dict = Depends(get_current_user),
+# ):
+#     """
+#     记录用户查看了某只股票的推荐
+#
+#     用于去重和生成推荐历史
+#     """
+#     try:
+#         profile_service = get_user_profile_service()
+#
+#         # 获取当前推荐日期
+#         if date is None:
+#             rec_service = get_recommendation_service()
+#             date = rec_service._get_latest_date()
+#
+#         await profile_service.record_view(
+#             user_id=str(current_user["id"]),
+#             symbol=symbol,
+#             recommendation_date=date or datetime.now().strftime("%Y-%m-%d")
+#         )
+#
+#         return success_response(message="已记录查看")
+#     except Exception as e:
+#         logger.error(f"记录查看失败: {e}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=str(e))
+#
+#
+# @router.get("/history", response_model=dict)
+# async def get_recommendation_history(
+#     skip: int = Query(default=0, ge=0, description="跳过数量"),
+#     limit: int = Query(default=20, ge=1, le=100, description="返回数量"),
+#     current_user: dict = Depends(get_current_user),
+# ):
+#     """
+#     获取用户的推荐查看历史
+#
+#     按时间倒序返回用户查看过的推荐记录
+#     """
+#     try:
+#         profile_service = get_user_profile_service()
+#
+#         history = await profile_service.get_recommendation_history(
+#             user_id=str(current_user["id"]),
+#             skip=skip,
+#             limit=limit
+#         )
+#
+#         return success_response(data={
+#             "total": len(history),
+#             "skip": skip,
+#             "history": history
+#         })
+#     except Exception as e:
+#         logger.error(f"获取推荐历史失败: {e}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=str(e))
+#
+#
+# @router.delete("/history", response_model=dict)
+# async def clear_recommendation_history(
+#     current_user: dict = Depends(get_current_user),
+# ):
+#     """
+#     清空用户的推荐历史
+#
+#     清空后，之前的推荐可能再次出现在列表中
+#     """
+#     try:
+#         profile_service = get_user_profile_service()
+#
+#         success = await profile_service.clear_history(str(current_user["id"]))
+#
+#         if success:
+#             return success_response(message="推荐历史已清空")
+#         else:
+#             return success_response(message="没有可清空的历史记录")
+#     except Exception as e:
+#         logger.error(f"清空推荐历史失败: {e}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=str(e))

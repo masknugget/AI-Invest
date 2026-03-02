@@ -6,12 +6,16 @@ TradingAgents LLM 适配器模块
 
 from .embeddings import (
     OpenAIEmbeddings,
+    HSBCEmbeddings,
     create_dashscope_embeddings,
+    create_hsbc_embeddings,
     embedding_text,
 )
 
 __all__ = [
     "OpenAIEmbeddings",
+    "HSBCEmbeddings",
     "create_dashscope_embeddings",
+    "create_hsbc_embeddings",
     "embedding_text",
 ]

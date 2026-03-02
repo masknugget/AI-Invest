@@ -7,7 +7,7 @@ import logging
 from typing import List, Dict, Any, Optional, Union
 from dataclasses import dataclass
 
-from tradingagents.llm_adapters.embeddings import OpenAIEmbeddings, create_dashscope_embeddings
+from tradingagents.llm_adapters.embeddings import OpenAIEmbeddings, create_dashscope_embeddings, HSBCEmbeddings
 from tradingagents.agents.utils.chromadb_config import (
     get_default_chromadb_client,
     get_persistent_chromadb_client,
@@ -41,7 +41,7 @@ class VectorStore:
     def __init__(
         self,
         collection_name: str = "default",
-        embeddings: Optional[OpenAIEmbeddings] = None,
+        embeddings: Optional[HSBCEmbeddings] = None,
         chroma_client = None,
         persist_directory: Optional[str] = None,
     ):
