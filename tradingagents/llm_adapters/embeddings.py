@@ -15,6 +15,7 @@ from typing import List, Optional
 import httpx
 import truststore
 import openai
+from openai import OpenAI
 
 logger = logging.getLogger(__name__)
 
@@ -138,30 +139,38 @@ class OpenAIEmbeddings:
         Returns:
             tuple: (client, auth_headers)
         """
-        http_client = _build_hsbc_http_client()
-        
-        auth_headers = _get_hsbc_auth_headers(
-            http_client,
-            self.auth_method,
-            self.service_account,
-            self.password,
-            self.ib2b_dsp_url,
-            self.amtoken,
+        # http_client = _build_hsbc_http_client()
+        #
+        # auth_headers = _get_hsbc_auth_headers(
+        #     http_client,
+        #     self.auth_method,
+        #     self.service_account,
+        #     self.password,
+        #     self.ib2b_dsp_url,
+        #     self.amtoken,
+        # )
+        #
+        # client = openai.OpenAI(
+        #     api_key="N/A",
+        #     base_url=self.base_url,
+        #     http_client=http_client,
+        #     default_headers={
+        #         "Content-Type": "application/json",
+        #         "x-correlation-id": str(uuid.uuid4()),
+        #         "x-usersession-id": str(uuid.uuid4()),
+        #     },
+        # )
+        #
+        # return client, auth_headers
+        client = OpenAI(
+            # 若没有配置环境变量，请用阿里云百炼API Key将下行替换为：api_key="sk-xxx",
+            # 各地域的API Key不同。获取API Key：https://help.aliyun.com/zh/model-studio/get-api-key
+            api_key=r'sk-d6e82744ac33451fbe0cff05687a3695',
+            # 以下是北京地域base-url，如果使用新加坡地域的模型，需要将base_url替换为：https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+            base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
         )
-        
-        client = openai.OpenAI(
-            api_key="N/A",
-            base_url=self.base_url,
-            http_client=http_client,
-            default_headers={
-                "Content-Type": "application/json",
-                "x-correlation-id": str(uuid.uuid4()),
-                "x-usersession-id": str(uuid.uuid4()),
-            },
-        )
-        
-        return client, auth_headers
-    
+        return client
+
     def embed_query(self, text: str) -> List[float]:
         """
         单个文本向量化
@@ -176,14 +185,13 @@ class OpenAIEmbeddings:
             return []
         
         # 每次调用都重新初始化 client 和获取 auth
-        client, auth_headers = self._create_client()
-        
+        # client, auth_headers = self._create_client()
+        client = self._create_client()
+
         try:
             response = client.embeddings.create(
-                model=self.model,
-                input=text,
-                user=self.user,
-                extra_headers=auth_headers,
+                model="text-embedding-v4",
+                input=text
             )
             return response.data[0].embedding
         finally:
@@ -216,15 +224,20 @@ class OpenAIEmbeddings:
             
             try:
                 # 每个 batch 重新获取 client 和 auth
-                client, auth_headers = self._create_client()
-                
+                # client, auth_headers = self._create_client()
+                client = self._create_client()
+
                 try:
                     response = client.embeddings.create(
-                        model=self.model,
-                        input=batch,
-                        user=self.user,
-                        extra_headers=auth_headers,
+                        model="text-embedding-v4",
+                        input=batch
                     )
+                    # response = client.embeddings.create(
+                    #     model=self.model,
+                    #     input=batch,
+                    #     user=self.user,
+                    #     extra_headers=auth_headers,
+                    # )
                     batch_embeddings = [item.embedding for item in response.data]
                     all_embeddings.extend(batch_embeddings)
                     

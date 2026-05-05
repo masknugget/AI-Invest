@@ -17,24 +17,6 @@ from .stock_models import (
     StockStatus
 )
 
-# 导入推荐系统模型
-from .recommendation import (
-    RiskLevel,
-    InvestmentStyle,
-    RecommendationQuery,
-    BatchGenerateRequest,
-    StockMetrics,
-    RecommendationReasons,
-    StockRecommendationResponse,
-    RecommendationListResponse,
-    HotStock,
-    DashboardData,
-    RecommendationStats,
-    UserProfile,
-    StockRecommendation,
-    UserRecommendation,
-    DailyRecommendationBatch,
-)
 
 __all__ = [
     # 股票模型
@@ -49,20 +31,4 @@ __all__ = [
     "ExchangeType",
     "CurrencyType",
     "StockStatus",
-    # 推荐模型
-    "RiskLevel",
-    "InvestmentStyle",
-    "RecommendationQuery",
-    "BatchGenerateRequest",
-    "StockMetrics",
-    "RecommendationReasons",
-    "StockRecommendationResponse",
-    "RecommendationListResponse",
-    "HotStock",
-    "DashboardData",
-    "RecommendationStats",
-    "UserProfile",
-    "StockRecommendation",
-    "UserRecommendation",
-    "DailyRecommendationBatch",
 ]

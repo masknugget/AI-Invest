@@ -311,7 +311,8 @@ app.include_router(websocket_notifications_router.router, prefix="/api", tags=["
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
 app.include_router(chat_bot.router, prefix="/api/chatbot", tags=["chatbot"])
 app.include_router(search_router.router, prefix="/api", tags=["search"])
-app.include_router(recommendation_router.router, prefix="/api/v1", tags=["recommendations"])
+app.include_router(recommendation_router.router, prefix="/api", tags=["recommendation"])
+
 
 
 @app.get("/")
