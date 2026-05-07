@@ -25,7 +25,7 @@ from tradingagents.searcher import VectorStore, create_vector_store
 
 # ==================== 固定配置 ====================
 
-INPUT_FILE = r"F:\project_work\hf\AI-Invest\scripts\data_local\stock_qa_5000.json"
+INPUT_FILE = r"F:\project_work\hf\AI-Invest\scripts\data_local\data_qa_5000.json"
 COLLECTION_NAME = "stock_qa"
 BATCH_SIZE = 50
 CLEAR_FIRST = False      # 导入前是否清空集合
@@ -147,15 +147,25 @@ def read_json_data(file_path: str) -> List[Dict[str, Any]]:
     for idx, item in enumerate(data):
         # 处理字段名大小写（支持 meta_data / metaData / meta 等）
         item_lower = {str(k).lower(): v for k, v in item.items()}
-        
+
+        # 将 uuid 和 meta_data 组合为新的 dict 格式
+        uuid_val = str(item_lower.get("uuid", "")).strip()
+        name_val = str(item_lower.get("meta_data", "")).strip()
+
+        meta_dict = {}
+        if uuid_val:
+            meta_dict["uuid"] = uuid_val
+        if name_val:
+            meta_dict["name"] = name_val
+
         record = {
             "row_index": idx,
             "query": str(item_lower.get("query", "")).strip(),
             "answer": str(item_lower.get("answer", "")).strip(),
-            "meta_data": str(item_lower.get("meta_data", "")).strip() if "meta_data" in item_lower else "",
+            "meta_data": meta_dict,
         }
         records.append(record)
-    
+
     return records
 
 
@@ -181,9 +191,9 @@ def validate_data(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             skipped += 1
             continue
         
-        # 尝试解析 meta_data 为 JSON
+        # 尝试解析 meta_data 为 JSON（仅当它是字符串时）
         meta_raw = record["meta_data"]
-        if meta_raw:
+        if isinstance(meta_raw, str) and meta_raw:
             try:
                 record["meta_data"] = json.loads(meta_raw)
             except json.JSONDecodeError:
@@ -256,10 +266,10 @@ def build_documents(
             "row_index": record["row_index"],
         }
         
-        # 添加 meta_data（如果是 dict 则展开，否则作为字符串）
+        # 添加 meta_data（ChromaDB 只支持 str/int/float/bool/None）
         meta_value = record["meta_data"]
         if isinstance(meta_value, dict):
-            metadata["meta_data"] = meta_value
+            metadata["meta_data"] = json.dumps(meta_value, ensure_ascii=False)
         elif meta_value:
             metadata["meta_data"] = meta_value
         
@@ -375,7 +385,7 @@ def test_search(collection_name: str, query: str, top_k: int = 3):
 
 def main():
     """固定配置入口：直接修改上方 INPUT_FILE 等常量即可"""
-    INPUT_FILE = r'F:\project_work\hf\AI-Invest\scripts\data_local\stock_qa_5000.json'
+    INPUT_FILE = r'F:\project_work\hf\AI-Invest\scripts\data_local\data_qa_5000.json'
     print("=" * 60)
     print("JSON → ChromaDB 导入工具")
     print("=" * 60)
