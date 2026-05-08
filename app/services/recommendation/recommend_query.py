@@ -14,6 +14,7 @@ Usage:
         print(f"Score: {r.score:.3f}")
 """
 
+import json
 import logging
 from typing import List, Optional
 from pydantic import BaseModel
@@ -28,6 +29,7 @@ logger = logging.getLogger("webapi")
 
 class QueryRecommendation(BaseModel):
     """查询推荐项"""
+    uuid: str           # QA 对的唯一标识符
     query: str          # 相似的问题
     answer: str         # 对应答案
     meta_data: str      # 股票代码等元数据
@@ -45,6 +47,33 @@ class RecommendQueryResponse(BaseModel):
     original_query: str
     recommendations: List[QueryRecommendation]
     total_found: int
+
+
+def _extract_uuid(metadata: dict) -> str:
+    """从 metadata 中提取 uuid
+    
+    优先顺序:
+    1. metadata["uuid"]
+    2. 解析 metadata["meta_data"] JSON 字符串中的 uuid
+    3. 返回空字符串
+    """
+    # 1. 直接获取 uuid 字段
+    uuid_val = metadata.get("uuid")
+    if uuid_val:
+        return str(uuid_val)
+    
+    # 2. 解析 meta_data JSON
+    meta_data_str = metadata.get("meta_data", "")
+    if meta_data_str and isinstance(meta_data_str, str):
+        try:
+            meta_dict = json.loads(meta_data_str)
+            uuid_from_meta = meta_dict.get("uuid")
+            if uuid_from_meta:
+                return str(uuid_from_meta)
+        except json.JSONDecodeError:
+            pass
+    
+    return ""
 
 
 # ==================== 核心服务类 ====================
@@ -100,6 +129,7 @@ class QueryRecommendationService:
             recommendations = []
             for r in results:
                 rec = QueryRecommendation(
+                    uuid=_extract_uuid(r.metadata),
                     query=r.content,           # content 是原始 query
                     answer=r.metadata.get("answer", ""),
                     meta_data=r.metadata.get("meta_data", ""),

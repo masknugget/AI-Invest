@@ -14,7 +14,7 @@ from .bm25_store import (
     HybridSearcher,
     create_bm25_store,
 )
-from tradingagents.agents.utils.chromadb_config import DEFAULT_CHROMA_PERSIST_DIR
+from tradingagents.agents.utils.lancedb_config import DEFAULT_LANCE_PERSIST_DIR
 
 __all__ = [
     # 向量搜索
@@ -27,5 +27,5 @@ __all__ = [
     "HybridSearcher",
     "create_bm25_store",
     # 配置
-    "DEFAULT_CHROMA_PERSIST_DIR",
+    "DEFAULT_LANCE_PERSIST_DIR",
 ]

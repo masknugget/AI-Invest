@@ -35,7 +35,7 @@ TEST_MODULES = {
         "tests/test_connect/test_redis.py",
     ],
     "推荐系统": [
-        "tests/test_recommender/test_excel_to_chromadb.py",
+        "tests/test_recommender/test_excel_to_lancedb.py",
     ],
 }
 
