@@ -2,10 +2,6 @@ import os
 import json
 import sys
 
-# 添加项目根目录到 Python 路径，以便复用 app 配置和数据库连接
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, project_root)
-
 from app.core.database import get_mongo_db_sync
 
 path_dir = r'F:\work\report'
@@ -23,6 +19,13 @@ for filename in os.listdir(path_dir):
         filename = os.path.join(path_dir, filename)
         data = load_dict(filename)
         data_out.append(data)
+
+
+df = pd.read_csv(r'F:\project_work\hf\AI-Invest\scripts\data_local\user.csv')
+df['data_ner'] =df['data_ner'].map(eval)
+df['data_label'] =df['data_label'].map(eval)
+df['data_event'] =df['data_event'].map(eval)
+df['data_router'] =df['data_router'].map(eval)
 
 # 将数据逐条存入 MongoDB insight_news 集合
 if data_out:

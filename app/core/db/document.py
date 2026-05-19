@@ -213,6 +213,169 @@ def get_rec_history(
         client.close()
 
 
+def log_rec_content_history(user_id: Union[str, int], rec_content_data: List[Dict[str, Any]]) -> None:
+    """
+    保存推荐内容的完整数据到MongoDB
+    
+    Args:
+        user_id: 用户ID
+        rec_content_data: 推荐内容数据列表，包含每条推荐的完整信息
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['rec_history']
+        coll = db['rec_content_history']
+        log_entry = {
+            "timestamp": datetime.now(),
+            "user_id": user_id,
+            "rec_content_data": rec_content_data,
+            "create_datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        coll.insert_one(log_entry)
+    except Exception as e:
+        print(f"保存推荐内容日志失败: {e}")
+    finally:
+        client.close()
+
+
+def log_views_insight(user_id: Union[str, int], insight_id: str) -> None:
+    """
+    保存 Insight 浏览记录到 MongoDB
+
+    Args:
+        user_id: 用户ID
+        insight_id: 浏览的 Insight ID
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['rec_history']
+        coll = db['insight_views']
+        log_entry = {
+            "timestamp": datetime.now(),
+            "user_id": user_id,
+            "insight_id": insight_id,
+            "create_datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }
+        coll.insert_one(log_entry)
+    except Exception as e:
+        print(f"保存浏览记录失败: {e}")
+    finally:
+        client.close()
+
+
+def get_views_insight(
+    user_id: Union[str, int],
+    page_size: int = 20,
+    page: int = 1
+) -> Dict[str, Any]:
+    """
+    查询用户 Insight 浏览历史
+
+    Args:
+        user_id: 用户ID
+        page_size: 每页数量
+        page: 页码，从1开始
+
+    Returns:
+        Dict: 包含 items 和 pagination 的字典
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['rec_history']
+        coll = db['insight_views']
+
+        if user_id is None:
+            return {
+                "items": [],
+                "pagination": {"page": page, "pageSize": page_size, "total": 0, "hasMore": False}
+            }
+
+        filter_dict = {"user_id": user_id}
+
+        # 分页查询
+        skip = (page - 1) * page_size
+        cursor = coll.find(filter_dict).sort("timestamp", DESCENDING).skip(skip).limit(page_size)
+        items = [{k: v for k, v in doc.items() if k != "_id"} for doc in cursor]
+
+        # 获取总数
+        total = coll.count_documents(filter_dict)
+
+        return {
+            "items": items,
+            "pagination": {
+                "page": page,
+                "pageSize": page_size,
+                "total": total,
+                "hasMore": total > skip + len(items),
+            }
+        }
+    except Exception as e:
+        print(f"查询浏览历史失败: {e}")
+        return {
+            "items": [],
+            "pagination": {"page": page, "pageSize": page_size, "total": 0, "hasMore": False}
+        }
+    finally:
+        client.close()
+
+
+def get_recommendation_history_docs(
+    user_id: Union[str, int],
+    page_size: int = 20,
+    page: int = 1,
+    action: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    查询用户推荐内容历史记录（从 rec_content_history 集合）
+
+    Args:
+        user_id: 用户ID
+        page_size: 每页数量
+        page: 页码，从1开始
+        action: 过滤特定动作: click/dismiss/share/save
+
+    Returns:
+        Dict: 包含 items 和 pagination 的字典
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['rec_history']
+        coll = db['rec_content_history']
+
+        # 构建查询条件
+        query = {}
+        if user_id is not None:
+            query["user_id"] = user_id
+        if action:
+            query["action"] = action
+
+        # 分页查询
+        skip = (page - 1) * page_size
+        cursor = coll.find(query).sort("timestamp", DESCENDING).skip(skip).limit(page_size)
+        items = [{k: v for k, v in doc.items() if k != "_id"} for doc in cursor]
+
+        # 获取总数
+        total = coll.count_documents(query)
+
+        return {
+            "items": items,
+            "pagination": {
+                "page": page,
+                "pageSize": page_size,
+                "total": total,
+                "hasMore": total > skip + len(items),
+            }
+        }
+    except Exception as e:
+        print(f"查询推荐历史失败: {e}")
+        return {
+            "items": [],
+            "pagination": {"page": page, "pageSize": page_size, "total": 0, "hasMore": False}
+        }
+    finally:
+        client.close()
+
+
 def del_user_conversation(
     user_id: Union[str, int],
     conversation_id: str
@@ -293,6 +456,45 @@ def update_conversation_title(
         client.close()
 
 
+def get_insight_by_id(insight_id: str) -> Optional[Dict[str, Any]]:
+    """
+    根据 ID 从 MongoDB insight_news 集合查询单条洞察数据
+
+    Args:
+        insight_id: Insight ID（MongoDB _id 的字符串形式）
+
+    Returns:
+        Dict: 洞察数据，找不到返回 None
+    """
+    from bson import ObjectId
+
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['tradingagents']
+        coll = db['insight_news']
+
+        try:
+            obj_id = ObjectId(insight_id)
+        except Exception:
+            # 如果 insight_id 不是有效的 ObjectId，尝试用字符串匹配
+            doc = coll.find_one({"uuid": insight_id})
+            if doc:
+                doc.pop("_id", None)
+                return doc
+            return None
+
+        doc = coll.find_one({"_id": obj_id})
+        if doc:
+            doc.pop("_id", None)
+            return doc
+        return None
+    except Exception as e:
+        print(f"查询 Insight 失败: {e}")
+        return None
+    finally:
+        client.close()
+
+
 def get_user_profile(user_id: Union[str, int]) -> Optional[Dict[str, Any]]:
     """
     获取用户最新画像
@@ -321,6 +523,40 @@ def get_user_profile(user_id: Union[str, int]) -> Optional[Dict[str, Any]]:
         return None
     except Exception as e:
         print(f"查询用户画像失败: {e}")
+        return None
+    finally:
+        client.close()
+
+
+def save_user_profile(user_id: Union[str, int], profile_data: Dict[str, Any]) -> Optional[str]:
+    """
+    保存用户画像到 MongoDB user_profiles 集合
+
+    Args:
+        user_id: 用户ID
+        profile_data: LLM 生成的画像数据（含 generatedTags, summary, audit 等）
+
+    Returns:
+        str: 插入文档的 _id，失败返回 None
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['tradingagents']
+        coll = db['user_profiles']
+
+        doc = {
+            "user_id": user_id,
+            "generatedTags": profile_data.get("generatedTags", []),
+            "summary": profile_data.get("summary", {}),
+            "audit": profile_data.get("audit", {}),
+            "datetime": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "timestamp": datetime.now(),
+        }
+
+        result = coll.insert_one(doc)
+        return str(result.inserted_id)
+    except Exception as e:
+        print(f"保存用户画像失败: {e}")
         return None
     finally:
         client.close()

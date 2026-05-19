@@ -36,6 +36,7 @@ TEST_MODULES = {
     ],
     "推荐系统": [
         "tests/test_recommender/test_excel_to_lancedb.py",
+        "tests/test_recommender/test_gen_user_profiles.py",
     ],
 }
 

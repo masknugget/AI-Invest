@@ -12,10 +12,13 @@ from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, Header, Request
 from pydantic import BaseModel, Field
 
-from app.core.db.document import log_rec_history, get_user_profile, get_rec_history
+from app.core.db.document import (
+    log_rec_history, log_rec_content_history, log_views_insight,
+    get_views_insight, get_recommendation_history_docs,
+    get_user_profile, get_rec_history, get_insight_by_id
+)
 from app.routers.auth_db import get_current_user
-from app.core.database import get_mongo_db
-from scripts.data_handler.news.prompt_userprofiles import USER_PROFILE_TAGS
+from app.services.recommendation.user_profile_service import USER_PROFILE_TAGS
 from tradingagents.searcher import VectorStore
 
 logger = logging.getLogger("webapi")
@@ -37,10 +40,6 @@ TYPE_LABELS = {
     "POPULAR": ("Popular", "熱門話題"),
 }
 
-DISCLOSURE_VERSION = "2026-04-v1"
-
-
-
 
 def get_tag_name(name_str):
     """
@@ -54,7 +53,6 @@ def get_tag_name(name_str):
     if name_str in USER_PROFILE_TAGS:
         return USER_PROFILE_TAGS[name_str]
     return name_str
-
 
 
 # ============================================================================
@@ -75,7 +73,6 @@ async def get_feed(
     - `cursor`: 分页游标，首次请求为空，翻页时传入上次响应的 nextCursor
     - `filterTypes`: 逗号分隔的内容类型过滤
     """
-
 
     user_id = "admin123"
     profile = get_user_profile(user_id)
@@ -118,9 +115,49 @@ async def get_feed(
 
     log_rec_history(data_rec_log)
 
-    return {
+    out_data = []
+    for item in result_sorted:
+        data = {
+            "id": item.id,
+            "content": item.content,
+            "uuid": item.metadata.get('uuid'),
+            "data_ner": item.metadata.get('data_ner'),
+            "data_label": item.metadata.get('data_label'),
+            "data_event": item.metadata.get('data_event'),
+            "data_report": item.metadata.get('data_report'),
+        }
+        out_data.append(data)
 
+    # 保存推荐内容的完整数据
+    log_rec_content_history(user_id, out_data)
+
+    return {
+        "data": out_data,
+        "count": len(out_data)
     }
+
+
+@router.get("/views/history", summary="获取 Insight 浏览历史")
+async def get_insight_views_history(
+    pageSize: int = Query(20, ge=1, le=100),
+    page: int = Query(1, ge=1),
+    # user: dict = Depends(get_current_user),
+):
+    """
+    获取用户的 Insight 浏览历史记录。
+    """
+    user_id = "admin123"
+    result = get_views_insight(user_id, page_size=pageSize, page=page)
+    items = result.get('items')
+
+    for item in items:
+        insight_id = item.get('insight_id')
+        insight_content = get_insight_by_id(insight_id)
+        if insight_content:
+            item['insight'] = insight_content
+
+    return result
+
 
 @router.get("/{insightId}", summary="获取 Insight 详情")
 async def get_insight_detail(
@@ -134,7 +171,7 @@ async def get_insight_detail(
     - `insightId`: Feed 接口返回的 ID
     - `fromFeed`: 标识是否来自 Feed 点击，用于后端埋点归因
     """
-    detail = _mock_insight_detail(insightId)
+    detail = get_insight_by_id(insightId)
     if not detail:
         raise HTTPException(status_code=404, detail=f"Insight {insightId} not found")
 
@@ -142,9 +179,11 @@ async def get_insight_detail(
     if fromFeed:
         logger.info(f"Insight {insightId} viewed from feed")
 
+    # 记录浏览历史
+    user_id = "admin123"
+    log_views_insight(user_id, insightId)
+
     return detail
-
-
 
 
 @router.get("/history/recommendations", summary="获取推荐历史")
@@ -157,120 +196,17 @@ async def get_recommendation_history(
     """
     获取用户的推荐交互历史记录。
     """
+    user_id = "admin123"
     try:
-        db = get_mongo_db()
-        collection = db["ai_insights_recommendation_logs"]
-
-        # 构建查询条件
-        query = {}
-        # query["userId"] = user.get("id")
-        if action:
-            query["action"] = action
-
-        # 分页查询
-        skip = (page - 1) * pageSize
-        cursor = collection.find(query).sort("timestamp", -1).skip(skip).limit(pageSize)
-        items = await cursor.to_list(length=pageSize)
-
-        # 清理 MongoDB _id
-        for item in items:
-            item.pop("_id", None)
-
-        # 获取总数
-        total = await collection.count_documents(query)
-
-        return {
-            "items": items,
-            "pagination": {
-                "page": page,
-                "pageSize": pageSize,
-                "total": total,
-                "hasMore": total > skip + len(items),
-            }
-        }
-
+        result = get_recommendation_history_docs(
+            user_id=user_id,
+            page_size=pageSize,
+            page=page,
+            action=action
+        )
+        items = result.get('items')
+        rec_content = items.get("rec_content_data")
+        return rec_content
     except Exception as e:
         logger.error(f"获取推荐历史失败: {e}")
-        return {"items": [], "pagination": {"page": page, "pageSize": pageSize, "total": 0, "hasMore": False}}
-
-
-# ============================================================================
-# 浏览记录
-# ============================================================================
-
-@router.post("/track/view", summary="记录浏览行为")
-async def track_view(
-        request: TrackViewRequest,
-        # user: dict = Depends(get_current_user),
-):
-    """
-    记录用户的浏览行为（阅读时长、滚动深度等）。
-    
-    用于分析用户对内容的兴趣度和优化内容推荐。
-    """
-    try:
-        db = get_mongo_db()
-        collection = db["ai_insights_view_logs"]
-
-        record = {
-            # "userId": user.get("id"),
-            "insightId": request.insightId,
-            "durationSeconds": request.durationSeconds,
-            "scrollDepth": request.scrollDepth,
-            "timestamp": request.timestamp or _now_iso(),
-            "createdAt": _now_iso(),
-        }
-
-        await collection.insert_one(record)
-
-        logger.info(f"浏览记录: insightId={request.insightId}, duration={request.durationSeconds}s")
-
-        return {"success": True, "message": "记录已保存"}
-
-    except Exception as e:
-        logger.error(f"记录浏览行为失败: {e}")
-        return {"success": True, "message": "记录已接收"}
-
-
-@router.get("/history/views", summary="获取浏览历史")
-async def get_view_history(
-        pageSize: int = Query(20, ge=1, le=100),
-        page: int = Query(1, ge=1),
-        # user: dict = Depends(get_current_user),
-):
-    """
-    获取用户的浏览历史记录。
-    """
-    try:
-        db = get_mongo_db()
-        collection = db["ai_insights_view_logs"]
-
-        # 构建查询条件
-        query = {}
-        # query["userId"] = user.get("id")
-
-        # 分页查询
-        skip = (page - 1) * pageSize
-        cursor = collection.find(query).sort("timestamp", -1).skip(skip).limit(pageSize)
-        items = await cursor.to_list(length=pageSize)
-
-        # 清理 MongoDB _id
-        for item in items:
-            item.pop("_id", None)
-
-        # 获取总数
-        total = await collection.count_documents(query)
-
-        return {
-            "items": items,
-            "pagination": {
-                "page": page,
-                "pageSize": pageSize,
-                "total": total,
-                "hasMore": total > skip + len(items),
-            }
-        }
-
-    except Exception as e:
-        logger.error(f"获取浏览历史失败: {e}")
         return {"items": [], "pagination": {"page": page, "pageSize": pageSize, "total": 0, "hasMore": False}}
