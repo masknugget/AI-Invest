@@ -142,6 +142,77 @@ def get_chat_history(
         client.close()
 
 
+def log_rec_history(data: Dict[str, Any]) -> None:
+    """
+    保存推荐历史记录到MongoDB
+    
+    Args:
+        data: 推荐记录字典，包含用户推荐历史
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['rec_history']
+        coll = db['rec_history']
+        log_entry = {
+            "timestamp": datetime.now(),
+            "user_id": data.get("user_id"),
+            "rec_content_ids": data.get("rec_content_ids"),
+            "create_datetime": data.get("create_datetime"),
+        }
+        coll.insert_one(log_entry)
+    except Exception as e:
+        print(f"保存推荐日志失败: {e}")
+    finally:
+        client.close()
+
+
+def get_rec_history(
+    user_id: Union[str, int],
+    conversation_id = None
+) -> List[Dict[str, Any]]:
+    """
+    通过 user_id 和 conversation_id 查找 rec_history，按照 create_datetime 升序排序返回列表
+    
+    Args:
+        user_id: 用户ID
+        conversation_id: 对话ID
+        
+    Returns:
+        List[Dict]: 推荐记录列表，按创建时间升序排列
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['rec_history']
+        coll = db['rec_history']
+        
+        if user_id is None:
+            return []
+
+        if conversation_id is None:
+            filter_dict = {
+                "user_id": user_id,
+            }
+        else:
+            filter_dict = {
+                "user_id": user_id,
+                "conversation_id": conversation_id,
+            }
+        cursor = coll.find(filter_dict).sort("create_datetime", ASCENDING)
+        records = [{k: v for k, v in doc.items() if k != "_id"} for doc in cursor]
+        rec_history = set()
+        for i in records[:30]:
+            if 'rec_content_ids' in i:
+                ids = i['rec_content_ids']
+                for j in ids:
+                    rec_history.add(j)
+        return list(rec_history)
+    except Exception as e:
+        print(f"查询推荐历史失败: {e}")
+        return []
+    finally:
+        client.close()
+
+
 def del_user_conversation(
     user_id: Union[str, int],
     conversation_id: str
@@ -222,15 +293,48 @@ def update_conversation_title(
         client.close()
 
 
+def get_user_profile(user_id: Union[str, int]) -> Optional[Dict[str, Any]]:
+    """
+    获取用户最新画像
+
+    从 MongoDB user_profiles 集合中，根据 user_id 获取最新的一条记录（按 datetime 降序）。
+
+    Args:
+        user_id: 用户ID
+
+    Returns:
+        Dict: 用户画像数据，找不到返回 None
+    """
+    client = MongoClient(MONGO_URI)
+    try:
+        db = client['tradingagents']
+        coll = db['user_profiles']
+
+        doc = coll.find_one(
+            {"user_id": user_id},
+            sort=[("datetime", DESCENDING)]
+        )
+
+        if doc:
+            doc.pop("_id", None)
+            return doc
+        return None
+    except Exception as e:
+        print(f"查询用户画像失败: {e}")
+        return None
+    finally:
+        client.close()
+
+
 def get_symbol(
         symbol_name: str,
 ) -> Optional[Dict[str, Any]]:
     """
     查询股票信息，支持通过symbol或name进行OR查询
-    
+
     Args:
         symbol_name: 股票代码或名称
-        
+
     Returns:
         Dict: 股票基本信息，如果找不到返回None
     """

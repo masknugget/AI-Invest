@@ -399,3 +399,59 @@ def build_user_profile_prompt_string(
         include_few_shot=include_few_shot
     )
     return f"{prompts['system']}\n\n---\n\n{prompts['user']}"
+
+
+# ==================== 使用示例 ====================
+if __name__ == "__main__":
+    # 模拟用户输入数据
+    sample_user = {
+        "clickstream_7d": [
+            {"page": "AI_INSIGHT_MACRO", "dwellSec": 180, "timestamp": "2026-05-10T08:15:00Z"},
+            {"page": "AI_INSIGHT_MACRO", "dwellSec": 210, "timestamp": "2026-05-11T08:20:00Z"},
+            {"page": "STOCK_DETAIL_NVDA", "dwellSec": 15, "timestamp": "2026-05-12T09:30:00Z"},
+            {"page": "STOCK_DETAIL_NVDA", "dwellSec": 12, "timestamp": "2026-05-13T09:35:00Z"}
+        ],
+        "search_logs_30d": [
+            {"query": "fed interest rate cut impact", "clicked": True},
+            {"query": "what is golden cross", "clicked": True}
+        ],
+        "trade_history_30d": [
+            {"symbol": "NVDA", "side": "BUY", "timestamp": "2026-05-12T09:32:00Z"}
+        ],
+        "watchlist_snapshot": ["NVDA", "MSFT", "AAPL"],
+        "content_engagement_14d": [
+            {"insightType": "MACRO", "action": "READ_FULL", "timestamp": "2026-05-10T08:15:00Z"}
+        ],
+        "recent_news_browsing_7d": [
+            {
+                "title": "How is the war with Iran impacting interest rates, money flow, and the stock market?",
+                "summary": "Middle East Conflict: 2026 Market Pivot and Economic Re-Alignment...",
+                "category": "Macro & Micro",
+                "dwellSec": 185,
+                "timestamp": "2026-05-10T08:15:00Z"
+            },
+            {
+                "title": "AI Sector Rebounds: Strategic Partnerships and 'Physical AI' Pivot Drive 2026 Q2 Kickoff",
+                "summary": "NVIDIA and Microsoft lead the charge as AI infrastructure spending accelerates...",
+                "category": "Sector",
+                "dwellSec": 95,
+                "timestamp": "2026-05-11T09:20:00Z"
+            }
+        ]
+    }
+
+    # 方式一：返回结构化 dict（推荐，用于 Chat API）
+    result = build_user_profile_prompt(
+        user_data=sample_user,
+        market_context="中东地缘冲突持续，美联储维持利率不变预期升温。",
+        include_few_shot=True  # 生产环境可设为 False 节省 Token
+    )
+
+    print("=== SYSTEM ===")
+    print(result["system"][:500] + "...")
+    print("\n=== USER ===")
+    print(result["user"][:500] + "...")
+    print("\n=== META ===", result["meta"])
+
+    # 方式二：返回单字符串（简单场景）
+    # full_str = build_user_profile_prompt_string(sample_user, include_few_shot=False)
