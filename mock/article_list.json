@@ -1,0 +1,161 @@
+[
+  {
+    "article_id": "article_001",
+    "title": "贵州茅台2024年净利润同比增长15%，分红方案超预期",
+    "author": "张明",
+    "status": "published",
+    "publish_time": "2025-03-31T10:30:00",
+    "create_time": "2025-03-31T09:00:00",
+    "stock_codes": ["600519.SH"],
+    "tags": ["贵州茅台", "白酒", "财报", "分红", "业绩"],
+    "stats": {
+      "view_count": 15420,
+      "like_count": 892,
+      "share_count": 456,
+      "comment_count": 234,
+      "avg_read_time": 180
+    },
+    "engagement": {
+      "likes": [
+        {"user_id": "user_001", "time": "2025-03-31T10:35:00"},
+        {"user_id": "user_002", "time": "2025-03-31T10:40:00"}
+      ],
+      "shares": [
+        {"user_id": "user_001", "platform": "wechat", "time": "2025-03-31T10:45:00"}
+      ],
+      "bookmarks": [
+        {"user_id": "user_003", "time": "2025-03-31T11:00:00"}
+      ]
+    }
+  },
+  {
+    "article_id": "article_002",
+    "title": "特斯拉Q1交付量不及预期，股价盘后下跌5%",
+    "author": "李华",
+    "status": "published",
+    "publish_time": "2025-04-03T06:00:00",
+    "create_time": "2025-04-03T05:30:00",
+    "stock_codes": ["TSLA", "BYD"],
+    "tags": ["特斯拉", "电动汽车", "交付量", "股价", "新能源车"],
+    "stats": {
+      "view_count": 23150,
+      "like_count": 567,
+      "share_count": 789,
+      "comment_count": 567,
+      "avg_read_time": 150
+    },
+    "engagement": {
+      "likes": [
+        {"user_id": "user_005", "time": "2025-04-03T06:15:00"},
+        {"user_id": "user_008", "time": "2025-04-03T06:30:00"}
+      ],
+      "shares": [
+        {"user_id": "user_006", "platform": "weibo", "time": "2025-04-03T07:00:00"}
+      ],
+      "bookmarks": [
+        {"user_id": "user_007", "time": "2025-04-03T08:00:00"}
+      ]
+    }
+  },
+  {
+    "article_id": "article_003",
+    "title": "美联储维持利率不变，暗示年内可能降息两次",
+    "author": "王磊",
+    "status": "published",
+    "publish_time": "2025-04-03T08:00:00",
+    "create_time": "2025-04-03T07:30:00",
+    "stock_codes": [],
+    "tags": ["美联储", "利率决议", "降息", "鲍威尔", "通胀"],
+    "stats": {
+      "view_count": 18900,
+      "like_count": 723,
+      "share_count": 567,
+      "comment_count": 345,
+      "avg_read_time": 200
+    },
+    "engagement": {
+      "likes": [
+        {"user_id": "user_010", "time": "2025-04-03T08:30:00"}
+      ],
+      "shares": [
+        {"user_id": "user_011", "platform": "wechat", "time": "2025-04-03T09:00:00"}
+      ],
+      "bookmarks": [
+        {"user_id": "user_012", "time": "2025-04-03T09:30:00"}
+      ]
+    }
+  },
+  {
+    "article_id": "article_004",
+    "title": "深度分析：人工智能板块投资逻辑与前景展望",
+    "author": "陈思远",
+    "status": "published",
+    "publish_time": "2025-04-02T14:00:00",
+    "create_time": "2025-04-02T10:00:00",
+    "stock_codes": ["NVDA", "MSFT", "BABA"],
+    "tags": ["人工智能", "AI", "投资分析", "大模型", "芯片"],
+    "stats": {
+      "view_count": 28560,
+      "like_count": 1456,
+      "share_count": 1123,
+      "comment_count": 678,
+      "avg_read_time": 420
+    },
+    "engagement": {
+      "likes": [
+        {"user_id": "user_015", "time": "2025-04-02T15:00:00"},
+        {"user_id": "user_016", "time": "2025-04-02T16:00:00"}
+      ],
+      "shares": [
+        {"user_id": "user_017", "platform": "linkedin", "time": "2025-04-02T17:00:00"}
+      ],
+      "bookmarks": [
+        {"user_id": "user_018", "time": "2025-04-02T18:00:00"}
+      ]
+    }
+  },
+  {
+    "article_id": "article_006",
+    "title": "【草稿】宁德时代2024年年报分析",
+    "author": "刘芳",
+    "status": "draft",
+    "publish_time": null,
+    "create_time": "2025-04-03T16:00:00",
+    "stock_codes": ["300750.SZ"],
+    "tags": ["宁德时代", "动力电池", "财报"],
+    "stats": {
+      "view_count": 0,
+      "like_count": 0,
+      "share_count": 0,
+      "comment_count": 0,
+      "avg_read_time": 0
+    },
+    "engagement": {
+      "likes": [],
+      "shares": [],
+      "bookmarks": []
+    }
+  },
+  {
+    "article_id": "article_007",
+    "title": "【待审核】腾讯Q1游戏业务分析",
+    "author": "赵强",
+    "status": "pending",
+    "publish_time": null,
+    "create_time": "2025-04-02T14:00:00",
+    "stock_codes": ["0700.HK"],
+    "tags": ["腾讯", "游戏", "财报"],
+    "stats": {
+      "view_count": 0,
+      "like_count": 0,
+      "share_count": 0,
+      "comment_count": 0,
+      "avg_read_time": 0
+    },
+    "engagement": {
+      "likes": [],
+      "shares": [],
+      "bookmarks": []
+    }
+  }
+]

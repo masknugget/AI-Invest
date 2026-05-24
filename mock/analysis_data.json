@@ -1,0 +1,454 @@
+[
+  {
+    "article_id": "article_001",
+    "ner_data": {
+      "companies": [
+        {
+          "name": "贵州茅台",
+          "code": "600519.SH",
+          "type": "company",
+          "mentions": 12
+        },
+        {
+          "name": "贵州茅台酒股份有限公司",
+          "code": "600519.SH",
+          "type": "company_full",
+          "mentions": 3
+        }
+      ],
+      "persons": [
+        {
+          "name": "张明",
+          "type": "author",
+          "mentions": 1
+        }
+      ],
+      "events": [
+        {
+          "name": "2024年年报发布",
+          "type": "financial_report",
+          "date": "2025-03-31"
+        },
+        {
+          "name": "分红方案公告",
+          "type": "dividend",
+          "date": "2025-03-31"
+        }
+      ],
+      "financial_metrics": [
+        {
+          "metric": "营业收入",
+          "value": "1505亿元",
+          "change": "+18%"
+        },
+        {
+          "metric": "净利润",
+          "value": "747亿元",
+          "change": "+15%"
+        },
+        {
+          "metric": "分红",
+          "value": "每10股300元",
+          "change": null
+        }
+      ],
+      "locations": [
+        {
+          "name": "贵州省",
+          "type": "province"
+        }
+      ]
+    },
+    "label_data": {
+      "news_type": "news",
+      "category": "财报解读",
+      "impact_level": "high",
+      "asset_class": ["股票", "白酒"],
+      "sentiment": "positive",
+      "confidence": 0.92,
+      "tags": ["贵州茅台", "白酒", "财报", "分红", "业绩"],
+      "market_focus": ["A股", "消费"]
+    },
+    "event_data": {
+      "subject": "贵州茅台",
+      "action": "发布",
+      "object": "2024年年报",
+      "time": "2025-03-31",
+      "location": "上海证券交易所",
+      "participants": ["贵州茅台", "投资者"],
+      "expectation": "业绩稳健，分红超预期",
+      "reality": "净利润747亿元，分红每10股300元",
+      "gap": "符合预期",
+      "market_reaction": "股价可能上涨",
+      "affected_scope": {
+        "companies": ["贵州茅台", "五粮液", "泸州老窖"],
+        "industries": ["白酒", "食品饮料"],
+        "regions": ["中国大陆"],
+        "duration": "短期"
+      }
+    },
+    "analyst_data": {
+      "market_analyst": {
+        "view": "积极",
+        "reason": "业绩稳健，分红超预期，显示公司现金流充沛",
+        "price_target": {
+          "target": 1750.0,
+          "current": 1680.5,
+          "upside": 4.14
+        },
+        "rating": "买入"
+      },
+      "fundamentals_analyst": {
+        "view": "积极",
+        "financial_health": "优秀",
+        "key_metrics": {
+          "revenue_growth": "18%",
+          "profit_margin": "49.6%",
+          "roe": "28.5%"
+        },
+        "strengths": ["品牌护城河", "定价权", "现金流充沛"],
+        "weaknesses": ["增速放缓", "渠道库存压力"],
+        "opportunities": ["国际化", "系列酒增长"],
+        "threats": ["消费降级", "年轻消费群体流失"]
+      },
+      "news_analyst": {
+        "view": "中性偏积极",
+        "key_points": ["业绩符合预期", "分红慷慨", "市场信心稳固"],
+        "risk_factors": ["估值偏高", "行业竞争加剧"],
+        "overall_assessment": "基本面稳固，适合长期持有"
+      },
+      "social_media_analyst": {
+        "view": "积极",
+        "sentiment_score": 0.85,
+        "hot_topics": ["茅台分红", "白酒业绩", "价值投资"],
+        "influencer_opinions": [
+          {
+            "platform": "微博",
+            "sentiment": "positive",
+            "key_message": "茅台依然是最稳健的投资标的"
+          },
+          {
+            "platform": "雪球",
+            "sentiment": "positive",
+            "key_message": "分红超预期，长期看好"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "article_id": "article_002",
+    "ner_data": {
+      "companies": [
+        {
+          "name": "特斯拉",
+          "code": "TSLA",
+          "type": "company",
+          "mentions": 18
+        },
+        {
+          "name": "比亚迪",
+          "code": "BYD",
+          "type": "company",
+          "mentions": 3
+        },
+        {
+          "name": "蔚来",
+          "code": "NIO",
+          "type": "company",
+          "mentions": 2
+        },
+        {
+          "name": "小鹏汽车",
+          "code": "XPEV",
+          "type": "company",
+          "mentions": 2
+        }
+      ],
+      "persons": [
+        {
+          "name": "李华",
+          "type": "author",
+          "mentions": 1
+        }
+      ],
+      "events": [
+        {
+          "name": "Q1交付数据公布",
+          "type": "delivery_data",
+          "date": "2025-04-03"
+        }
+      ],
+      "financial_metrics": [
+        {
+          "metric": "交付量",
+          "value": "38.6万辆",
+          "change": "-8.5%"
+        }
+      ],
+      "locations": [
+        {
+          "name": "中国",
+          "type": "country"
+        },
+        {
+          "name": "美国",
+          "type": "country"
+        },
+        {
+          "name": "欧洲",
+          "type": "region"
+        }
+      ]
+    },
+    "label_data": {
+      "news_type": "news",
+      "category": "国际财经",
+      "impact_level": "high",
+      "asset_class": ["股票", "新能源汽车"],
+      "sentiment": "negative",
+      "confidence": 0.88,
+      "tags": ["特斯拉", "电动汽车", "交付量", "股价", "新能源车"],
+      "market_focus": ["美股", "全球"]
+    },
+    "event_data": {
+      "subject": "特斯拉",
+      "action": "公布",
+      "object": "2025年Q1交付数据",
+      "time": "2025-04-03",
+      "location": "全球市场",
+      "participants": ["特斯拉", "投资者", "竞争对手"],
+      "expectation": "42万辆",
+      "reality": "38.6万辆",
+      "gap": "低于预期8%",
+      "market_reaction": "股价下跌5%",
+      "affected_scope": {
+        "companies": ["特斯拉", "比亚迪", "蔚来", "小鹏"],
+        "industries": ["新能源汽车", "锂电池"],
+        "regions": ["全球"],
+        "duration": "短期"
+      }
+    },
+    "analyst_data": {
+      "market_analyst": {
+        "view": "消极",
+        "reason": "交付量不及预期，市场份额受挤压",
+        "price_target": {
+          "target": 160.0,
+          "current": 175.3,
+          "upside": -8.73
+        },
+        "rating": "中性"
+      },
+      "fundamentals_analyst": {
+        "view": "中性",
+        "financial_health": "良好",
+        "key_metrics": {
+          "delivery_growth": "-8.5%",
+          "market_share": "下降",
+          "competition": "加剧"
+        },
+        "strengths": ["技术领先", "品牌影响力", "超充网络"],
+        "weaknesses": ["产品线单一", "价格战压力"],
+        "opportunities": ["自动驾驶", "储能业务"],
+        "threats": ["中国车企竞争", "补贴退坡"]
+      },
+      "news_analyst": {
+        "view": "中性偏消极",
+        "key_points": ["交付量低于预期", "中国市场疲软", "竞争加剧"],
+        "risk_factors": ["Model Y换代期", "价格战持续"],
+        "overall_assessment": "短期承压，关注产品迭代进展"
+      },
+      "social_media_analyst": {
+        "view": "消极",
+        "sentiment_score": -0.65,
+        "hot_topics": ["特斯拉销量", "电动车竞争", "股价下跌"],
+        "influencer_opinions": [
+          {
+            "platform": "Twitter",
+            "sentiment": "negative",
+            "key_message": "Tesla losing ground in China"
+          },
+          {
+            "platform": "雪球",
+            "sentiment": "negative",
+            "key_message": "增速放缓，估值过高"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "article_id": "article_004",
+    "ner_data": {
+      "companies": [
+        {
+          "name": "英伟达",
+          "code": "NVDA",
+          "type": "company",
+          "mentions": 15
+        },
+        {
+          "name": "微软",
+          "code": "MSFT",
+          "type": "company",
+          "mentions": 12
+        },
+        {
+          "name": "谷歌",
+          "code": "GOOGL",
+          "type": "company",
+          "mentions": 8
+        },
+        {
+          "name": "Meta",
+          "code": "META",
+          "type": "company",
+          "mentions": 6
+        },
+        {
+          "name": "亚马逊",
+          "code": "AMZN",
+          "type": "company",
+          "mentions": 5
+        },
+        {
+          "name": "阿里巴巴",
+          "code": "BABA",
+          "type": "company",
+          "mentions": 4
+        },
+        {
+          "name": "百度",
+          "code": "BIDU",
+          "type": "company",
+          "mentions": 3
+        },
+        {
+          "name": "OpenAI",
+          "code": null,
+          "type": "company",
+          "mentions": 5
+        },
+        {
+          "name": "Anthropic",
+          "code": null,
+          "type": "company",
+          "mentions": 2
+        }
+      ],
+      "persons": [
+        {
+          "name": "陈思远",
+          "type": "author",
+          "mentions": 1
+        }
+      ],
+      "events": [
+        {
+          "name": "AI产业发展",
+          "type": "industry_trend",
+          "date": "2025"
+        },
+        {
+          "name": "大模型技术突破",
+          "type": "technology",
+          "date": "2024-2025"
+        }
+      ],
+      "financial_metrics": [
+        {
+          "metric": "AI投入",
+          "value": "数千亿美元",
+          "change": "持续增长"
+        }
+      ],
+      "technologies": [
+        {
+          "name": "大语言模型",
+          "type": "AI技术"
+        },
+        {
+          "name": "GPT-4",
+          "type": "AI模型"
+        },
+        {
+          "name": "多模态AI",
+          "type": "AI技术"
+        }
+      ]
+    },
+    "label_data": {
+      "news_type": "analysis",
+      "category": "深度分析",
+      "impact_level": "medium",
+      "asset_class": ["股票", "AI", "科技"],
+      "sentiment": "neutral",
+      "confidence": 0.85,
+      "tags": ["人工智能", "AI", "投资分析", "大模型", "芯片"],
+      "market_focus": ["全球", "科技股"]
+    },
+    "event_data": {
+      "subject": "AI产业",
+      "action": "发展",
+      "object": "商业化落地",
+      "time": "2025",
+      "location": "全球",
+      "participants": ["科技巨头", "创业公司", "投资者"],
+      "expectation": "AI技术商业化加速",
+      "reality": "处于从技术向商业落地过渡期",
+      "gap": "商业化路径仍在探索",
+      "market_reaction": "板块震荡调整",
+      "affected_scope": {
+        "companies": ["英伟达", "微软", "谷歌", "Meta", "阿里"],
+        "industries": ["AI芯片", "云计算", "软件"],
+        "regions": ["全球"],
+        "duration": "长期"
+      }
+    },
+    "analyst_data": {
+      "market_analyst": {
+        "view": "中性",
+        "reason": "长期前景看好，但短期估值偏高",
+        "sector_outlook": "长期看好",
+        "recommended_allocation": "核心+卫星策略"
+      },
+      "fundamentals_analyst": {
+        "view": "中性偏积极",
+        "industry_health": "快速发展",
+        "key_metrics": {
+          "market_size": "快速增长",
+          "investment": "持续加大",
+          "competition": "激烈"
+        },
+        "strengths": ["技术突破", "政策支持", "资本投入"],
+        "weaknesses": ["商业化路径不明", "盈利能力待验证"],
+        "opportunities": ["行业应用", "效率提升"],
+        "threats": ["估值过高", "监管风险"]
+      },
+      "news_analyst": {
+        "view": "中性",
+        "key_points": ["技术进步", "竞争激烈", "商业化探索"],
+        "risk_factors": ["估值泡沫", "盈利不确定性"],
+        "overall_assessment": "关注基本面和估值合理性"
+      },
+      "social_media_analyst": {
+        "view": "中性",
+        "sentiment_score": 0.15,
+        "hot_topics": ["AI投资", "大模型", "商业化"],
+        "influencer_opinions": [
+          {
+            "platform": "Twitter",
+            "sentiment": "mixed",
+            "key_message": "AI hype vs reality"
+          },
+          {
+            "platform": "雪球",
+            "sentiment": "neutral",
+            "key_message": "长期看好，短期谨慎"
+          }
+        ]
+      }
+    }
+  }
+]

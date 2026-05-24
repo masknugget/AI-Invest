@@ -1,0 +1,82 @@
+[
+  {
+    "name": "财经早报",
+    "url": "https://finance.news",
+    "publish_time": "2025-03-31T08:00:00",
+    "author": "张明",
+    "type": "财经媒体",
+    "credibility_score": 0.92
+  },
+  {
+    "name": "华尔街见闻",
+    "url": "https://wallstreetcn.com",
+    "publish_time": "2025-04-03T05:00:00",
+    "author": "李华",
+    "type": "财经媒体",
+    "credibility_score": 0.89
+  },
+  {
+    "name": "FX168财经",
+    "url": "https://fx168.com",
+    "publish_time": "2025-04-03T07:00:00",
+    "author": "王磊",
+    "type": "专业财经",
+    "credibility_score": 0.85
+  },
+  {
+    "name": "深度投研",
+    "url": "https://research.invest",
+    "publish_time": "2025-04-02T13:00:00",
+    "author": "陈思远",
+    "type": "研究机构",
+    "credibility_score": 0.88
+  },
+  {
+    "name": "财联社",
+    "url": "https://cls.cn",
+    "publish_time": "2025-03-28T18:30:00",
+    "author": "快讯编辑部",
+    "type": "财经媒体",
+    "credibility_score": 0.91
+  },
+  {
+    "name": "证券时报",
+    "url": "https://stcn.com",
+    "publish_time": "2025-04-01T09:00:00",
+    "author": "刘芳",
+    "type": "官方媒体",
+    "credibility_score": 0.95
+  },
+  {
+    "name": "中国证券报",
+    "url": "https://cs.com.cn",
+    "publish_time": "2025-04-02T10:00:00",
+    "author": "赵强",
+    "type": "官方媒体",
+    "credibility_score": 0.94
+  },
+  {
+    "name": "第一财经",
+    "url": "https://yicai.com",
+    "publish_time": "2025-04-03T14:00:00",
+    "author": "孙丽",
+    "type": "财经媒体",
+    "credibility_score": 0.90
+  },
+  {
+    "name": "摩根士丹利",
+    "url": "https://morganstanley.com",
+    "publish_time": "2025-03-30T16:00:00",
+    "author": "研究报告部",
+    "type": "投行/券商",
+    "credibility_score": 0.93
+  },
+  {
+    "name": "高盛研究",
+    "url": "https://goldmansachs.com",
+    "publish_time": "2025-04-02T11:00:00",
+    "author": "全球投资研究部",
+    "type": "投行/券商",
+    "credibility_score": 0.94
+  }
+]

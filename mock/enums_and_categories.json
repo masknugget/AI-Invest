@@ -1,0 +1,167 @@
+{
+  "categories": [
+    {
+      "id": "category_001",
+      "name": "财报解读",
+      "description": "上市公司财报分析与解读",
+      "parent_id": null,
+      "sort_order": 1
+    },
+    {
+      "id": "category_002",
+      "name": "国际财经",
+      "description": "国际金融市场动态",
+      "parent_id": null,
+      "sort_order": 2
+    },
+    {
+      "id": "category_003",
+      "name": "宏观政策",
+      "description": "宏观经济政策分析",
+      "parent_id": null,
+      "sort_order": 3
+    },
+    {
+      "id": "category_004",
+      "name": "深度分析",
+      "description": "深度研究报告与分析",
+      "parent_id": null,
+      "sort_order": 4
+    },
+    {
+      "id": "category_005",
+      "name": "行业研究",
+      "description": "行业趋势与前景分析",
+      "parent_id": "category_004",
+      "sort_order": 1
+    },
+    {
+      "id": "category_006",
+      "name": "个股研究",
+      "description": "个股深度研究",
+      "parent_id": "category_004",
+      "sort_order": 2
+    },
+    {
+      "id": "category_007",
+      "name": "市场快讯",
+      "description": "实时市场快讯",
+      "parent_id": null,
+      "sort_order": 5
+    }
+  ],
+  "article_status": [
+    {
+      "value": "draft",
+      "label": "草稿",
+      "description": "文章草稿状态"
+    },
+    {
+      "value": "pending",
+      "label": "待审核",
+      "description": "等待审核发布"
+    },
+    {
+      "value": "published",
+      "label": "已发布",
+      "description": "已公开发布"
+    },
+    {
+      "value": "archived",
+      "label": "已归档",
+      "description": "已归档的文章"
+    },
+    {
+      "value": "deleted",
+      "label": "已删除",
+      "description": "已删除的文章"
+    }
+  ],
+  "news_types": [
+    {
+      "value": "flash",
+      "label": "快讯",
+      "description": "简短的实时快讯"
+    },
+    {
+      "value": "news",
+      "label": "新闻",
+      "description": "标准新闻报道"
+    },
+    {
+      "value": "analysis",
+      "label": "深度分析",
+      "description": "深度分析文章"
+    },
+    {
+      "value": "research",
+      "label": "研究报告",
+      "description": "专业研究报告"
+    },
+    {
+      "value": "opinion",
+      "label": "观点评论",
+      "description": "观点评论文章"
+    }
+  ],
+  "sentiment_types": [
+    {
+      "value": "positive",
+      "label": "正面",
+      "description": "积极乐观的情感",
+      "score_range": [0.3, 1.0]
+    },
+    {
+      "value": "neutral",
+      "label": "中性",
+      "description": "中性的情感",
+      "score_range": [-0.3, 0.3]
+    },
+    {
+      "value": "negative",
+      "label": "负面",
+      "description": "消极负面的情感",
+      "score_range": [-1.0, -0.3]
+    },
+    {
+      "value": "mixed",
+      "label": "多空交织",
+      "description": "多空观点交织",
+      "score_range": [-0.5, 0.5]
+    }
+  ],
+  "impact_levels": [
+    {
+      "value": "high",
+      "label": "高影响",
+      "description": "对市场或个股有重大影响"
+    },
+    {
+      "value": "medium",
+      "label": "中等影响",
+      "description": "对市场或个股有中等影响"
+    },
+    {
+      "value": "low",
+      "label": "低影响",
+      "description": "对市场或个股影响较小"
+    }
+  ],
+  "access_levels": [
+    {
+      "value": "free",
+      "label": "免费",
+      "description": "所有用户可访问"
+    },
+    {
+      "value": "vip",
+      "label": "VIP",
+      "description": "VIP会员可访问"
+    },
+    {
+      "value": "premium",
+      "label": "高级会员",
+      "description": "高级会员专享"
+    }
+  ]
+}
