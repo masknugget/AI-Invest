@@ -18,7 +18,7 @@ from app.core.db.document import (
     get_user_profile, get_rec_history, get_insight_by_id
 )
 from app.routers.auth_db import get_current_user
-from app.services.recommendation.user_profile_service import USER_PROFILE_TAGS
+
 from tradingagents.searcher import VectorStore
 
 logger = logging.getLogger("webapi")
@@ -50,6 +50,7 @@ def get_tag_name(name_str):
     Returns:
 
     """
+    from recommender.user_profile.gen_user_profiles import USER_PROFILE_TAGS
     if name_str in USER_PROFILE_TAGS:
         return USER_PROFILE_TAGS[name_str]
     return name_str
@@ -85,7 +86,7 @@ async def get_feed(
     history = get_rec_history(user_id)
 
     # 召回
-    vector_store = VectorStore('insight_news')
+    vector_store = VectorStore('insight_agg')
 
     result = []
     for tag in tags_zn:
@@ -119,12 +120,9 @@ async def get_feed(
     for item in result_sorted:
         data = {
             "id": item.id,
-            "content": item.content,
-            "uuid": item.metadata.get('uuid'),
-            "data_ner": item.metadata.get('data_ner'),
-            "data_label": item.metadata.get('data_label'),
-            "data_event": item.metadata.get('data_event'),
-            "data_report": item.metadata.get('data_report'),
+            "title": item.metadata.get('title'),
+            "uuid": item.metadata.get('article_id'),
+            'language': item.metadata.get('language'),
         }
         out_data.append(data)
 

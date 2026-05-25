@@ -471,13 +471,13 @@ def get_insight_by_id(insight_id: str) -> Optional[Dict[str, Any]]:
     client = MongoClient(MONGO_URI)
     try:
         db = client['tradingagents']
-        coll = db['insight_news']
+        coll = db['insight_agg']
 
         try:
             obj_id = ObjectId(insight_id)
         except Exception:
             # 如果 insight_id 不是有效的 ObjectId，尝试用字符串匹配
-            doc = coll.find_one({"uuid": insight_id})
+            doc = coll.find_one({'article_id': insight_id})
             if doc:
                 doc.pop("_id", None)
                 return doc
