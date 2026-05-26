@@ -1,13 +1,13 @@
-from research.newsReader.agents.analyst.high_dividend_analyst import prompt_high_dividend
-from research.newsReader.agents.analyst.highlow52_analyst import prompt_highlow52
-from research.newsReader.agents.analyst.industry_analyst import prompt_industry
-from research.newsReader.agents.analyst.macro_analyst import prompt_macro
-from research.newsReader.agents.analyst.micro_analyst import prompt_micro
-from research.newsReader.agents.analyst.portfolio_analyst import prompt_portfolio
-from research.newsReader.agents.analyst.price_fluctuation_analyst import prompt_price_fluctuation
-from research.newsReader.agents.analyst.repurchase_analyst import prompt_repurchase
-from research.newsReader.agents.analyst.symbol.technical_analyst import prompt_technical
-from research.newsReader.agents.analyst.symbol.fundamental_analyst import prompt_fundamental
+from recommender.newsReader.agents.analyst.symbol.high_dividend_analyst import prompt_high_dividend
+from recommender.newsReader.agents.analyst.symbol.highlow52_analyst import prompt_highlow52
+from recommender.newsReader.agents.analyst.industry_analyst import prompt_industry
+from recommender.newsReader.agents.analyst.macro_analyst import prompt_macro
+from recommender.newsReader.agents.analyst.micro_analyst import prompt_micro
+from recommender.newsReader.agents.analyst.portfolio_analyst import prompt_portfolio
+from recommender.newsReader.agents.analyst.price_fluctuation_analyst import prompt_price_fluctuation
+from recommender.newsReader.agents.analyst.repurchase_analyst import prompt_repurchase
+from recommender.newsReader.agents.analyst.symbol.technical_analyst import prompt_technical
+from recommender.newsReader.agents.analyst.symbol.fundamental_analyst import prompt_fundamental
 
 _Mapping = {
     "MacroAgent": prompt_macro(),
