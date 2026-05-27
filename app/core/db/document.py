@@ -249,7 +249,7 @@ def log_views_insight(user_id: Union[str, int], insight_id: str) -> None:
     client = MongoClient(MONGO_URI)
     try:
         db = client['rec_history']
-        coll = db['insight_views']
+        coll = db['insight_agg']
         log_entry = {
             "timestamp": datetime.now(),
             "user_id": user_id,
@@ -282,7 +282,7 @@ def get_views_insight(
     client = MongoClient(MONGO_URI)
     try:
         db = client['rec_history']
-        coll = db['insight_views']
+        coll = db['insight_agg']
 
         if user_id is None:
             return {
@@ -296,6 +296,11 @@ def get_views_insight(
         skip = (page - 1) * page_size
         cursor = coll.find(filter_dict).sort("timestamp", DESCENDING).skip(skip).limit(page_size)
         items = [{k: v for k, v in doc.items() if k != "_id"} for doc in cursor]
+
+        # 去重
+        df = pd.DataFrame(items)
+        unique_df = df.drop_duplicates(subset='insight_id', keep='first')
+        items = unique_df.to_dict('records')
 
         # 获取总数
         total = coll.count_documents(filter_dict)

@@ -14,6 +14,7 @@ p2 = r'F:\project_work\hf\AI-Invest\mock\mock_articles_002.json'
 p3 = r'F:\project_work\hf\AI-Invest\mock\mock_articles_003.json'
 p4 = r'F:\project_work\hf\AI-Invest\mock\mock_articles_004.json'
 p5 = r'F:\project_work\hf\AI-Invest\mock\mock_articles_005.json'
+p6 = r'F:\project_work\hf\AI-Invest\mock\documents.json'
 
 
 all_data = []
@@ -21,9 +22,12 @@ for i in [p1, p2, p3, p4, p5]:
     all_data.extend(load_dict(i))
 
 
-
+all_data = load_dict(p6)
 db = get_mongo_db_sync()
-collection = db["insight_agg"]
+collection = db["insight_aggs"]
+
+
+
 inserted = 0
 failed = 0
 for item in all_data:

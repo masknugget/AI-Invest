@@ -95,7 +95,7 @@ async def get_feed(
 
     dt_dict = {}
     for item in result:
-        if item.id in history:
+        if item.metadata.get('article_id') in history:
             continue
         dt_dict[item.id] = item
 
@@ -107,7 +107,7 @@ async def get_feed(
     result_sorted = result_sorted[:3]
 
     # 记录推荐历史
-    rec_ids = [i.id for i in result_sorted]
+    rec_ids = [i.metadata.get("article_id") for i in result_sorted]
     data_rec_log = {
         'user_id': user_id,
         'rec_content_ids': rec_ids,
@@ -119,7 +119,7 @@ async def get_feed(
     out_data = []
     for item in result_sorted:
         data = {
-            "id": item.id,
+            # "id": item.id,
             "title": item.metadata.get('title'),
             "uuid": item.metadata.get('article_id'),
             'language': item.metadata.get('language'),
@@ -177,11 +177,12 @@ async def get_insight_detail(
     if fromFeed:
         logger.info(f"Insight {insightId} viewed from feed")
 
+    out_data = detail.get('data_align')
     # 记录浏览历史
     user_id = "admin123"
     log_views_insight(user_id, insightId)
 
-    return detail
+    return out_data
 
 
 @router.get("/history/recommendations", summary="获取推荐历史")

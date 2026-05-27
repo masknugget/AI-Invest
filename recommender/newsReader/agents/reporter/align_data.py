@@ -6,7 +6,8 @@ def prompt_align_data(data_dict):
 # Task
 基于以下多模态输入数据，生成一个严格符合格式的 JSON 对象。输入包含：
 1. `data_report` — 综合报告正文（Markdown格式）
-2. `IndustryAgent` — 深度行业分析（含10步推理链）
+2. `news` - 新闻内容
+2. `**Agent` — 深度分析（含10步推理链）
 3. `data_ner` — 命名实体识别结果
 4. `data_label` — 新闻分类标签
 5. `data_event` — 事件关系与影响范围
@@ -15,17 +16,17 @@ def prompt_align_data(data_dict):
 请严格按照以下字段生成，缺失值用 null 或空数组/空字符串表示：
 
 {{
-    "title": "str — 从data_report标题或核心结论提取，20字以内，突出事件+影响",
+    "title": "str — 从data_report标题或核心结论中提取，结合news内容,20字以内，突出事件+影响",
     "sub_title": "str — 从data_report副标题或Step 1重要性判断提取，40字以内，补充量化数据",
-    "summary": "str — 从data_report核心结论前置部分提取，200字以内，包含事件、数据、影响方向",
-    "content": "str — 将data_report正文去Markdown表格/代码块后转为纯文本，保留关键数据；若data_report为空则取IndustryAgent全文",
+    "summary": "str — 从data_report核心结论前置部分提取，结合news内容，200字以内，包含事件、数据、影响方向",
+    "content": "str — 将data_report部分，为md格式的正文，可以稍微结合上下文修改以下，但要保持md格式，并且这是一个解读分析的报告",
     "source": {{
         "name": "str — 固定为'市场监管总局'或从data_ner中CENTRAL_BANK实体提取",
         "url": "str — 若无可填null",
         "publish_time": "str — 从data_event或data_label中推断，格式'2024-06-XX'"
     }},
-    "category_id": "str — 从data_label.classification.news_type主标签映射：POLICY→'policy', EVENT→'event'",
-    "category_name": "str — 中文映射：POLICY→'政策监管', EVENT→'行业事件'",
+    "category_id": "str — 从data_label.classification.news_type主标签映射：例如POLICY→'policy', EVENT→'event' 或者其他",
+    "category_name": "str — 中文映射：POLICY→'政策监管', EVENT→'行业事件' 等等",
     "stock_codes": [
         {{
             "code": "str — 股票代码",
@@ -40,9 +41,7 @@ def prompt_align_data(data_dict):
     "language": "str — 固定'zh-CN'",
     "news_type": "str — 从data_label.classification.news_type取置信度最高的label",
     "tags": ["str — 从data_ner实体类型+data_label影响级别组合，如'无人机','低空经济','政策监管','召回管理'],
-    "keywords": ["str — 从data_ner实体文本+IndustryAgent高频词，如'市场监管总局','缺陷信息','车规级芯片'],
-    "create_time": "str — 当前处理时间，格式'2024-06-26 14:30:00'",
-    "publish_time": "str — 从data_event或source推断，格式同上",
+    "keywords": ["str — 从data_ner实体文本+**Agent高频词，如'市场监管总局','缺陷信息','车规级芯片'],
     "metadata": {{
         "impact_level": ["str — data_label.classification.impact_level所有label"],
         "sentiment": "str — data_label.classification.sentiment.label",
@@ -58,11 +57,11 @@ def prompt_align_data(data_dict):
 }}
 
 # Extraction Rules
-1. **stock_codes**：从IndustryAgent Step 8（A股标的映射）和Step 4（产业链图谱）提取所有提到的A股标的，结合`影响方向`判断impact字段。必须包含：敏芯股份(688286)、晶晨股份(688099)、航天彩虹(002389)、纵横股份(688070)、中科星图(688568)、海康威视(002415)。代码前缀：688→SH，002/000→SZ。
-2. **title**：必须包含"无人机"和"召回"关键词，参考data_report主标题风格。
-3. **sub_title**：必须包含量化数字"579例"和"2797台"。
-4. **tags**：必须包含'低空经济'、'无人机'、'召回监管'。
-5. **keywords**：必须包含'市场监管总局'、'缺陷信息'、'车规级认证'。
+1. **stock_codes**：。
+2. **title**：。
+3. **sub_title**：。
+4. **tags**：。
+5. **keywords**：。
 6. **metadata**：完整保留原始分类置信度和路由信息，便于下游系统追溯。
 7. **content**：保留所有关键推理链和量化数据，但移除Mermaid图表语法和复杂表格，转为段落描述。
 

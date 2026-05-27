@@ -11,7 +11,7 @@ from recommender.newsReader.agents.pipelines.router import prompt_router
 from recommender.newsReader.agents.report import prompt_report
 from recommender.newsReader.agents.reporter.align_data import prompt_align_data
 from recommender.newsReader.llms import chat_once
-from recommender.newsReader.utils import parse_json_from_llm
+from recommender.newsReader.utils import parse_json_from_llm, gen_uuid
 
 dir_path = r'D:\BaiduNetdiskDownload\财经新闻\新浪财经新闻-2025'
 
@@ -34,6 +34,7 @@ for i in file_names:
 content = news[100]
 
 
+artical_id = gen_uuid()
 
 p_ner = prompt_ner()
 p_labels = prompt_labels()

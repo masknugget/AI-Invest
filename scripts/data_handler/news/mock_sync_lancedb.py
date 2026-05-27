@@ -16,6 +16,7 @@ print(f"从 MongoDB 读取到 {len(documents)} 条数据")
 # content 字段作为 content，其余字段作为 metadata
 vector_docs = []
 for doc in documents:
+    doc =  doc.get("data_align")
     # 获取 content 字段
     content = doc.get("content", "")
     if not content:
