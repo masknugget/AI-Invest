@@ -1,0 +1,12 @@
+{
+  "industries": [
+    {"name": "日常消费", "percentage": 42, "color": "#4472C4", "category": "defensive"},
+    {"name": "信息技术", "percentage": 25, "color": "#ED7D31", "category": "growth"},
+    {"name": "医疗保健", "percentage": 18, "color": "#A5A5A5", "category": "defensive"}
+  ],
+  "others": {"name": "其他", "percentage": 15, "color": "#B4C7E7"},
+  "total": 100,
+  "is_concentrated": true,
+  "max_single_ratio": 42,
+  "disclaimer": "以上行业分布由 AI 模型基于模拟持仓数据生成，仅供参考，不构成投资建议。"
+}

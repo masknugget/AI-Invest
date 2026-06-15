@@ -1,0 +1,18 @@
+{
+  "current_metrics": {
+    "expected_annual_return": 0.082,
+    "volatility": 0.18,
+    "sharpe_ratio": 0.45,
+    "max_drawdown_1y": -0.25
+  },
+  "risk_match": {
+    "user_risk_level": "R3",
+    "portfolio_risk_level": "R4",
+    "is_matched": false,
+    "alert": "当前组合风险高于您的风险承受能力"
+  },
+  "industry_concentration": {
+    "top3_industry": ["白酒", "半导体", "医药"],
+    "max_industry_weight": 0.45
+  }
+}

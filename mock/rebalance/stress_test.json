@@ -1,0 +1,19 @@
+{
+  "scenario": {
+    "id": "2008_financial_crisis",
+    "name": "2008年金融危机",
+    "period": "2007-10~2009-03"
+  },
+  "portfolio_drawdown": -0.324,
+  "benchmark_drawdown": -0.289,
+  "single_fund_alert": {
+    "label": "科技股板块整体回调",
+    "drawdown": -0.458
+  },
+  "scenario_list": [
+    { "id": "2008_financial_crisis", "name": "2008年金融危机", "is_default": true },
+    { "id": "2015_stock_crash", "name": "2015年股灾" },
+    { "id": "2020_covid", "name": "2020年疫情熔断" },
+    { "id": "2022_rate_hike", "name": "2022年美联储加息" }
+  ]
+}

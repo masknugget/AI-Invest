@@ -1,0 +1,11 @@
+{
+  "plan_id": "PLAN_20260614_001",
+  "status": "generated",
+  "optimized_metrics": {
+    "expected_annual_return": 0.105,
+    "volatility": 0.158,
+    "volatility_reduction": 0.123,
+    "sharpe_ratio": 0.66
+  },
+  "created_at": "2026-06-14T09:30:00Z"
+}

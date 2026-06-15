@@ -1,0 +1,23 @@
+{
+  "plan_id": "PLAN_20260614_001",
+  "current_metrics": {
+    "expected_annual_return": 0.082,
+    "volatility": 0.18
+  },
+  "optimized_metrics": {
+    "expected_annual_return": 0.105,
+    "volatility": 0.158,
+    "volatility_reduction": 0.123
+  },
+  "trades": {
+    "sell": [
+      { "fund_code": "005827", "fund_name": "易方达蓝筹精选", "amount": 13563, "reason": "减少风险暴露", "weight_before": 0.35, "weight_after": 0 },
+      { "fund_code": "320007", "fund_name": "诺安成长混合", "amount": 7900, "reason": "减少风险暴露", "weight_before": 0.20, "weight_after": 0 }
+    ],
+    "buy": [
+      { "fund_code": "012348", "fund_name": "恒生科技ETF", "amount": 12000, "reason": "增加成长风格", "weight_before": 0, "weight_after": 0.30 },
+      { "fund_code": "515080", "fund_name": "招商中证红利ETF", "amount": 9463, "reason": "增加稳健收益", "weight_before": 0, "weight_after": 0.25 }
+    ]
+  },
+  "estimated_fee": 156.8
+}

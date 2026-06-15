@@ -1,0 +1,47 @@
+{
+  "dimensions": [
+    {
+      "key": "return_stability",
+      "name": "收益稳定性",
+      "score": 75,
+      "weight": 0.20,
+      "description": "近一年收益波动较小"
+    },
+    {
+      "key": "style_balance",
+      "name": "风格均衡",
+      "score": 60,
+      "weight": 0.20,
+      "description": "成长与价值风格配置尚不均衡"
+    },
+    {
+      "key": "cost_performance",
+      "name": "持仓性价比",
+      "score": 65,
+      "weight": 0.20,
+      "description": "整体估值处于合理区间"
+    },
+    {
+      "key": "drawback_resistance",
+      "name": "抗回撤能力",
+      "score": 70,
+      "weight": 0.20,
+      "description": "最大回撤控制尚可"
+    },
+    {
+      "key": "industry_diversification",
+      "name": "行业分散度",
+      "score": 55,
+      "weight": 0.20,
+      "description": "行业集中度偏高，存在单一行业依赖"
+    }
+  ],
+  "benchmark": [
+    {"key": "return_stability", "avg_score": 68},
+    {"key": "style_balance", "avg_score": 72},
+    {"key": "cost_performance", "avg_score": 66},
+    {"key": "drawback_resistance", "avg_score": 64},
+    {"key": "industry_diversification", "avg_score": 70}
+  ],
+  "disclaimer": "以上维度评分由 AI 模型生成，仅供参考，不构成投资建议。"
+}

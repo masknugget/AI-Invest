@@ -1,0 +1,40 @@
+{
+  "solution_id": "sol_001",
+  "title": "AI 智能调仓方案",
+  "summary": "基于你的风险偏好，建议将消费板块占比从 42% 降至 30%，增配信息技术 10%、债券基金 15%。",
+  "expected_improvement": {
+    "score_before": 72,
+    "score_after": 85,
+    "volatility_reduction": "5%",
+    "industry_balance_improvement": "显著"
+  },
+  "actions": [
+    {
+      "action": "reduce",
+      "target": "消费主题基金",
+      "current_ratio": "42%",
+      "suggested_ratio": "30%",
+      "reason": "行业过度集中"
+    },
+    {
+      "action": "increase",
+      "target": "信息技术指数基金",
+      "current_ratio": "25%",
+      "suggested_ratio": "35%",
+      "reason": "提升成长性"
+    },
+    {
+      "action": "increase",
+      "target": "债券型基金",
+      "current_ratio": "0%",
+      "suggested_ratio": "15%",
+      "reason": "平滑波动、增强抗回撤能力"
+    }
+  ],
+  "disclaimer": "以上建议由 AI 模型生成，仅供参考，不构成投资建议。市场有风险，投资需谨慎。",
+  "cta_button": {
+    "text": "查看 AI 优化方案",
+    "action": "navigate",
+    "target_page": "/ai-solution/detail"
+  }
+}
