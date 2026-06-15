@@ -62,17 +62,12 @@ def get_tag_name(name_str):
 
 @router.get("/feed", summary="获取 AI Insights Feed 流")
 async def get_feed(
-        pageSize: int = Query(5, ge=1, le=20, description="单次拉取数量"),
-        cursor: Optional[str] = Query(None, description="分页游标"),
-        filterTypes: Optional[str] = Query(None, description="逗号分隔的内容类型过滤，如 MACRO,SECTOR,VOLATILITY"),
+        k: int = Query(3, ge=1, le=30, description="返回数据的天数（控制召回数量）"),
         # user: dict = Depends(get_current_user),
 ):
     """
     获取 AI 洞察卡片 Feed 流，用于首页 "HSBC AI: Market Insights for You" 模块。
-    
-    - `pageSize`: 单次拉取数量，默认 5，最大 20
-    - `cursor`: 分页游标，首次请求为空，翻页时传入上次响应的 nextCursor
-    - `filterTypes`: 逗号分隔的内容类型过滤
+    - `k`: 返回数据的天数（控制召回数量），默认 5，最大 30
     """
 
     user_id = "admin123"
@@ -90,7 +85,7 @@ async def get_feed(
 
     result = []
     for tag in tags_zn:
-        vector = vector_store.search(tag, top_k=5)
+        vector = vector_store.search(tag, top_k=k)
         result.extend(vector)
 
     dt_dict = {}
@@ -104,7 +99,7 @@ async def get_feed(
     # 评分排序
     result_sorted = sorted(result, key=lambda x: x.score, reverse=True)
 
-    result_sorted = result_sorted[:3]
+    result_sorted = result_sorted[:k]
 
     # 记录推荐历史
     rec_ids = [i.metadata.get("article_id") for i in result_sorted]

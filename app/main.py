@@ -33,6 +33,7 @@ from app.routers import chat_bot
 from app.routers import search as search_router
 from app.routers import recommendation as recommendation_router
 from app.routers import ai_insights as ai_insights_router
+from app.routers import portfolio_advisor as portfolio_advisor_router
 
 
 
@@ -314,6 +315,8 @@ app.include_router(chat_bot.router, prefix="/api/chatbot", tags=["chatbot"])
 app.include_router(search_router.router, prefix="/api", tags=["search"])
 app.include_router(recommendation_router.router, prefix="/api", tags=["recommendation"])
 app.include_router(ai_insights_router.router, prefix="/api", tags=["ai-insights"])
+app.include_router(portfolio_advisor_router.router, prefix="/api", tags=["risk-diagnosis"])
+app.include_router(portfolio_advisor_router.rebalance_router, prefix="/api", tags=["rebalance"])
 
 
 
