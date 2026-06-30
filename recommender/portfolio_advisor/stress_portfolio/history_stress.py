@@ -33,7 +33,7 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
-from research.portfolio_advisor.stress_portfolio.const import (
+from recommender.portfolio_advisor.stress_portfolio.const import (
     HISTORICAL_SCENARIOS,
     StressScenario,
     build_scenarios,

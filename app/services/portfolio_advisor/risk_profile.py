@@ -1,12 +1,11 @@
 """
 投资组合风险画像服务（初步实现）
 
-基于 mock 数据提供账户健康度、五维评分、风险提示、行业分布、
-分享功能与 AI 优化方案的骨架实现。
+基于 mock 数据提供账户健康度、五维评分、风险提示、行业分布
+与 AI 优化方案的骨架实现。
 """
 
 import json
-import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -123,46 +122,6 @@ def get_industry_distribution(user_id: str, top_n: int = 5) -> Dict[str, Any]:
     data["total"] = sum(i.get("percentage", 0) for i in top_industries) + others_percentage
     data.setdefault("user_id", user_id)
     return data
-
-
-def create_share(
-    user_id: str,
-    share_type: str,
-    content_scope: str,
-    custom_text: Optional[str] = None
-) -> Dict[str, Any]:
-    """
-    生成风险诊断分享内容。
-
-    Args:
-        user_id: 用户标识
-        share_type: poster / link / wechat
-        content_scope: summary / full
-        custom_text: 用户自定义文案（可选）
-
-    Returns:
-        分享 ID、链接、海报地址、过期时间等
-    """
-    share_id = f"sh_{uuid.uuid4().hex[:8]}"
-    expire_at = (datetime.utcnow() + timedelta(hours=8, days=7)).strftime("%Y-%m-%d %H:%M:%S")
-
-    title = "我的账户健康度 72 分，快来看看你的！"
-    desc = "良好（亚健康）- 收益稳健，但行业集中度偏高"
-    if custom_text:
-        desc = custom_text
-
-    return {
-        "share_id": share_id,
-        "share_url": f"https://app.example.com/risk-report?token={share_id}",
-        "poster_url": f"https://cdn.example.com/posters/risk_{share_id}.png",
-        "expire_at": expire_at,
-        "title": title,
-        "desc": desc,
-        "share_type": share_type,
-        "content_scope": content_scope,
-        "user_id": user_id,
-        "disclaimer": "以上分享内容基于模拟数据生成，仅供参考，不构成投资建议。"
-    }
 
 
 def get_ai_solution(user_id: str, scenario: str = "risk_optimization") -> Dict[str, Any]:

@@ -14,10 +14,11 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from tradingagents.llm_adapters.embeddings import create_dashscope_embeddings
+
 
 from recommender.models import StockRecommendation
 from recommender.stock_scanner import get_all_symbols
+from tradingagents.llm_adapters.embeddings import create_embeddings
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +101,7 @@ def init_mongodb(uri: str = MONGO_URI, db_name: str = REC_DB) -> tuple[MongoClie
 
 def init_embeddings():
     """初始化嵌入模型"""
-    return create_dashscope_embeddings()
+    return create_embeddings()
 
 
 # ==================== 核心处理函数 ====================

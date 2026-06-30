@@ -9,7 +9,7 @@ from typing import List, Set, Tuple
 import numpy as np
 import pandas as pd
 
-from research.portfolio_advisor.rebalance.types import StockCandidate
+from recommender.portfolio_advisor.rebalance.types import StockCandidate
 
 
 WEIGHT_STRATEGIES: Set[str] = {"proportional", "equal", "fixed_new_weight"}

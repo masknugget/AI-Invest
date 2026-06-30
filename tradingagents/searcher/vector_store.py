@@ -9,7 +9,7 @@ import uuid
 from typing import List, Dict, Any, Optional, Union
 from dataclasses import dataclass
 
-from tradingagents.llm_adapters.embeddings import OpenAIEmbeddings, create_dashscope_embeddings, HSBCEmbeddings
+from tradingagents.llm_adapters.embeddings import OpenAIEmbeddings, create_hsbc_embeddings, HSBCEmbeddings
 from tradingagents.agents.utils.lancedb_config import (
     get_default_lancedb_db,
     get_persistent_lancedb_db,
@@ -57,7 +57,7 @@ class VectorStore:
 
         Args:
             collection_name: 集合名称（LanceDB 中对应表名）
-            embeddings: Embeddings 实例，默认使用 DashScope
+            embeddings: Embeddings 实例，默认使用 HSBC Embeddings
             db_client: LanceDB 数据库连接实例（可选）
             persist_directory: 数据持久化目录
                 - None: 使用默认持久化路径 ./data/lancedb/
@@ -70,10 +70,10 @@ class VectorStore:
         # 初始化 Embeddings
         if embeddings is None:
             try:
-                self.embeddings = create_dashscope_embeddings()
-                logger.info("✅ VectorStore 使用 DashScope Embeddings")
+                self.embeddings = create_hsbc_embeddings()
+                logger.info("✅ VectorStore 使用 HSBC Embeddings")
             except Exception as e:
-                logger.warning(f"⚠️ DashScope 初始化失败，尝试 OpenAI: {e}")
+                logger.warning(f"⚠️ HSBC Embeddings 初始化失败: {e}")
                 self.embeddings = OpenAIEmbeddings()
         else:
             self.embeddings = embeddings
@@ -436,7 +436,7 @@ class VectorStore:
 
 def create_vector_store(
     collection_name: str = "default",
-    use_dashscope: bool = True,
+    use_hsbc: bool = True,
     persist_directory: Optional[str] = None,
 ) -> VectorStore:
     """
@@ -444,14 +444,14 @@ def create_vector_store(
 
     Args:
         collection_name: 集合名称
-        use_dashscope: 是否使用 DashScope（否则使用 OpenAI）
+        use_hsbc: 是否使用 HSBC Embeddings（否则使用 OpenAIEmbeddings）
         persist_directory: 数据持久化目录，如 "./data/lancedb"
 
     Returns:
         VectorStore: 向量存储实例
     """
-    if use_dashscope:
-        embeddings = create_dashscope_embeddings()
+    if use_hsbc:
+        embeddings = create_hsbc_embeddings()
     else:
         embeddings = OpenAIEmbeddings()
 

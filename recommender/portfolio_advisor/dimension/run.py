@@ -17,25 +17,25 @@ from typing import List, Mapping, Optional, Union, cast
 
 import pandas as pd
 
-from infra_structure.data_engine.visitor.file_visitor import FileVisitor
+from recommender.portfolio_advisor.data_read import load_all
 
-from research.portfolio_advisor.dimension.drawdown_control import (
+from recommender.portfolio_advisor.dimension.drawdown_control import (
     calculate_portfolio_mdd,
     normalize_mdd_to_score,
 )
-from research.portfolio_advisor.dimension.portfolio_diversification import (
+from recommender.portfolio_advisor.dimension.portfolio_diversification import (
     compute_enb_from_dataframes,
     normalize_enb_to_score,
 )
-from research.portfolio_advisor.dimension.position_efficiency import (
+from recommender.portfolio_advisor.dimension.position_efficiency import (
     calculate_portfolio_sharpe_ratio,
     normalize_sharpe_to_score,
 )
-from research.portfolio_advisor.dimension.return_stability import (
+from recommender.portfolio_advisor.dimension.return_stability import (
     calculate_annualized_volatility,
     normalize_volatility_to_score,
 )
-from research.portfolio_advisor.dimension.style_balance import (
+from recommender.portfolio_advisor.dimension.style_balance import (
     calculate_style_hhi,
     normalize_style_hhi_to_score,
 )
@@ -311,9 +311,15 @@ def compute_portfolio_dimensions(
 
 
 def load_random_portfolio(n_assets: int = 5) -> List[pd.DataFrame]:
-    """通过 FileVisitor 随机抽取 n 只标的的日频行情数据。"""
-    file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
-    return [file_visitor.random_one() for _ in range(n_assets)]
+    """读取 recommender/portfolio_advisor/data 下的 df_1 ~ df_5 并返回 DataFrame 列表。
+
+    注：历史函数名为 load_random_portfolio，现改为从 data_read.load_all()
+    读取本地 parquet 数据，不再做随机抽取。n_assets 仅用于返回前 n 个 DataFrame。
+    """
+    data = load_all()
+    if n_assets > len(data):
+        raise ValueError(f"请求 {n_assets} 个资产，但 data_read 仅提供 {len(data)} 个")
+    return [data[f"df_{i}"] for i in range(1, n_assets + 1)]
 
 
 def _fmt(value: float) -> str:

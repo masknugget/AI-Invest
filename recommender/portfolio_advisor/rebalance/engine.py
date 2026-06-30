@@ -8,11 +8,11 @@
 import warnings
 from typing import List, Optional
 
-from research.portfolio_advisor.rebalance.constraints import clamp_max_actions, count_overlap_days
-from research.portfolio_advisor.rebalance.scoring import evaluate_portfolio
-from research.portfolio_advisor.rebalance.search import search_rebalance_plans
-from research.portfolio_advisor.rebalance.types import CandidatePool, RebalancePlan
-from research.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES
+from recommender.portfolio_advisor.rebalance.constraints import clamp_max_actions, count_overlap_days
+from recommender.portfolio_advisor.rebalance.scoring import evaluate_portfolio
+from recommender.portfolio_advisor.rebalance.search import search_rebalance_plans
+from recommender.portfolio_advisor.rebalance.types import CandidatePool, RebalancePlan
+from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES
 
 
 def suggest_rebalance(

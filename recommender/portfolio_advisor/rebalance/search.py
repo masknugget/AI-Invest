@@ -8,11 +8,11 @@ import itertools
 import multiprocessing
 from typing import List, Optional, Tuple
 
-from research.portfolio_advisor.rebalance.constraints import count_overlap_days
-from research.portfolio_advisor.rebalance.plan_builder import build_replacement_portfolio, make_actions
-from research.portfolio_advisor.rebalance.scoring import evaluate_portfolio
-from research.portfolio_advisor.rebalance.types import CandidatePool, RebalancePlan, StockCandidate
-from research.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES
+from recommender.portfolio_advisor.rebalance.constraints import count_overlap_days
+from recommender.portfolio_advisor.rebalance.plan_builder import build_replacement_portfolio, make_actions
+from recommender.portfolio_advisor.rebalance.scoring import evaluate_portfolio
+from recommender.portfolio_advisor.rebalance.types import CandidatePool, RebalancePlan, StockCandidate
+from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES
 
 
 def iter_replacement_candidates(

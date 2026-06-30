@@ -14,7 +14,7 @@
 提供个股调入/调出建议，支持启发式筛选与全量重算验证。
 """
 
-from research.portfolio_advisor.rebalance import (
+from recommender.portfolio_advisor.rebalance import (
     constraints,
     loader,
     plan_builder,
@@ -23,24 +23,24 @@ from research.portfolio_advisor.rebalance import (
     types,
     weights,
 )
-from research.portfolio_advisor.rebalance.engine import suggest_rebalance
-from research.portfolio_advisor.rebalance.loader import (
+from recommender.portfolio_advisor.rebalance.engine import suggest_rebalance
+from recommender.portfolio_advisor.rebalance.loader import (
     load_candidate_pool_from_jsonl,
     load_candidate_pool_from_jsonl_as_pool,
 )
-from research.portfolio_advisor.rebalance.scoring import (
+from recommender.portfolio_advisor.rebalance.scoring import (
     OBJECTIVES,
     evaluate_portfolio,
     extract_objective_score,
 )
-from research.portfolio_advisor.rebalance.types import (
+from recommender.portfolio_advisor.rebalance.types import (
     CandidatePool,
     CurrentPortfolio,
     RebalanceAction,
     RebalancePlan,
     StockCandidate,
 )
-from research.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES, replace_stock
+from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES, replace_stock
 
 __all__ = [
     "suggest_rebalance",

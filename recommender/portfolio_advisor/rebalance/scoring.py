@@ -6,7 +6,7 @@
 
 from typing import Set
 
-from research.portfolio_advisor.dimension.run import PortfolioDimensions, compute_portfolio_dimensions
+from recommender.portfolio_advisor.dimension.run import PortfolioDimensions, compute_portfolio_dimensions
 
 
 OBJECTIVES: Set[str] = {

@@ -2,20 +2,20 @@ import math
 
 import pandas as pd
 
-from infra_structure.data_engine.visitor.file_visitor import FileVisitor
-from research.portfolio_advisor.dimension.position_efficiency import (
+from recommender.portfolio_advisor.data_read import load_all
+from recommender.portfolio_advisor.dimension.position_efficiency import (
     calculate_portfolio_sharpe_ratio,
     calculate_portfolio_sharpe_score,
     normalize_sharpe_to_score,
 )
 
-file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
+data = load_all()
 
-df_1: pd.DataFrame = file_visitor.random_one()
-df_2: pd.DataFrame = file_visitor.random_one()
-df_3: pd.DataFrame = file_visitor.random_one()
-df_4: pd.DataFrame = file_visitor.random_one()
-df_5: pd.DataFrame = file_visitor.random_one()
+df_1: pd.DataFrame = data["df_1"]
+df_2: pd.DataFrame = data["df_2"]
+df_3: pd.DataFrame = data["df_3"]
+df_4: pd.DataFrame = data["df_4"]
+df_5: pd.DataFrame = data["df_5"]
 
 
 def _fmt(value: float) -> str:

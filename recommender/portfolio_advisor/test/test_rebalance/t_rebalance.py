@@ -1,5 +1,5 @@
 """
-调仓模块测试。
+调仓模块测试（普通 Python 脚本，无需 pytest）。
 
 覆盖：
 1. replace_stock 后权重归一化且总和为 1。
@@ -7,30 +7,44 @@
 3. min_improvement 约束过滤生效。
 4. load_candidate_pool_from_jsonl 对缺少 code 的数据报错。
 5. 不同 objective 下 evaluate_portfolio 返回正确的目标得分。
+
+运行方式：
+    python recommender/portfolio_advisor/test/test_rebalance/test_rebalance.py
 """
 
 import json
 import os
+import sys
 import tempfile
+import types
+import warnings
 from datetime import datetime, timedelta
 from typing import List
 
-import pandas as pd
-import pytest
+# 添加项目根目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
 
-from research.portfolio_advisor.dimension.run import GEOMETRIC_DIMENSION_WEIGHTS, compute_portfolio_dimensions
-from research.portfolio_advisor.rebalance import (
+# mock openai，避免 recommender/__init__.py 链式导入失败
+if "openai" not in sys.modules:
+    _openai_mock = types.ModuleType("openai")
+    _openai_mock.OpenAI = type("OpenAI", (), {})
+    sys.modules["openai"] = _openai_mock
+
+import pandas as pd
+
+from recommender.portfolio_advisor.dimension.run import compute_portfolio_dimensions
+from recommender.portfolio_advisor.rebalance import (
     CandidatePool,
     StockCandidate,
     load_candidate_pool_from_jsonl,
     suggest_rebalance,
 )
-from research.portfolio_advisor.rebalance.constraints import count_overlap_days
-from research.portfolio_advisor.rebalance.scoring import (
+from recommender.portfolio_advisor.rebalance.constraints import count_overlap_days
+from recommender.portfolio_advisor.rebalance.scoring import (
     evaluate_portfolio,
     extract_objective_score,
 )
-from research.portfolio_advisor.rebalance.weights import replace_stock
+from recommender.portfolio_advisor.rebalance.weights import replace_stock
 
 
 def _make_df(code: str, dates: List[datetime], prices: List[float]) -> pd.DataFrame:
@@ -65,14 +79,13 @@ def _make_stable_dates(n: int = 252) -> List[datetime]:
     return dates
 
 
-@pytest.fixture
-def stable_dates():
+def make_stable_dates():
     return _make_stable_dates(252)
 
 
-@pytest.fixture
-def current_portfolio(stable_dates):
+def make_current_portfolio():
     """构造一个当前组合：4 只稳定股 + 1 只高波动差股。"""
+    stable_dates = make_stable_dates()
     n = len(stable_dates)
     # 稳定缓慢上涨
     good_prices = [100.0 * (1 + 0.0003 * i) for i in range(n)]
@@ -91,9 +104,9 @@ def current_portfolio(stable_dates):
     return codes, weights, dfs
 
 
-@pytest.fixture
-def candidate_pool(stable_dates):
+def make_candidate_pool():
     """构造候选池：1 只好股 + 1 只差股。"""
+    stable_dates = make_stable_dates()
     n = len(stable_dates)
     good_prices = [100.0 * (1 + 0.0005 * i) for i in range(n)]
     bad_prices = [100.0 + 30.0 * (i % 8 - 4) - 0.3 * i for i in range(n)]
@@ -125,13 +138,15 @@ def candidate_pool(stable_dates):
     return CandidatePool(candidates=candidates)
 
 
-def test_count_overlap_days(current_portfolio):
-    _, _, dfs = current_portfolio
+def test_count_overlap_days():
+    _, _, dfs = make_current_portfolio()
     assert count_overlap_days(dfs) == len(dfs[0])
+    print("  [OK] test_count_overlap_days 通过")
 
 
-def test_replace_stock_weight_normalization(current_portfolio, candidate_pool):
-    codes, weights, dfs = current_portfolio
+def test_replace_stock_weight_normalization():
+    codes, weights, dfs = make_current_portfolio()
+    candidate_pool = make_candidate_pool()
     candidate = candidate_pool.candidates[0]
 
     for strategy in ["proportional", "equal", "fixed_new_weight"]:
@@ -149,10 +164,12 @@ def test_replace_stock_weight_normalization(current_portfolio, candidate_pool):
         assert abs(sum(new_weights) - 1.0) < 1e-9
         assert "BAD1" not in new_codes
         assert "CAND_GOOD" in new_codes
+    print("  [OK] test_replace_stock_weight_normalization 通过")
 
 
-def test_replace_stock_fixed_new_weight(current_portfolio, candidate_pool):
-    codes, weights, dfs = current_portfolio
+def test_replace_stock_fixed_new_weight():
+    codes, weights, dfs = make_current_portfolio()
+    candidate_pool = make_candidate_pool()
     candidate = candidate_pool.candidates[0]
 
     new_codes, new_weights, new_dfs = replace_stock(
@@ -160,10 +177,11 @@ def test_replace_stock_fixed_new_weight(current_portfolio, candidate_pool):
     )
     idx = new_codes.index("CAND_GOOD")
     assert abs(new_weights[idx] - 0.15) < 1e-9
+    print("  [OK] test_replace_stock_fixed_new_weight 通过")
 
 
-def test_evaluate_portfolio_objectives(current_portfolio):
-    codes, weights, dfs = current_portfolio
+def test_evaluate_portfolio_objectives():
+    codes, weights, dfs = make_current_portfolio()
     result = compute_portfolio_dimensions(dfs, weights)
 
     score_geo, _ = evaluate_portfolio(codes, weights, dfs, objective="geometric_composite_score")
@@ -177,6 +195,7 @@ def test_evaluate_portfolio_objectives(current_portfolio):
 
     score_dim, _ = evaluate_portfolio(codes, weights, dfs, objective="dimension:drawdown_control")
     assert abs(score_dim - result.drawdown_control.score) < 1e-9
+    print("  [OK] test_evaluate_portfolio_objectives 通过")
 
 
 def test_extract_objective_score_unknown():
@@ -187,12 +206,17 @@ def test_extract_objective_score_unknown():
         _make_df("ONLY2", dates, [100.0 + 0.5 * i for i in range(60)]),
     ]
     dims = compute_portfolio_dimensions(dfs, [0.5, 0.5])
-    with pytest.raises(ValueError):
+    try:
         extract_objective_score(dims, "unknown_objective")
+        raise AssertionError("应抛出 ValueError")
+    except ValueError:
+        pass
+    print("  [OK] test_extract_objective_score_unknown 通过")
 
 
-def test_suggest_rebalance_improvement_direction(current_portfolio, candidate_pool):
-    _, weights, dfs = current_portfolio
+def test_suggest_rebalance_improvement_direction():
+    _, weights, dfs = make_current_portfolio()
+    candidate_pool = make_candidate_pool()
 
     plans = suggest_rebalance(
         dfs,
@@ -211,10 +235,12 @@ def test_suggest_rebalance_improvement_direction(current_portfolio, candidate_po
     # 得分应提升或至少不下降
     assert best.score_after >= best.score_before - 1e-9
     assert best.improvement >= -1e-9
+    print("  [OK] test_suggest_rebalance_improvement_direction 通过")
 
 
-def test_suggest_rebalance_min_improvement_filter(current_portfolio, candidate_pool):
-    _, weights, dfs = current_portfolio
+def test_suggest_rebalance_min_improvement_filter():
+    _, weights, dfs = make_current_portfolio()
+    candidate_pool = make_candidate_pool()
 
     # 设置极高的最小提升阈值，应过滤掉所有方案
     plans = suggest_rebalance(
@@ -228,10 +254,12 @@ def test_suggest_rebalance_min_improvement_filter(current_portfolio, candidate_p
         min_overlap_days=60,
     )
     assert len(plans) == 0
+    print("  [OK] test_suggest_rebalance_min_improvement_filter 通过")
 
 
-def test_suggest_rebalance_max_actions_clamping(current_portfolio, candidate_pool):
-    _, weights, dfs = current_portfolio
+def test_suggest_rebalance_max_actions_clamping():
+    _, weights, dfs = make_current_portfolio()
+    candidate_pool = make_candidate_pool()
 
     # max_actions 超过当前组合大小应自动截断，不报错
     plans = suggest_rebalance(
@@ -244,6 +272,7 @@ def test_suggest_rebalance_max_actions_clamping(current_portfolio, candidate_poo
         min_overlap_days=60,
     )
     assert isinstance(plans, list)
+    print("  [OK] test_suggest_rebalance_max_actions_clamping 通过")
 
 
 def test_load_candidate_pool_from_jsonl_requires_code():
@@ -256,10 +285,14 @@ def test_load_candidate_pool_from_jsonl_requires_code():
         path = f.name
 
     try:
-        with pytest.raises(ValueError, match="code"):
+        try:
             load_candidate_pool_from_jsonl(path, require_code=True)
+            raise AssertionError("应抛出 ValueError")
+        except ValueError as e:
+            assert "code" in str(e), f"错误信息不包含 'code': {e}"
     finally:
         os.unlink(path)
+    print("  [OK] test_load_candidate_pool_from_jsonl_requires_code 通过")
 
 
 def test_load_candidate_pool_from_jsonl_skip_missing_code():
@@ -273,13 +306,47 @@ def test_load_candidate_pool_from_jsonl_skip_missing_code():
         path = f.name
 
     try:
-        with pytest.warns(UserWarning):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
             candidates = load_candidate_pool_from_jsonl(path, require_code=False, fetch_full_df=False)
-        # 无 code 且未拉取 df，结果为空
-        assert len(candidates) == 0
+            # 无 code 且未拉取 df，结果为空
+            assert len(candidates) == 0
+            assert len(w) > 0 and issubclass(w[0].category, UserWarning), "应发出 UserWarning"
     finally:
         os.unlink(path)
+    print("  [OK] test_load_candidate_pool_from_jsonl_skip_missing_code 通过")
+
+
+def run_all_tests():
+    """运行所有测试。"""
+    tests = [
+        ("test_count_overlap_days", test_count_overlap_days),
+        ("test_replace_stock_weight_normalization", test_replace_stock_weight_normalization),
+        ("test_replace_stock_fixed_new_weight", test_replace_stock_fixed_new_weight),
+        ("test_evaluate_portfolio_objectives", test_evaluate_portfolio_objectives),
+        ("test_extract_objective_score_unknown", test_extract_objective_score_unknown),
+        ("test_suggest_rebalance_improvement_direction", test_suggest_rebalance_improvement_direction),
+        ("test_suggest_rebalance_min_improvement_filter", test_suggest_rebalance_min_improvement_filter),
+        ("test_suggest_rebalance_max_actions_clamping", test_suggest_rebalance_max_actions_clamping),
+        ("test_load_candidate_pool_from_jsonl_requires_code", test_load_candidate_pool_from_jsonl_requires_code),
+        ("test_load_candidate_pool_from_jsonl_skip_missing_code", test_load_candidate_pool_from_jsonl_skip_missing_code),
+    ]
+
+    passed = 0
+    failed = 0
+
+    for test_name, test_func in tests:
+        try:
+            test_func()
+            passed += 1
+        except Exception as e:
+            print(f"\n  [FAIL] {test_name} 测试失败: {e}")
+            failed += 1
+
+    print(f"\n测试结果: 通过 {passed}, 失败 {failed}")
+    return failed == 0
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    success = run_all_tests()
+    exit(0 if success else 1)

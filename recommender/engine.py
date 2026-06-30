@@ -8,7 +8,7 @@ import logging
 from typing import List, Optional
 
 
-from tradingagents.llm_adapters.embeddings import create_dashscope_embeddings
+from tradingagents.llm_adapters.embeddings import create_embeddings
 
 from recommender.models import UserProfile, RiskLevel
 from recommender.stock_scanner import get_all_stocks

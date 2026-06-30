@@ -5,9 +5,10 @@
 """
 
 import warnings
+import pandas as pd
+
 from typing import List
 
-import pandas as pd
 
 
 def clamp_max_actions(max_actions: int, n_current: int) -> int:

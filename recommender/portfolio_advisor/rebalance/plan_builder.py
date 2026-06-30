@@ -6,8 +6,8 @@
 
 from typing import List, Tuple
 
-from research.portfolio_advisor.rebalance.types import RebalanceAction, StockCandidate
-from research.portfolio_advisor.rebalance.weights import redistribute_weights
+from recommender.portfolio_advisor.rebalance.types import RebalanceAction, StockCandidate
+from recommender.portfolio_advisor.rebalance.weights import redistribute_weights
 
 
 def build_replacement_portfolio(

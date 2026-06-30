@@ -14,7 +14,9 @@ from typing import Any, List
 
 from infra_structure.data_engine.visitor.file_visitor import FileVisitor
 
-from research.portfolio_advisor.dimension.run import compute_portfolio_dimensions
+from recommender.portfolio_advisor.dimension.run import compute_portfolio_dimensions
+
+
 
 
 def _unwrap_df(item: Any) -> Any:

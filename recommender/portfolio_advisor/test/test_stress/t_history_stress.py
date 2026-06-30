@@ -6,18 +6,26 @@ history_stress.py 使用示例与简单校验。
 """
 
 import math
+import sys
+import types
 from typing import Any
 
 import pandas as pd
 
-from research.portfolio_advisor.stress_portfolio.history_stress import (
+# mock openai，避免 recommender/__init__.py 链式导入失败
+if "openai" not in sys.modules:
+    _openai_mock = types.ModuleType("openai")
+    _openai_mock.OpenAI = type("OpenAI", (), {})
+    sys.modules["openai"] = _openai_mock
+
+from recommender.portfolio_advisor.stress_portfolio.history_stress import (
     calculate_historical_drawdown,
     calculate_historical_scenario_result,
     compute_historical_stress,
     simulate_portfolio_drawdown,
     list_historical_scenario_names,
 )
-from research.portfolio_advisor.stress_portfolio.const import build_scenarios
+from recommender.portfolio_advisor.stress_portfolio.const import build_scenarios
 
 
 def _fmt(value: Any) -> str:
@@ -128,29 +136,29 @@ print("...")
 print(dd_df.tail(3).to_string(index=False))
 
 # -----------------------------------------------------------------------------
-# 7. 可选：用 FileVisitor 的真实数据跑一次
+# 7. 可选：用本地 parquet 数据跑一次
 # -----------------------------------------------------------------------------
 print("=" * 60)
-print("FileVisitor 真实数据示例")
+print("本地真实数据示例")
 print("=" * 60)
 
 try:
-    from infra_structure.data_engine.visitor.file_visitor import FileVisitor
+    from recommender.portfolio_advisor.data_read import load_all
 
-    file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
-    df_real = file_visitor.random_one()
+    data = load_all()
+    df_real = data["df_1"]
     code_real = str(df_real["code"].iloc[0])
 
     drawdown_real = calculate_historical_drawdown(
         df_real,
-        {"start_date": "2020-01-14", "end_date": "2020-03-19"},
+        {"start_date": "2022-01-01", "end_date": "2022-12-31"},
     )
     if drawdown_real is None:
         print(f"  股票 {code_real} 在指定场景区间内无数据")
     else:
-        print(f"  股票 {code_real} 在 2020 疫情场景下最大回撤: {_fmt(drawdown_real['max_drawdown'] * 100)}%")
+        print(f"  股票 {code_real} 在 2022 年场景下最大回撤: {_fmt(drawdown_real['max_drawdown'] * 100)}%")
 except Exception as exc:  # noqa: BLE001
-    print(f"  FileVisitor 示例跳过（环境依赖不满足）: {exc}")
+    print(f"  本地数据示例跳过（环境依赖不满足）: {exc}")
 
 print("=" * 60)
 print("t_history_stress.py 运行完成")

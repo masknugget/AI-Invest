@@ -7,11 +7,12 @@
 实现直接复用 run.py 中的组合维度函数；对于单只股票，风格均衡维度退化处理。
 """
 
+import random
+
 import pandas as pd
 
-from infra_structure.data_engine.visitor.file_visitor import FileVisitor
-
-from research.portfolio_advisor.dimension.run import (
+from recommender.portfolio_advisor.data_read import load_all
+from recommender.portfolio_advisor.dimension.run import (
     DEFAULT_DIMENSION_WEIGHTS,
     GEOMETRIC_DIMENSION_WEIGHTS,
     PortfolioDimensions,
@@ -91,9 +92,8 @@ def compute_stock_dimensions(
 
 
 def load_random_stock() -> pd.DataFrame:
-    """通过 FileVisitor 随机抽取 1 只标的的日频行情数据。"""
-    file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
-    return file_visitor.random_one()
+    """从 data_read.load_all() 返回的 df_1 ~ df_5 中随机抽取 1 只标的的行情数据。"""
+    return random.choice(list(load_all().values()))
 
 
 def _fmt(value: float) -> str:

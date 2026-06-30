@@ -10,8 +10,8 @@ from typing import Any, List, Optional, Protocol
 
 import pandas as pd
 
-from research.portfolio_advisor.rebalance.types import CandidatePool, StockCandidate
-from research.portfolio_advisor.utils import load_jsonl
+from recommender.portfolio_advisor.rebalance.types import CandidatePool, StockCandidate
+from recommender.portfolio_advisor.utils import load_jsonl
 
 
 DIMENSION_NAMES = {

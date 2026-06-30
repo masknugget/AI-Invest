@@ -2,15 +2,24 @@
 sector_stress.py 使用示例与简单校验。
 
 运行方式：
-    python research/portfolio_advisor/test/test_stress/t_sector_stress.py
+    python recommender/portfolio_advisor/test/test_stress/t_sector_stress.py
 """
 
-from research.portfolio_advisor.stress_portfolio.sector_stress import (
+import sys
+import types
+
+# mock openai，避免 recommender/__init__.py 链式导入失败
+if "openai" not in sys.modules:
+    _openai_mock = types.ModuleType("openai")
+    _openai_mock.OpenAI = type("OpenAI", (), {})
+    sys.modules["openai"] = _openai_mock
+
+from recommender.portfolio_advisor.stress_portfolio.sector_stress import (
     calculate_sector_stress_result,
     compute_sector_stress,
     list_sector_names,
 )
-from research.portfolio_advisor.stress_portfolio.const import SECTOR_BETAS
+from recommender.portfolio_advisor.stress_portfolio.const import SECTOR_BETAS
 
 
 # ---------------------------------------------------------------------------
@@ -116,17 +125,17 @@ except ValueError as e:
     print(f"ValueError: {e}")
 
 # ---------------------------------------------------------------------------
-# 6. 可选：用真实数据跑一次
+# 6. 可选：用本地 parquet 数据跑一次
 # ---------------------------------------------------------------------------
 print("=" * 60)
-print("FileVisitor 真实数据示例")
+print("本地真实数据示例")
 print("=" * 60)
 
 try:
-    from infra_structure.data_engine.visitor.file_visitor import FileVisitor
+    from recommender.portfolio_advisor.data_read import load_all
 
-    file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
-    dfs = [file_visitor.random_one() for _ in range(3)]
+    data = load_all()
+    dfs = [data["df_1"], data["df_2"], data["df_3"]]
     real_portfolio = [
         {"code": str(df["code"].iloc[0]), "weight": w, "amount": w * 100000}
         for df, w in zip(dfs, [0.4, 0.3, 0.3])
@@ -139,7 +148,7 @@ try:
     if result_real["warnings"]:
         print(f"warnings      : {result_real['warnings']}")
 except Exception as exc:  # noqa: BLE001
-    print(f"  FileVisitor 示例跳过（环境依赖不满足）: {exc}")
+    print(f"  本地数据示例跳过（环境依赖不满足）: {exc}")
 
 print("=" * 60)
 print("t_sector_stress.py 运行完成")

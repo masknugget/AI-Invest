@@ -5,6 +5,7 @@ AI 调仓管家服务（初步实现）
 调仓逻辑与实施建议等骨架实现。
 """
 
+import importlib.util
 import json
 import uuid
 from datetime import datetime, timedelta
@@ -13,6 +14,7 @@ from typing import Any, Dict, Optional
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 MOCK_DIR = PROJECT_ROOT / "mock" / "rebalance"
+REBALANCER_QA_PATH = PROJECT_ROOT / "recommender" / "portfolio_advisor" / "qa.py"
 
 
 def _load_mock_json(filename: str) -> Dict[str, Any]:
@@ -157,3 +159,22 @@ def get_plan_tips(plan_id: str) -> Dict[str, Any]:
     data = _load_mock_json("plan_tips.json")
     data["plan_id"] = plan_id
     return data
+
+
+# ============================================================================
+# 7. 常用问题
+# ============================================================================
+
+def get_common_questions() -> Dict[str, Any]:
+    """
+    获取投资组合/基金常用问题（FAQ）。
+
+    Returns:
+        包含 FAQ 列表的字典
+    """
+    spec = importlib.util.spec_from_file_location("recommender_portfolio_qa", REBALANCER_QA_PATH)
+    if spec is None or spec.loader is None:
+        return {"faq": []}
+    qa_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(qa_module)
+    return {"faq": getattr(qa_module, "faq", [])}

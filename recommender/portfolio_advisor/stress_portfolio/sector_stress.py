@@ -35,7 +35,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import pandas as pd
 
-from research.portfolio_advisor.stress_portfolio.const import (
+from recommender.portfolio_advisor.stress_portfolio.const import (
     DEFAULT_SECTOR_CALLBACK_PCT,
     SECTOR_BETAS,
     SW_INDUSTRY_TO_SECTOR,
@@ -48,14 +48,27 @@ from research.portfolio_advisor.stress_portfolio.const import (
 def _lookup_industry(
     industry_lookup: Optional[Callable[[str], Optional[str]]] = None,
 ) -> Callable[[str], Optional[str]]:
-    """延迟构造默认的行业查询函数。"""
+    """返回行业查询函数。未提供时使用硬编码的 mock 映射。"""
     if industry_lookup is not None:
         return industry_lookup
 
-    from infra_structure.models.dao.industry_obj import IndustryQuery
+    _mock_industry_map: Dict[str, str] = {
+        "600519": "食品饮料",
+        "000858": "食品饮料",
+        "000001": "银行",
+        "600036": "银行",
+        "601318": "非银金融",
+        "000333": "家用电器",
+        "002594": "汽车",
+        "300750": "电气设备",
+        "000725": "电子",
+        "600276": "医药生物",
+    }
 
-    iq = IndustryQuery()
-    return iq.query
+    def _query(code: str) -> Optional[str]:
+        return _mock_industry_map.get(code)
+
+    return _query
 
 
 # ============================================================================

@@ -5,12 +5,12 @@
 此处保留对外常用接口的快捷导入。
 """
 
-from research.portfolio_advisor.rebalance.scoring import (
+from recommender.portfolio_advisor.rebalance.scoring import (
     OBJECTIVES,
     evaluate_portfolio,
     extract_objective_score,
 )
-from research.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES, replace_stock
+from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES, replace_stock
 
 __all__ = [
     "OBJECTIVES",

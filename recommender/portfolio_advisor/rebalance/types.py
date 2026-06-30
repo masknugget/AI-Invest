@@ -11,7 +11,7 @@ from typing import Literal
 
 import pandas as pd
 
-from research.portfolio_advisor.dimension.run import PortfolioDimensions, compute_portfolio_dimensions
+from recommender.portfolio_advisor.dimension.run import PortfolioDimensions, compute_portfolio_dimensions
 
 
 @dataclass(frozen=True)
