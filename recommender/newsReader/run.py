@@ -1,16 +1,8 @@
-import json
 import os
-
+import json
 import pandas as pd
 
-from recommender.newsReader.agents.pipelines.event import prompt_event
-from recommender.newsReader.agents.pipelines.labels import prompt_labels
-from recommender.newsReader.agents.pipelines.ner import prompt_ner
-from recommender.newsReader.agents.pipelines.router import prompt_router
-from recommender.newsReader.agents.report import prompt_report
-from recommender.newsReader.dev import analyst
-from recommender.newsReader.llms import chat_once
-from recommender.newsReader.utils import parse_json_from_llm
+from recommender.newsReader.consumer.news import pipeline_news
 
 dir_path = r'D:\BaiduNetdiskDownload\财经新闻\新浪财经新闻-2025'
 
@@ -45,7 +37,7 @@ for i in news:
     print(cnt)
     try:
         file_path = rf"F:\work\\report\\{cnt}.json"
-        out_data = analyst(i)
+        out_data = pipeline_news(i)
         save_dict(out_data, file_path)
 
     except Exception as e:

@@ -289,7 +289,7 @@ def embedding_text(input_text: str) -> List[float]:
     Returns:
         List[float]: 向量
     """
-    embeddings = create_dashscope_embeddings()
+    embeddings = create_embeddings()
     return embeddings.embed_query(input_text)
 
 
