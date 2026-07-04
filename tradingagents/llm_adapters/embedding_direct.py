@@ -167,6 +167,7 @@ def embed_texts_direct(
             headers=headers,
             json=data,
             timeout=120,
+            verify=False
         )
         response.raise_for_status()
     finally:
