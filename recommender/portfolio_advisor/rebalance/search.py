@@ -5,7 +5,6 @@
 """
 
 import itertools
-import multiprocessing
 from typing import List, Optional, Tuple
 
 from recommender.portfolio_advisor.rebalance.constraints import count_overlap_days
@@ -176,18 +175,10 @@ def search_rebalance_plans(
     plans: List[RebalancePlan] = []
     messages: List[str] = []
 
-    # 任务数较少时，进程启动开销可能大于收益，保留串行路径
-    use_parallel = len(args_list) >= 4
-
-    if use_parallel:
-        # 线上服务器资源有限，默认最多 2 个进程
-        n_workers = min(2, multiprocessing.cpu_count(), len(args_list))
-        if verbose:
-            print(f"使用 {n_workers} 个进程并行评估 {len(args_list)} 个方案...")
-        with multiprocessing.Pool(processes=n_workers) as pool:
-            results = pool.map(_evaluate_replacement_worker, args_list, chunksize=max(1, len(args_list) // n_workers // 4))
-    else:
-        results = [_evaluate_replacement_worker(args) for args in args_list]
+    # 串行评估所有方案，避免多进程序列化与启动开销
+    if verbose:
+        print(f"串行评估 {len(args_list)} 个方案...")
+    results = [_evaluate_replacement_worker(args) for args in args_list]
 
     for plan, msgs in results:
         messages.extend(msgs)

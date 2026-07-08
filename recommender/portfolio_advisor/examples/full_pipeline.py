@@ -2,7 +2,7 @@
 投资组合诊断 + 风险分析 + 调仓建议 完整链路示例。
 
 用法：
-    python research/portfolio_advisor/examples/full_pipeline.py
+    python recommender/portfolio_advisor/examples/full_pipeline.py
 
 流程：
     1. 随机抽取 5 只标的并指定权重。
@@ -14,23 +14,27 @@
 需要在项目根目录下执行，或保证 sys.path 包含项目根目录。
 """
 
+import os
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
 
-from infra_structure.data_engine.visitor.file_visitor import FileVisitor
-from infra_structure.models.dao.industry_obj import IndustryQuery
 
-from research.portfolio_advisor.analyst import generate_risks, parse_risks
-from research.portfolio_advisor.dimension.run import compute_portfolio_dimensions
-from research.portfolio_advisor.rebalance import (
+
+from recommender.portfolio_advisor.analyst import generate_risks, parse_risks
+from recommender.portfolio_advisor.dimension.run import compute_portfolio_dimensions
+from recommender.portfolio_advisor.rebalance import (
     load_candidate_pool_from_jsonl_as_pool,
     suggest_rebalance,
 )
 
 
-# 候选池文件绝对路径（避免相对路径在不同工作目录下失效）
-CANDIDATE_POOL_PATH = Path(r"D:\q_project\quantq\research\portfolio_advisor\data\stock_dimension_scores.jsonl")
+# 候选池文件路径（基于本文件位置推导，避免硬编码绝对路径失效）
+CANDIDATE_POOL_PATH = Path(__file__).resolve().parent.parent / "data" / "stock_dimension_scores.jsonl"
+
+# 默认只加载候选池前 N 只股票，避免全量加载导致长时间无响应。
+# 可通过环境变量 CANDIDATE_LIMIT 覆盖，例如：set CANDIDATE_LIMIT=50
+DEFAULT_CANDIDATE_LIMIT = int(os.environ.get("CANDIDATE_LIMIT", "30"))
 
 
 def build_industry_distribution(codes: List[str], weights: List[float]) -> Dict[str, float]:
@@ -194,7 +198,18 @@ def main() -> None:
     # ------------------------------------------------------------------
     # 4. 调仓建议
     # ------------------------------------------------------------------
-    pool = load_candidate_pool_from_jsonl_as_pool(str(CANDIDATE_POOL_PATH))
+    if not CANDIDATE_POOL_PATH.exists():
+        raise FileNotFoundError(f"候选池文件不存在: {CANDIDATE_POOL_PATH}")
+
+    pool = load_candidate_pool_from_jsonl_as_pool(
+        str(CANDIDATE_POOL_PATH),
+        file_visitor=file_visitor,
+        limit=DEFAULT_CANDIDATE_LIMIT,
+    )
+    if len(pool) == 0:
+        print("候选池为空，无法生成调仓建议。")
+        return
+
     print_rebalance_plans(dfs, weights, pool)
 
 

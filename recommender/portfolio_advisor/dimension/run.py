@@ -105,7 +105,7 @@ class PortfolioDimensions:
         """将 5 个维度的评分以字典形式返回（越高越好）。"""
         return {
             "drawdown_control": self.drawdown_control.score,
-            "portfolio_diversification": self.portfolio_diversification.score,
+            "portfolio_diversification": float(self.portfolio_diversification.score),
             "position_efficiency": self.position_efficiency.score,
             "return_stability": self.return_stability.score,
             "style_balance": self.style_balance.score,

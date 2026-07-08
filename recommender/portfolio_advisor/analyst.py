@@ -13,8 +13,7 @@
 import json
 from typing import Any, Dict, List, Optional
 
-from research.newsReader.llms import chat_once
-
+from recommender.news_reader.llms import chat_once
 
 RiskItem = Dict[str, str]
 
@@ -90,7 +89,7 @@ def generate_risks(weights: List[float], industry_dist: Dict[str, float]) -> Opt
     return chat_once(prompt)
 
 
-def parse_risks(raw: Optional[str]) -> List[RiskItem]:
+def parse_risks(raw: Optional[str]):
     """
     简单解析模型返回的 JSON 风险提示列表。
 
@@ -110,11 +109,45 @@ def parse_risks(raw: Optional[str]) -> List[RiskItem]:
         data: Any = json.loads(text)
         if isinstance(data, list):
             return [item for item in data if isinstance(item, dict)]
+        return data
     except json.JSONDecodeError:
         print("[warn] JSON 解析失败，原始输出如下：")
         print(raw)
 
     return []
+
+
+def prompt_comprehensive(
+        drawdown_control,
+        return_stability,
+        position_efficiency,
+        portfolio_diversification,
+        style_balance,
+):
+    data_str = f"""
+    
+    # 任务
+    给定一个组合的如下指标
+    进行评价，或者总结，也可使或是诊断
+    
+    # 指标
+    drawdown_control: {drawdown_control}
+    return_stability: {return_stability}
+    position_efficiency: {position_efficiency}
+    portfolio_diversification: {portfolio_diversification}
+    style_balance： {style_balance}
+    
+    # 输出格式
+    {{
+        "text": ***,
+        "label": ***,
+    }}
+    其中label为良好，亚健康等诊断词汇
+    
+    # 字数要求
+    在20-80字之间
+    """
+    return data_str
 
 
 if __name__ == "__main__":

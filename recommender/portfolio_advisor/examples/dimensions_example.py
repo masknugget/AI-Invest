@@ -12,12 +12,10 @@
 
 from typing import Any, List
 
-from infra_structure.data_engine.visitor.file_visitor import FileVisitor
+from pathlib import Path
+import pandas as pd
 
 from recommender.portfolio_advisor.dimension.run import compute_portfolio_dimensions
-
-
-
 
 def _unwrap_df(item: Any) -> Any:
     """兼容 FileVisitor 可能返回 (key, df) 元组的情况。"""
@@ -27,10 +25,22 @@ def _unwrap_df(item: Any) -> Any:
 
 
 def main() -> None:
-    file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
+    DATA_DIR = Path(r'F:\project_work\hf\AI-Invest\recommender\portfolio_advisor\data')
 
-    dfs = [_unwrap_df(file_visitor.random_one()) for _ in range(5)]
-    weights = [0.2, 0.2, 0.2, 0.2, 0.2]
+    def _read_parquet(filename: str) -> pd.DataFrame:
+        """读取单个 parquet 文件，文件不存在时抛出 FileNotFoundError。"""
+        path = DATA_DIR / filename
+        if not path.exists():
+            raise FileNotFoundError(f"数据文件不存在: {path}")
+        return pd.read_parquet(path)
+
+    # 模块级变量：df_1 ~ df_5
+    df_1 = _read_parquet("df_1.parquet")
+    df_2 = _read_parquet("df_2.parquet")
+    df_3 = _read_parquet("df_3.parquet")
+
+    dfs = [df_1, df_2, df_3]
+    weights = [0.3, 0.3, 0.4]
     codes = [str(df["code"].iloc[0]) for df in dfs]
 
     result = compute_portfolio_dimensions(dfs, weights)

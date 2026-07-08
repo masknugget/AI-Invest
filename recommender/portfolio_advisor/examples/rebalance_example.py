@@ -2,7 +2,7 @@
 调仓建议独立示例（增强版）。
 
 用法：
-    python research/portfolio_advisor/examples/rebalance_example.py
+    python recommender/portfolio_advisor/examples/rebalance_example.py
 
 流程：
     1. 随机抽取 5 只标的并指定权重作为当前组合。
@@ -11,7 +11,7 @@
     4. 打印 Top-K 调入/调出建议。
 
 改进：
-    - 使用绝对路径指向候选池，避免工作目录不一致时找不到文件。
+    - 候选池路径基于本文件位置推导，避免硬编码绝对路径失效。
     - 复用同一个 FileVisitor 实例，减少重复初始化开销。
     - 默认限制候选池大小，缩短加载与搜索时间。
     - 开启 verbose，实时显示搜索进度。
@@ -23,16 +23,14 @@ import time
 from pathlib import Path
 from typing import Any
 
-from infra_structure.data_engine.visitor.file_visitor import FileVisitor
-
-from research.portfolio_advisor.rebalance import (
+from recommender.portfolio_advisor.rebalance import (
     load_candidate_pool_from_jsonl_as_pool,
     suggest_rebalance,
 )
 
 
-# 候选池文件绝对路径（避免相对路径在不同工作目录下失效）
-CANDIDATE_POOL_PATH = Path(r"D:\q_project\quantq\research\portfolio_advisor\data\stock_dimension_scores.jsonl")
+# 候选池文件路径（基于本文件位置推导，避免硬编码绝对路径失效）
+CANDIDATE_POOL_PATH = Path(__file__).resolve().parent.parent / "data" / "stock_dimension_scores.jsonl"
 
 # 默认只加载候选池前 N 只股票，避免全量加载导致长时间无响应。
 # 可通过环境变量 CANDIDATE_LIMIT 覆盖，例如：set CANDIDATE_LIMIT=50

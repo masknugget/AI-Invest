@@ -4,8 +4,8 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Union, Any
 
 from app.core.db.document import save_user_profile, get_insight_by_id, get_views_insight
-from recommender.newsReader.llms import chat_once
-from recommender.newsReader.utils import parse_json_from_llm
+from recommender.news_reader.llms import chat_once
+from recommender.news_reader.utils import parse_json_from_llm
 
 # 延迟导入：仅在函数内部使用，避免模块级依赖链
 

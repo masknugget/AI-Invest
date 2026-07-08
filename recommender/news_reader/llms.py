@@ -6,7 +6,7 @@ from openai import OpenAI
 def chat_once(user_prompt: str, sys_prompt: Optional[str] = None) -> Optional[str]:
     client = OpenAI(
         # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx"
-        api_key=r'sk-d6e82744ac33451fbe0cff05687a3695',
+        api_key=r'sk-ws-H.EMLRLHR.3AMv.MEUCIQChnDAtZxkF7Zg7Slf36ZuCIMHLC3RJSeBxHj1hIb2zHwIgE69u7YyQebffftFjFiPD1nmxzyQXaUcclm2WuNJHxuU',
         base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
 
