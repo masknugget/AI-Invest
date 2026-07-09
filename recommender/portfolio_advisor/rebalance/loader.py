@@ -36,11 +36,6 @@ def _extract_dimension_scores(record: dict) -> dict:
 
 def _load_df_for_code(code: str, file_visitor: Optional[Any] = None) -> Optional[pd.DataFrame]:
     """根据股票代码从 FileVisitor 拉取完整行情 DataFrame。"""
-    if file_visitor is None:
-        # 延迟导入，避免模块加载时触发 FileVisitor 初始化
-        from infra_structure.data_engine.visitor.file_visitor import FileVisitor
-
-        file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
     try:
         df = file_visitor.get(code)
         if df is None or df.empty:
@@ -98,11 +93,10 @@ def load_candidate_pool_from_jsonl(
         df: Optional[pd.DataFrame] = None
         if fetch_full_df:
             df = _load_df_for_code(code, file_visitor)
-
-        if df is None:
-            # 无法拉取完整行情时给出警告并跳过
-            warnings.warn(f"无法为股票 {code} 拉取完整行情，跳过该候选。", stacklevel=2)
-            continue
+            if df is None:
+                # 主动要求拉取行情但失败时给出警告并跳过
+                warnings.warn(f"无法为股票 {code} 拉取完整行情，跳过该候选。", stacklevel=2)
+                continue
 
         candidates.append(
             StockCandidate(

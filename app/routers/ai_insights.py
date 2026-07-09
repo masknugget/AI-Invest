@@ -12,7 +12,7 @@ import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.db.cache import CacheEmbedding
-from app.core.db.document import (
+from app.core.db import (
     get_insight_by_id,
     get_recommendation_history_docs,
     get_rec_history,

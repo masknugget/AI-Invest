@@ -65,15 +65,19 @@ class StockCandidate:
     """候选股票，用于调仓搜索。"""
 
     code: str
-    df: pd.DataFrame
+    df: Optional[pd.DataFrame] = None
     dimension_scores: Dict[str, float] = field(default_factory=dict)
     industry: Optional[str] = None
 
     def to_dict(self) -> Dict:
+        start_date = end_date = None
+        if self.df is not None and "date" in self.df.columns:
+            start_date = str(self.df["date"].iloc[0])
+            end_date = str(self.df["date"].iloc[-1])
         return {
             "code": self.code,
-            "start_date": str(self.df["date"].iloc[0]) if "date" in self.df.columns else None,
-            "end_date": str(self.df["date"].iloc[-1]) if "date" in self.df.columns else None,
+            "start_date": start_date,
+            "end_date": end_date,
             "dimension_scores": dict(self.dimension_scores),
             "industry": self.industry,
         }

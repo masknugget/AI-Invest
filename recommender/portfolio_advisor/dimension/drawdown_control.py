@@ -9,9 +9,9 @@ from typing import List, Union
 
 
 def calculate_portfolio_mdd(
-    dfs: List[pd.DataFrame],
-    weights: Union[List[float], np.ndarray],
-    price_col: str = 'close',
+        dfs: List[pd.DataFrame],
+        weights: Union[List[float], np.ndarray],
+        price_col: str = 'close',
 ) -> float:
     """
     计算投资组合的最大回撤（Maximum Drawdown, MDD）。
@@ -86,44 +86,44 @@ def calculate_portfolio_mdd(
 
 def normalize_mdd_to_score(mdd: float) -> float:
     """
-    将最大回撤（MDD）归一化为 0-100 的风险分数。
+    将最大回撤（MDD）归一化为 0-100 的表现分数。
+    MDD 越小，分数越高；MDD 越大，分数越低。
 
     采用阈值分段线性映射，区间划分如下：
-        - MDD ≤ 10%   : 低风险，分数 0-20
-        - 10% < MDD ≤ 20% : 中低风险，分数 20-50
-        - 20% < MDD ≤ 35% : 中高风险，分数 50-80
-        - 35% < MDD ≤ 50% : 高风险，分数 80-100
-        - MDD > 50%   : 极高风险，分数 100（截断）
+        - MDD ≤ 10%   : 优秀，分数 80-100
+        - 10% < MDD ≤ 20% : 良好，分数 50-80
+        - 20% < MDD ≤ 35% : 一般，分数 20-50
+        - 35% < MDD ≤ 50% : 较差，分数 0-20
+        - MDD > 50%   : 极差，分数 0（截断）
 
     参数:
         mdd: 最大回撤值，为小数形式（例如 0.3624 表示 36.24%）。
              必须为非负数。
 
     返回:
-        float: 0-100 的风险分数，保留两位小数。
+        float: 0-100 的表现分数，保留两位小数。
 
     示例:
         >>> normalize_mdd_to_score(0.3624)
-        81.65
+        18.35
     """
     assert mdd >= 0, "MDD 必须为非负数"
 
-    # 区间边界与对应分数
     if mdd <= 0.10:
-        # [0, 0.10] -> [0, 20]
-        score = (mdd / 0.10) * 20
+        # [0, 0.10] -> [100, 80]
+        score = 100 - (mdd / 0.10) * 20
     elif mdd <= 0.20:
-        # (0.10, 0.20] -> (20, 50]
-        score = 20 + (mdd - 0.10) / (0.20 - 0.10) * (50 - 20)
+        # (0.10, 0.20] -> [80, 50]
+        score = 80 - (mdd - 0.10) / (0.20 - 0.10) * (80 - 50)
     elif mdd <= 0.35:
-        # (0.20, 0.35] -> (50, 80]
-        score = 50 + (mdd - 0.20) / (0.35 - 0.20) * (80 - 50)
+        # (0.20, 0.35] -> [50, 20]
+        score = 50 - (mdd - 0.20) / (0.35 - 0.20) * (50 - 20)
     elif mdd <= 0.50:
-        # (0.35, 0.50] -> (80, 100]
-        score = 80 + (mdd - 0.35) / (0.50 - 0.35) * (100 - 80)
+        # (0.35, 0.50] -> [20, 0]
+        score = 20 - (mdd - 0.35) / (0.50 - 0.35) * (20 - 0)
     else:
-        # > 0.50: 截断为 100
-        score = 100.0
+        # > 0.50: 截断为 0
+        score = 0.0
 
     return round(score, 2)
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     # 假设已调用 calculate_portfolio_mdd 得到 mdd 值
     mdd = 0.3624  # 36.24%
     risk_score = normalize_mdd_to_score(mdd)
-    print(f"组合最大回撤: {mdd:.4f} ({mdd*100:.2f}%)")
+    print(f"组合最大回撤: {mdd:.4f} ({mdd * 100:.2f}%)")
     print(f"风险分数 (0-100): {risk_score}")
 
     # 各区间边界验证

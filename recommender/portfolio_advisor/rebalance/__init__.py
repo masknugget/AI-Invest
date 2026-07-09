@@ -23,7 +23,10 @@ from recommender.portfolio_advisor.rebalance import (
     types,
     weights,
 )
-from recommender.portfolio_advisor.rebalance.engine import suggest_rebalance
+from recommender.portfolio_advisor.rebalance.engine import (
+    suggest_rebalance,
+    suggest_rebalance_by_scores,
+)
 from recommender.portfolio_advisor.rebalance.loader import (
     load_candidate_pool_from_jsonl,
     load_candidate_pool_from_jsonl_as_pool,
@@ -31,7 +34,9 @@ from recommender.portfolio_advisor.rebalance.loader import (
 from recommender.portfolio_advisor.rebalance.scoring import (
     OBJECTIVES,
     evaluate_portfolio,
+    evaluate_portfolio_from_scores,
     extract_objective_score,
+    make_portfolio_dimensions_from_scores,
 )
 from recommender.portfolio_advisor.rebalance.types import (
     CandidatePool,
@@ -44,10 +49,13 @@ from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES, r
 
 __all__ = [
     "suggest_rebalance",
+    "suggest_rebalance_by_scores",
     "load_candidate_pool_from_jsonl",
     "load_candidate_pool_from_jsonl_as_pool",
     "replace_stock",
     "evaluate_portfolio",
+    "evaluate_portfolio_from_scores",
+    "make_portfolio_dimensions_from_scores",
     "extract_objective_score",
     "CandidatePool",
     "CurrentPortfolio",

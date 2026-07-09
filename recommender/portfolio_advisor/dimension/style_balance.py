@@ -137,44 +137,16 @@ def _compute_value_score(df: pd.DataFrame) -> pd.Series:
     """
     计算估值得分，用于区分价值 / 均衡 / 成长。
 
-    基于 PE、PB、PS、PCF 的倒数综合计算。最终标准化到 [0, 1]。
+    当前实现假设横截面 DataFrame 中没有 peTTM / pbMRQ / psTTM / pcfNcfTTM
+    等估值字段，直接返回中性得分 0.5。若后续接入估值数据，可在此扩展。
 
     参数:
         df: 横截面 DataFrame
 
     返回:
-        估值得分序列
+        估值得分序列，所有资产均为 0.5（均衡）
     """
-    value_cols = ['peTTM', 'pbMRQ', 'psTTM', 'pcfNcfTTM']
-    available = [c for c in value_cols if c in df.columns]
-
-    indicators = []
-    for col in available:
-        s = df[col].astype(float).copy()
-        s = s.where(s > 0, np.nan)
-        if s.isna().all():
-            continue
-        s = s.fillna(s.median())
-        s = _winsorize_series(s)
-        indicators.append(1.0 / s)
-
-    if not indicators:
-        warnings.warn("无有效估值指标，使用价格倒数作为估值代理")
-        price = _winsorize_series(df['close'].astype(float))
-        min_p, max_p = price.min(), price.max()
-        if max_p - min_p < 1e-10:
-            return pd.Series(0.5, index=df.index)
-        return 1.0 - (price - min_p) / (max_p - min_p)
-
-    value_score = pd.concat(indicators, axis=1).mean(axis=1)
-    value_score = _winsorize_series(value_score)
-
-    min_val = value_score.min()
-    max_val = value_score.max()
-    if max_val - min_val < 1e-10:
-        return pd.Series(0.5, index=df.index)
-
-    return (value_score - min_val) / (max_val - min_val)
+    return pd.Series(0.5, index=df.index)
 
 
 def _assign_style_buckets(
@@ -184,6 +156,9 @@ def _assign_style_buckets(
 ) -> pd.Series:
     """
     基于规模得分和估值得分，将资产分配到风格桶。
+
+    当估值得分缺少区分度（唯一值少于 n_buckets）时，所有资产标记为
+    'blend'，避免 pd.qcut 在常数序列上报错。
     """
     size_labels = ['small', 'mid', 'large'] if n_buckets == 3 else [f'S{i+1}' for i in range(n_buckets)]
     size_buckets = pd.qcut(
@@ -193,15 +168,19 @@ def _assign_style_buckets(
         duplicates='drop'
     )
 
-    value_labels = ['growth', 'blend', 'value'] if n_buckets == 3 else [f'V{i+1}' for i in range(n_buckets)]
-    value_buckets = pd.qcut(
-        value_scores,
-        q=n_buckets,
-        labels=value_labels,
-        duplicates='drop'
-    )
+    if value_scores.nunique() < n_buckets:
+        value_buckets = pd.Series('blend', index=value_scores.index)
+    else:
+        value_labels = ['growth', 'blend', 'value'] if n_buckets == 3 else [f'V{i+1}' for i in range(n_buckets)]
+        value_buckets = pd.qcut(
+            value_scores,
+            q=n_buckets,
+            labels=value_labels,
+            duplicates='drop'
+        )
+        value_buckets = value_buckets.astype(str)
 
-    return size_buckets.astype(str) + '_' + value_buckets.astype(str)
+    return size_buckets.astype(str) + '_' + value_buckets
 
 
 # ============================================================================
