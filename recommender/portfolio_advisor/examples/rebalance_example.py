@@ -5,43 +5,55 @@
     python recommender/portfolio_advisor/examples/rebalance_example.py
 
 流程：
-    1. 随机抽取 5 只标的并指定权重作为当前组合。
-    2. 从 stock_dimension_scores.jsonl 加载候选池（默认前 N 只，避免全量加载卡死）。
+    1. 从 stock_dimension_scores.jsonl 随机抽取 5 只标的作为当前组合。
+    2. 从同一文件加载候选池（默认前 N 只，避免全量加载卡死）。
     3. 调用 suggest_rebalance 搜索调仓方案。
     4. 打印 Top-K 调入/调出建议。
 
-改进：
-    - 候选池路径基于本文件位置推导，避免硬编码绝对路径失效。
-    - 复用同一个 FileVisitor 实例，减少重复初始化开销。
-    - 默认限制候选池大小，缩短加载与搜索时间。
-    - 开启 verbose，实时显示搜索进度。
-    - 增加运行耗时统计与友好提示。
+说明：
+    本示例完全基于 stock_dimension_scores.jsonl 中的预计算五维得分，不再加载
+    行情 DataFrame，因此不再依赖 FileVisitor。
 """
 
 import os
+import random
+import sys
 import time
+import types
 from pathlib import Path
-from typing import Any
+from typing import List
+
+# 将项目根目录加入路径，使本示例可直接运行
+sys.path.insert(
+    0,
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+)
+
+# mock openai，避免触发 recommender/__init__.py 中的大量依赖链
+if "openai" not in sys.modules:
+    _openai_mock = types.ModuleType("openai")
+    setattr(_openai_mock, "OpenAI", type("OpenAI", (), {}))
+    sys.modules["openai"] = _openai_mock
 
 from recommender.portfolio_advisor.rebalance import (
-    load_candidate_pool_from_jsonl_as_pool,
+    load_stock_scores_from_jsonl,
     suggest_rebalance,
 )
 
 
 # 候选池文件路径（基于本文件位置推导，避免硬编码绝对路径失效）
-CANDIDATE_POOL_PATH = Path(__file__).resolve().parent.parent / "data" / "stock_dimension_scores.jsonl"
+SCORES_PATH = Path(__file__).resolve().parent.parent / "data" / "stock_dimension_scores.jsonl"
 
 # 默认只加载候选池前 N 只股票，避免全量加载导致长时间无响应。
 # 可通过环境变量 CANDIDATE_LIMIT 覆盖，例如：set CANDIDATE_LIMIT=50
 DEFAULT_CANDIDATE_LIMIT = int(os.environ.get("CANDIDATE_LIMIT", "30"))
 
 
-def _unwrap_df(item: Any) -> Any:
-    """兼容 FileVisitor 可能返回 (key, df) 元组的情况。"""
-    if isinstance(item, tuple):
-        return item[1]
-    return item
+def _pick_current_codes(all_codes: List[str], n: int = 5) -> List[str]:
+    """从所有股票中随机抽取 n 只作为当前组合。"""
+    if len(all_codes) < n:
+        raise ValueError(f"可选股票数量不足 {n}，当前仅 {len(all_codes)} 只")
+    return random.sample(all_codes, n)
 
 
 def main() -> None:
@@ -50,14 +62,17 @@ def main() -> None:
     print("调仓建议独立示例")
     print("=" * 70)
 
-    # 复用同一个 FileVisitor 实例，避免重复初始化
-    print("[1/4] 初始化 FileVisitor ...")
-    file_visitor = FileVisitor("basic", "stock", "market", "d1", "time_series").data_set()
+    if not SCORES_PATH.exists():
+        raise FileNotFoundError(f"维度得分文件不存在: {SCORES_PATH}")
 
-    print("[2/4] 构造当前组合（随机 5 只标的）...")
-    current_dfs = [_unwrap_df(file_visitor.random_one()) for _ in range(5)]
+    print("[1/3] 从 stock_dimension_scores.jsonl 加载所有股票代码...")
+    all_scores = load_stock_scores_from_jsonl(str(SCORES_PATH))
+    all_codes = list(all_scores.keys())
+    print(f"共加载 {len(all_codes)} 只股票")
+
+    print("[2/3] 构造当前组合（随机 5 只标的）...")
+    current_codes = _pick_current_codes(all_codes, n=5)
     current_weights = [0.2, 0.3, 0.1, 0.2, 0.2]
-    current_codes = [str(df["code"].iloc[0]) for df in current_dfs]
 
     print("-" * 70)
     print("当前组合")
@@ -65,33 +80,16 @@ def main() -> None:
     print(f"标的: {current_codes}")
     print(f"权重: {current_weights}")
 
-    if not CANDIDATE_POOL_PATH.exists():
-        raise FileNotFoundError(f"候选池文件不存在: {CANDIDATE_POOL_PATH}")
-
     print(
-        f"[3/4] 加载候选池（默认前 {DEFAULT_CANDIDATE_LIMIT} 只，"
-        "可通过 CANDIDATE_LIMIT 环境变量调整）..."
+        f"[3/3] 搜索调仓方案（默认候选前 {DEFAULT_CANDIDATE_LIMIT} 只，"
+        "可通过 CANDIDATE_LIMIT 环境变量调整；开启 verbose 观察进度）..."
     )
-    pool = load_candidate_pool_from_jsonl_as_pool(
-        str(CANDIDATE_POOL_PATH),
-        file_visitor=file_visitor,
-        limit=DEFAULT_CANDIDATE_LIMIT,
-    )
-    print(f"实际加载候选数: {len(pool)}")
-
-    if len(pool) == 0:
-        print("候选池为空，无法生成调仓建议。")
-        return
-
-    print("[4/4] 搜索调仓方案（开启 verbose，可观察进度）...")
     plans = suggest_rebalance(
-        current_dfs,
-        current_weights,
-        pool,
-        objective="geometric_composite_score",
+        current_codes=current_codes,
+        current_weights=current_weights,
+        scores_path=str(SCORES_PATH),
         max_actions=1,
         top_k=3,
-        min_overlap_days=60,
         verbose=True,
     )
 

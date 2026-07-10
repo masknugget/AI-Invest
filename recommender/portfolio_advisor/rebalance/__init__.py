@@ -28,12 +28,13 @@ from recommender.portfolio_advisor.rebalance.engine import (
     suggest_rebalance_by_scores,
 )
 from recommender.portfolio_advisor.rebalance.loader import (
+    get_current_stock_scores,
     load_candidate_pool_from_jsonl,
     load_candidate_pool_from_jsonl_as_pool,
+    load_stock_scores_from_jsonl,
 )
 from recommender.portfolio_advisor.rebalance.scoring import (
     OBJECTIVES,
-    evaluate_portfolio,
     evaluate_portfolio_from_scores,
     extract_objective_score,
     make_portfolio_dimensions_from_scores,
@@ -52,8 +53,9 @@ __all__ = [
     "suggest_rebalance_by_scores",
     "load_candidate_pool_from_jsonl",
     "load_candidate_pool_from_jsonl_as_pool",
+    "load_stock_scores_from_jsonl",
+    "get_current_stock_scores",
     "replace_stock",
-    "evaluate_portfolio",
     "evaluate_portfolio_from_scores",
     "make_portfolio_dimensions_from_scores",
     "extract_objective_score",

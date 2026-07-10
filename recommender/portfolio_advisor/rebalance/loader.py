@@ -1,8 +1,8 @@
 """
 候选股票池加载器。
 
-支持从 stock_dimension_scores.jsonl 加载候选股票，并根据 code 字段
-通过 FileVisitor 拉取完整行情 DataFrame。
+支持从 stock_dimension_scores.jsonl 加载候选股票及其预计算五维得分。
+优化调仓仅依赖该 JSONL 中的 dimension_scores，不再加载行情 DataFrame。
 """
 
 import warnings
@@ -34,8 +34,62 @@ def _extract_dimension_scores(record: dict) -> dict:
     return {dim: float(record[dim]) for dim in DIMENSION_NAMES if dim in record}
 
 
+def load_stock_scores_from_jsonl(path: str) -> dict[str, dict]:
+    """
+    从 stock_dimension_scores.jsonl 加载所有股票的维度得分。
+
+    Parameters
+    ----------
+    path : str
+        JSONL 文件路径。
+
+    Returns
+    -------
+    dict[str, dict]
+        以股票 code 为键、五维得分字典为值的映射。
+    """
+    records = load_jsonl(path)
+    return {
+        str(record["code"]): _extract_dimension_scores(record)
+        for record in records
+        if "code" in record
+    }
+
+
+def get_current_stock_scores(current_codes: List[str], scores_path: str) -> List[dict]:
+    """
+    从 stock_dimension_scores.jsonl 加载当前组合各股票的维度得分。
+
+    Parameters
+    ----------
+    current_codes : List[str]
+        当前组合标的代码。
+    scores_path : str
+        stock_dimension_scores.jsonl 文件路径。
+
+    Returns
+    -------
+    List[dict]
+        与 current_codes 顺序一致的五维得分列表。
+
+    Raises
+    ------
+    ValueError
+        当前组合中存在股票在 scores_path 中找不到维度得分。
+    """
+    all_scores = load_stock_scores_from_jsonl(scores_path)
+    missing = [code for code in current_codes if code not in all_scores]
+    if missing:
+        raise ValueError(
+            f"当前组合中以下股票缺少维度得分，请检查 {scores_path}: {missing}"
+        )
+    return [all_scores[code] for code in current_codes]
+
+
 def _load_df_for_code(code: str, file_visitor: Optional[Any] = None) -> Optional[pd.DataFrame]:
     """根据股票代码从 FileVisitor 拉取完整行情 DataFrame。"""
+    if file_visitor is None:
+        return None
     try:
         df = file_visitor.get(code)
         if df is None or df.empty:
@@ -48,9 +102,9 @@ def _load_df_for_code(code: str, file_visitor: Optional[Any] = None) -> Optional
 def load_candidate_pool_from_jsonl(
     path: str,
     require_code: bool = True,
+    limit: Optional[int] = None,
     fetch_full_df: bool = True,
     file_visitor: Optional[Any] = None,
-    limit: Optional[int] = None,
 ) -> List[StockCandidate]:
     """
     从 stock_dimension_scores.jsonl 加载候选池。
@@ -62,7 +116,7 @@ def load_candidate_pool_from_jsonl(
     require_code : bool, default True
         是否要求每条记录必须包含 code 字段。若为 True 且缺失，抛出 ValueError。
     fetch_full_df : bool, default True
-        是否尝试通过 FileVisitor 拉取完整行情 DataFrame。
+        是否尝试通过 file_visitor 拉取完整行情 DataFrame。拉取失败时跳过该候选。
     file_visitor : Optional[Any]
         外部传入的 FileVisitor.data_set() 实例，避免重复构造。
     limit : Optional[int], default None
@@ -90,19 +144,18 @@ def load_candidate_pool_from_jsonl(
         code = str(record["code"])
         dimension_scores = _extract_dimension_scores(record)
 
-        df: Optional[pd.DataFrame] = None
+        df = None
         if fetch_full_df:
             df = _load_df_for_code(code, file_visitor)
             if df is None:
-                # 主动要求拉取行情但失败时给出警告并跳过
-                warnings.warn(f"无法为股票 {code} 拉取完整行情，跳过该候选。", stacklevel=2)
+                warnings.warn(f"无法为股票 {code} 拉取完整行情，跳过该候选。")
                 continue
 
         candidates.append(
             StockCandidate(
                 code=code,
-                df=df,
                 dimension_scores=dimension_scores,
+                df=df,
             )
         )
 
@@ -112,17 +165,16 @@ def load_candidate_pool_from_jsonl(
 def load_candidate_pool_from_jsonl_as_pool(
     path: str,
     require_code: bool = True,
+    limit: Optional[int] = None,
     fetch_full_df: bool = True,
     file_visitor: Optional[Any] = None,
-    limit: Optional[int] = None,
 ) -> CandidatePool:
     """以 CandidatePool 对象形式返回候选池。"""
     candidates = load_candidate_pool_from_jsonl(
         path,
         require_code=require_code,
+        limit=limit,
         fetch_full_df=fetch_full_df,
         file_visitor=file_visitor,
-        limit=limit,
     )
     return CandidatePool(candidates=candidates)
-

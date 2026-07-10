@@ -117,6 +117,104 @@ def parse_risks(raw: Optional[str]):
     return []
 
 
+def build_rebalance_reason_prompt(
+    code_out: Optional[str],
+    code_in: Optional[str],
+    weight_out: float,
+    weight_in: float,
+    score_before: float,
+    score_after: float,
+    improvement: float,
+    scores_out: Optional[Dict[str, float]] = None,
+    scores_in: Optional[Dict[str, float]] = None,
+    objective: str = "composite_score",
+) -> str:
+    """构造调仓动作详细原因说明的 Prompt。"""
+    scores_out_str = json.dumps(scores_out, ensure_ascii=False, indent=2) if scores_out else "无"
+    scores_in_str = json.dumps(scores_in, ensure_ascii=False, indent=2) if scores_in else "无"
+    return f"""
+# 角色
+你是一位专业的量化投资顾问，擅长根据五维评分解释调仓决策。
+
+# 任务
+请根据以下调仓动作信息，以及调出、调入股票的五维评分，生成一段详细的调入/调出原因说明。
+
+# 五维评分说明
+- drawdown_control（回撤控制）：得分越高，抗回撤能力越强
+- portfolio_diversification（分散度）：得分越高，组合分散效果越好
+- position_efficiency（持仓效率）：得分越高，风险调整后收益越好
+- return_stability（收益稳定性）：得分越高，波动越小
+- style_balance（风格均衡）：得分越高，风格暴露越均衡
+
+# 输入数据
+- 调出股票: {code_out or "无"}
+- 调出股票五维评分:
+{scores_out_str}
+- 调入股票: {code_in or "无"}
+- 调入股票五维评分:
+{scores_in_str}
+- 调出前权重: {weight_out:.4f}
+- 调入后权重: {weight_in:.4f}
+- 调仓前得分: {score_before:.4f}
+- 调仓后得分: {score_after:.4f}
+- 得分提升: {improvement:.4f}
+- 优化目标: {objective}
+
+# 输出要求
+请重点对比调出股票和调入股票在五维评分上的差异，解释为什么这次替换能提升组合得分。
+不要直接输出数值，应该是说明效果，比如降低回撤，引入更稳健资产，降低集中度等利于理解的表达。
+生成一段 30-90 字的说明，直接输出文本，不要输出 JSON 或 Markdown 代码块。
+"""
+
+
+def reason_llm(
+    code_out: Optional[str],
+    code_in: Optional[str],
+    weight_out: float,
+    weight_in: float,
+    score_before: float,
+    score_after: float,
+    improvement: float,
+    scores_out: Optional[Dict[str, float]] = None,
+    scores_in: Optional[Dict[str, float]] = None,
+    objective: str = "composite_score",
+) -> Optional[str]:
+    """
+    调用 LLM 生成调仓动作的详细原因说明。
+
+    参数
+    ----------
+    code_out, code_in : 调出/调入股票代码
+    weight_out, weight_in : 调出/调入权重
+    score_before, score_after : 调仓前后得分
+    improvement : 得分提升
+    scores_out, scores_in : 调出/调入股票的五维评分字典
+    objective : 优化目标
+
+    返回
+    -------
+    Optional[str]
+        模型返回的文本；若调用失败则返回 None。
+    """
+    prompt = build_rebalance_reason_prompt(
+        code_out=code_out,
+        code_in=code_in,
+        weight_out=weight_out,
+        weight_in=weight_in,
+        score_before=score_before,
+        score_after=score_after,
+        improvement=improvement,
+        scores_out=scores_out,
+        scores_in=scores_in,
+        objective=objective,
+    )
+    try:
+        return chat_once(prompt)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[warn] reason_llm 调用失败: {exc}")
+        return None
+
+
 def prompt_comprehensive(
         drawdown_control,
         return_stability,

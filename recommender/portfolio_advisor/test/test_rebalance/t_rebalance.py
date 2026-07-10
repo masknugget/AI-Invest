@@ -104,6 +104,35 @@ def make_current_portfolio():
     return codes, weights, dfs
 
 
+def _make_scores(drawdown: float, diversification: float, efficiency: float, stability: float, style: float) -> dict:
+    """构造标准化五维得分字典。"""
+    return {
+        "drawdown_control": drawdown,
+        "portfolio_diversification": diversification,
+        "position_efficiency": efficiency,
+        "return_stability": stability,
+        "style_balance": style,
+    }
+
+
+def _make_rebalance_scores_path():
+    """创建调仓测试用的临时 stock_dimension_scores.jsonl，返回路径。"""
+    records = [
+        {"code": "GOOD1", **_make_scores(60, 100, 60, 60, 50)},
+        {"code": "GOOD2", **_make_scores(60, 100, 60, 60, 50)},
+        {"code": "GOOD3", **_make_scores(60, 100, 60, 60, 50)},
+        {"code": "GOOD4", **_make_scores(60, 100, 60, 60, 50)},
+        {"code": "BAD1", **_make_scores(30, 100, 30, 30, 50)},
+        {"code": "CAND_GOOD", **_make_scores(80, 100, 80, 80, 50)},
+        {"code": "CAND_BAD", **_make_scores(20, 100, 20, 20, 50)},
+    ]
+    f = tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8")
+    for record in records:
+        f.write(json.dumps(record) + "\n")
+    f.close()
+    return f.name
+
+
 def make_candidate_pool():
     """构造候选池：1 只好股 + 1 只差股。"""
     stable_dates = make_stable_dates()
@@ -216,63 +245,69 @@ def test_extract_objective_score_unknown():
 
 def test_suggest_rebalance_improvement_direction():
     _, weights, dfs = make_current_portfolio()
-    candidate_pool = make_candidate_pool()
+    codes = [str(df["code"].iloc[0]) for df in dfs]
+    scores_path = _make_rebalance_scores_path()
 
-    plans = suggest_rebalance(
-        dfs,
-        weights,
-        candidate_pool,
-        objective="geometric_composite_score",
-        max_actions=1,
-        top_k=3,
-        min_overlap_days=60,
-    )
+    try:
+        plans = suggest_rebalance(
+            current_codes=codes,
+            current_weights=weights,
+            scores_path=scores_path,
+            max_actions=1,
+            top_k=3,
+        )
 
-    assert len(plans) > 0
-    best = plans[0]
-    # 最优方案应推荐调入好股票
-    assert any(action.code_in == "CAND_GOOD" for action in best.actions)
-    # 得分应提升或至少不下降
-    assert best.score_after >= best.score_before - 1e-9
-    assert best.improvement >= -1e-9
-    print("  [OK] test_suggest_rebalance_improvement_direction 通过")
+        assert len(plans) > 0
+        best = plans[0]
+        # 最优方案应推荐调入好股票
+        assert any(action.code_in == "CAND_GOOD" for action in best.actions)
+        # 得分应提升或至少不下降
+        assert best.score_after >= best.score_before - 1e-9
+        assert best.improvement >= -1e-9
+        print("  [OK] test_suggest_rebalance_improvement_direction 通过")
+    finally:
+        os.unlink(scores_path)
 
 
 def test_suggest_rebalance_min_improvement_filter():
     _, weights, dfs = make_current_portfolio()
-    candidate_pool = make_candidate_pool()
+    codes = [str(df["code"].iloc[0]) for df in dfs]
+    scores_path = _make_rebalance_scores_path()
 
-    # 设置极高的最小提升阈值，应过滤掉所有方案
-    plans = suggest_rebalance(
-        dfs,
-        weights,
-        candidate_pool,
-        objective="geometric_composite_score",
-        max_actions=1,
-        min_improvement=1_000_000.0,
-        top_k=3,
-        min_overlap_days=60,
-    )
-    assert len(plans) == 0
-    print("  [OK] test_suggest_rebalance_min_improvement_filter 通过")
+    try:
+        # 设置极高的最小提升阈值，应过滤掉所有方案
+        plans = suggest_rebalance(
+            current_codes=codes,
+            current_weights=weights,
+            scores_path=scores_path,
+            max_actions=1,
+            min_improvement=1_000_000.0,
+            top_k=3,
+        )
+        assert len(plans) == 0
+        print("  [OK] test_suggest_rebalance_min_improvement_filter 通过")
+    finally:
+        os.unlink(scores_path)
 
 
 def test_suggest_rebalance_max_actions_clamping():
     _, weights, dfs = make_current_portfolio()
-    candidate_pool = make_candidate_pool()
+    codes = [str(df["code"].iloc[0]) for df in dfs]
+    scores_path = _make_rebalance_scores_path()
 
-    # max_actions 超过当前组合大小应自动截断，不报错
-    plans = suggest_rebalance(
-        dfs,
-        weights,
-        candidate_pool,
-        objective="geometric_composite_score",
-        max_actions=10,
-        top_k=3,
-        min_overlap_days=60,
-    )
-    assert isinstance(plans, list)
-    print("  [OK] test_suggest_rebalance_max_actions_clamping 通过")
+    try:
+        # max_actions 超过当前组合大小应自动截断，不报错
+        plans = suggest_rebalance(
+            current_codes=codes,
+            current_weights=weights,
+            scores_path=scores_path,
+            max_actions=10,
+            top_k=3,
+        )
+        assert isinstance(plans, list)
+        print("  [OK] test_suggest_rebalance_max_actions_clamping 通过")
+    finally:
+        os.unlink(scores_path)
 
 
 def test_load_candidate_pool_from_jsonl_requires_code():
@@ -308,9 +343,9 @@ def test_load_candidate_pool_from_jsonl_skip_missing_code():
     try:
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            candidates = load_candidate_pool_from_jsonl(path, require_code=False, fetch_full_df=False)
-            # 无 code 且未拉取 df，结果为空
-            assert len(candidates) == 0
+            candidates = load_candidate_pool_from_jsonl(path, require_code=False)
+            # 无 code 的记录被跳过，仅剩 HAS_CODE 一条
+            assert len(candidates) == 1
             assert len(w) > 0 and issubclass(w[0].category, UserWarning), "应发出 UserWarning"
     finally:
         os.unlink(path)

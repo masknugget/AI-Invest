@@ -65,9 +65,9 @@ class StockCandidate:
     """候选股票，用于调仓搜索。"""
 
     code: str
-    df: Optional[pd.DataFrame] = None
     dimension_scores: Dict[str, float] = field(default_factory=dict)
     industry: Optional[str] = None
+    df: Optional[pd.DataFrame] = None
 
     def to_dict(self) -> Dict:
         start_date = end_date = None

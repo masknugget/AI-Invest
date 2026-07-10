@@ -116,20 +116,18 @@ def print_risks(weights: List[float], industry_dist: Dict[str, float]) -> None:
         print(raw_output)
 
 
-def print_rebalance_plans(dfs, weights, pool) -> None:
+def print_rebalance_plans(codes, weights, scores_path) -> None:
     """打印调仓建议。"""
     print("\n" + "=" * 70)
     print("【调仓建议】")
     print("=" * 70)
 
     plans = suggest_rebalance(
-        dfs,
-        weights,
-        pool,
-        objective="geometric_composite_score",
+        current_codes=codes,
+        current_weights=weights,
+        scores_path=scores_path,
         max_actions=1,
         top_k=3,
-        min_overlap_days=60,
     )
 
     if not plans:
@@ -201,16 +199,7 @@ def main() -> None:
     if not CANDIDATE_POOL_PATH.exists():
         raise FileNotFoundError(f"候选池文件不存在: {CANDIDATE_POOL_PATH}")
 
-    pool = load_candidate_pool_from_jsonl_as_pool(
-        str(CANDIDATE_POOL_PATH),
-        file_visitor=file_visitor,
-        limit=DEFAULT_CANDIDATE_LIMIT,
-    )
-    if len(pool) == 0:
-        print("候选池为空，无法生成调仓建议。")
-        return
-
-    print_rebalance_plans(dfs, weights, pool)
+    print_rebalance_plans(codes, weights, str(CANDIDATE_POOL_PATH))
 
 
 if __name__ == "__main__":

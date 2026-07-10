@@ -1,44 +1,51 @@
 """
 调仓建议引擎入口。
 
-仅负责参数校验与模块编排，将具体计算委托给 search / scoring / weights / constraints 等子模块。
+仅负责参数校验与模块编排，将具体计算委托给 search / scoring / weights / loader 等子模块。
 不做多轮贪心迭代。
+
+当前优化仅依赖 stock_dimension_scores.jsonl 中的预计算五维得分，不再加载
+行情 DataFrame 进行重算。
 """
 
-import warnings
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-from recommender.portfolio_advisor.rebalance.constraints import clamp_max_actions, count_overlap_days
-from recommender.portfolio_advisor.rebalance.scoring import evaluate_portfolio, evaluate_portfolio_from_scores
+from recommender.portfolio_advisor.rebalance.constraints import clamp_max_actions
+from recommender.portfolio_advisor.rebalance.loader import (
+    get_current_stock_scores,
+    load_candidate_pool_from_jsonl_as_pool,
+)
+from recommender.portfolio_advisor.rebalance.scoring import evaluate_portfolio_from_scores
 from recommender.portfolio_advisor.rebalance.search import search_rebalance_plans, search_rebalance_plans_by_scores
 from recommender.portfolio_advisor.rebalance.types import CandidatePool, RebalancePlan
 from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES
 
 
 def suggest_rebalance(
-    current_dfs: List,
+    current_codes: List[str],
     current_weights: List[float],
-    candidate_pool: CandidatePool,
-    objective: str = "geometric_composite_score",
+    scores_path: str,
+    objective: str = "composite_score",
     max_actions: int = 1,
     min_improvement: float = 0.0,
     weight_strategy: str = "proportional",
     top_k: int = 3,
     verbose: bool = False,
     fixed_new_weight: float = 0.0,
-    min_overlap_days: Optional[int] = None,
 ) -> List[RebalancePlan]:
     """
     生成调仓建议。
 
+    仅依赖 stock_dimension_scores.jsonl 中的预计算五维得分，不加载行情 DataFrame。
+
     Parameters
     ----------
-    current_dfs : List[pd.DataFrame]
-        当前组合各标的行情数据。
+    current_codes : List[str]
+        当前组合标的代码。
     current_weights : List[float]
         当前组合权重，和应为 1。
-    candidate_pool : CandidatePool
-        候选股票池。
+    scores_path : str
+        stock_dimension_scores.jsonl 文件路径。
     objective : str, default "geometric_composite_score"
         优化目标："composite_score" / "geometric_composite_score" /
         "min_dimension_score" / "dimension:<name>"。
@@ -54,9 +61,6 @@ def suggest_rebalance(
         是否打印中间过程。
     fixed_new_weight : float, default 0.0
         weight_strategy="fixed_new_weight" 时每只调入标的的固定权重。
-    min_overlap_days : Optional[int], default None
-        若指定，则要求当前组合及每个新组合的重叠交易日数不低于该阈值；
-        不足时跳过该方案并发出警告。
 
     Returns
     -------
@@ -66,29 +70,29 @@ def suggest_rebalance(
     if weight_strategy not in WEIGHT_STRATEGIES:
         raise ValueError(f"不支持的权重策略: {weight_strategy}，可选: {WEIGHT_STRATEGIES}")
 
-    n_current = len(current_dfs)
+    n_current = len(current_codes)
     if n_current == 0:
         raise ValueError("当前组合不能为空")
     if len(current_weights) != n_current:
-        raise ValueError("current_weights 长度必须与 current_dfs 一致")
+        raise ValueError("current_weights 长度必须与 current_codes 一致")
 
-    candidates = list(candidate_pool.candidates)
+    current_stock_scores = get_current_stock_scores(current_codes, scores_path)
+    if len(current_stock_scores) != n_current:
+        raise ValueError("current_stock_scores 长度必须与 current_codes 一致")
+
+    current_codes_set = set(current_codes)
+    candidate_pool = load_candidate_pool_from_jsonl_as_pool(scores_path, fetch_full_df=False)
+    candidates = [
+        c for c in candidate_pool.candidates if c.code not in current_codes_set
+    ]
     if len(candidates) == 0:
         raise ValueError("候选股票池不能为空")
+    candidate_pool = CandidatePool(candidates=candidates)
 
     max_actions = clamp_max_actions(max_actions, n_current)
 
-    current_codes = [str(df["code"].iloc[0]) for df in current_dfs]
-
-    if min_overlap_days is not None and count_overlap_days(current_dfs) < min_overlap_days:
-        warnings.warn(
-            f"当前组合重叠交易日 {count_overlap_days(current_dfs)} 少于阈值 {min_overlap_days}，"
-            "结果可能不可靠。",
-            stacklevel=2,
-        )
-
-    score_current, portfolio_current = evaluate_portfolio(
-        current_codes, current_weights, current_dfs, objective
+    score_current, portfolio_current = evaluate_portfolio_from_scores(
+        current_codes, current_stock_scores, current_weights, objective
     )
 
     if verbose:
@@ -97,7 +101,7 @@ def suggest_rebalance(
     plans = search_rebalance_plans(
         current_codes,
         current_weights,
-        current_dfs,
+        current_stock_scores,
         candidate_pool,
         score_current,
         portfolio_current,
@@ -106,7 +110,6 @@ def suggest_rebalance(
         min_improvement,
         weight_strategy,
         fixed_new_weight,
-        min_overlap_days=min_overlap_days,
         verbose=verbose,
     )
 
@@ -118,7 +121,7 @@ def suggest_rebalance_by_scores(
     current_weights: List[float],
     current_stock_scores: List[Dict[str, float]],
     candidate_pool: CandidatePool,
-    objective: str = "geometric_composite_score",
+    objective: str = "composite_score",
     max_actions: int = 1,
     min_improvement: float = 0.0,
     weight_strategy: str = "proportional",

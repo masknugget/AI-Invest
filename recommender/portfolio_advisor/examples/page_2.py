@@ -1,21 +1,45 @@
 from typing import Any, List
 
+import json
+
 from pathlib import Path
-import os
-import sys
-import types
 import pandas as pd
 
-# 将项目根目录加入 sys.path，确保能导入 recommender 等模块
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
-
-# mock openai，避免 recommender/__init__.py 链式导入失败
-if "openai" not in sys.modules:
-    _openai_mock = types.ModuleType("openai")
-    setattr(_openai_mock, "OpenAI", type("OpenAI", (), {}))
-    sys.modules["openai"] = _openai_mock
-
+from app.core.db import save_advisor_result
+from app.core.db.p_advisor import (
+    save_rebalance_plans,
+    get_rebalance_plans,
+    save_stress_report,
+    get_stress_report,
+)
+from recommender.news_reader.llms import chat_once
+from recommender.portfolio_advisor.analyst import parse_risks, generate_risks, prompt_comprehensive
 from recommender.portfolio_advisor.dimension.run import compute_portfolio_dimensions
+from recommender.portfolio_advisor.format_adapt.format_rebalance import format_rebalance_plans
+from recommender.portfolio_advisor.rebalance import (
+    load_stock_scores_from_jsonl,
+    suggest_rebalance,
+)
+from recommender.portfolio_advisor.format_adapt.format_stress import (
+    format_all_stress_reports,
+    format_macro_reports,
+    format_sector_reports,
+    format_stress_reports,
+    format_stress_scenario,
+)
+from recommender.portfolio_advisor.stress_portfolio.history_stress import (
+    compute_historical_stress,
+    list_historical_scenario_names,
+    simulate_portfolio_drawdown,
+)
+from recommender.portfolio_advisor.stress_portfolio.scenario_stress import (
+    compute_scenario_stress,
+    list_scenario_names as list_macro_scenario_names,
+)
+from recommender.portfolio_advisor.stress_portfolio.sector_stress import (
+    compute_sector_stress,
+    list_sector_names,
+)
 
 
 def _unwrap_df(item: Any) -> Any:
@@ -42,135 +66,179 @@ df_3 = _read_parquet("df_3.parquet")
 
 dfs = [df_1, df_2, df_3]
 weights = [0.3, 0.3, 0.4]
+# codes = [str(df["code"].iloc[0]) for df in dfs]
+codes = ["sh.600008", "sh.600009", "sh.600010"]
+
+# 核心风险提示
+sample_industry = {
+    "Specialty Retailers": 0.7,
+    "Natural Gas Utilities": 0.3,
+}
+
+user_id = "admin123"
 
 
-# ============================================================
-# 压力测试：基于 stress_portfolio 模块
-# ============================================================
-from recommender.portfolio_advisor.stress_portfolio.history_stress import (
-    compute_historical_stress,
-    simulate_portfolio_drawdown,
-)
-from recommender.portfolio_advisor.stress_portfolio.scenario_stress import compute_scenario_stress
-from recommender.portfolio_advisor.stress_portfolio.sector_stress import (
-    compute_sector_stress,
-    list_sector_names,
-)
-
-# 构造持仓列表与行情映射
-codes = [str(df["code"].iloc[0]) for df in dfs]
-portfolio = [{"code": code, "weight": w, "amount": w * 100000.0} for code, w in zip(codes, weights)]
+# 构造压力测试所需的持仓与行情映射
+portfolio = [
+    {"code": code, "weight": weight, "amount": weight}
+    for code, weight in zip(codes, weights)
+]
 dfs_map = {code: df for code, df in zip(codes, dfs)}
 
-print("\n" + "=" * 70)
-print("【压力测试】")
+# 简单行业映射（无实际行业查询时供板块/情景压力测试使用）
+_industry_lookup = {
+    "sz.300005": "医药生物",
+    "sz.300291": "电子",
+    "sh.601689": "汽车",
+}.get
+
+
+print("=" * 70)
+print("压力测试")
 print("=" * 70)
 
-# 1. 历史极端行情压力测试
-print("\n--- 历史极端行情压力测试 ---")
-historical_results = compute_historical_stress(portfolio, dfs_map)
-if historical_results:
-    for r in historical_results:
-        print(f"场景: {r['scenario_name']} ({r['start_date']} ~ {r['end_date']})")
-        print(f"  组合损失: {r['portfolio_loss_pct']}%")
-        print(f"  损失金额: {r['portfolio_loss_amount']}")
-        print(f"  基准回撤: {r['benchmark_drawdown']}")
-else:
-    print("无历史压力测试结果。")
-
-# 2. 板块压力测试
-print("\n--- 板块压力测试 ---")
-for sector in list_sector_names():
-    r = compute_sector_stress(portfolio, sector=sector, sector_callback_pct=0.20)
-    print(f"场景: {r['scenario']}")
-    print(f"  组合损失: {r['portfolio_loss_pct']}%")
-    print(f"  受影响股票: {r['affected_stocks']}")
+# 历史极端行情压力测试
+print("\n【历史极端行情压力测试】")
+print("可用历史场景:", list_historical_scenario_names())
+hist_results = compute_historical_stress(portfolio, dfs_map)
+for r in hist_results:
+    print(f"  {r['scenario_name']}: 组合损失 {r['portfolio_loss_pct']}%  (基准 {r['benchmark_drawdown']})")
     if r["warnings"]:
-        print(f"  警告: {r['warnings']}")
+        for w in r["warnings"]:
+            print(f"    warning: {w}")
 
-# 3. 宏观情景压力测试
-print("\n--- 宏观情景压力测试 ---")
-for scenario_name in ["美联储加息", "通胀上行", "经济衰退"]:
-    r = compute_scenario_stress(portfolio, scenario_name=scenario_name)
-    print(f"情景: {r['scenario_name']}")
-    print(f"  组合损失: {r['portfolio_loss_pct']}%")
-    print(f"  受影响股票: {r['affected_stocks']}")
+# 格式化为前端展示格式
+print("\n【历史极端行情压力测试 - 格式化输出】")
+formatted_stress = format_stress_reports(hist_results)
+for item in formatted_stress:
+    print(json.dumps(item, ensure_ascii=False, indent=2))
+
+
+# 宏观情景压力测试
+print("\n【宏观情景压力测试】")
+print("可用宏观情景:", list_macro_scenario_names())
+macro_results = []
+for scenario_name in list_macro_scenario_names():
+    r = compute_scenario_stress(
+        portfolio, scenario_name, industry_lookup=_industry_lookup
+    )
+    macro_results.append(r)
+    print(f"  {r['scenario_name']}: 组合损失 {r['portfolio_loss_pct']}%")
     if r["warnings"]:
-        print(f"  警告: {r['warnings']}")
+        for w in r["warnings"]:
+            print(f"    warning: {w}")
 
-# 4. 组合净值与回撤时间序列模拟
-print("\n--- 组合净值回撤模拟 ---")
+# 格式化为前端展示格式
+print("\n【宏观情景压力测试 - 格式化输出】")
+for item in format_macro_reports(macro_results):
+    print(json.dumps(item, ensure_ascii=False, indent=2))
+
+# 板块压力测试
+print("\n【板块压力测试】")
+print("可用板块:", list_sector_names())
+sector_results = []
+for sector_name in list_sector_names():
+    r = compute_sector_stress(
+        portfolio,
+        sector=sector_name,
+        sector_callback_pct=0.20,
+        industry_lookup=_industry_lookup,
+    )
+    sector_results.append(r)
+    print(f"  {r['scenario']}: 组合损失 {r['portfolio_loss_pct']}%")
+    if r["warnings"]:
+        for w in r["warnings"]:
+            print(f"    warning: {w}")
+
+# 格式化为前端展示格式
+print("\n【板块压力测试 - 格式化输出】")
+for item in format_sector_reports(sector_results):
+    print(json.dumps(item, ensure_ascii=False, indent=2))
+
+# 组合历史净值与回撤时间序列模拟
+print("\n【组合历史净值与回撤模拟】")
 drawdown_df = simulate_portfolio_drawdown(dfs, weights)
-if not drawdown_df.empty:
-    max_drawdown = drawdown_df["drawdown"].min()
-    print(f"历史最大回撤: {max_drawdown * 100:.2f}%")
-    print(f"最新净值: {drawdown_df['portfolio_value'].iloc[-1]:.4f}")
-    print(f"数据区间: {drawdown_df['date'].iloc[0]} ~ {drawdown_df['date'].iloc[-1]}")
+print(drawdown_df.tail())
+print(f"  最新组合净值: {drawdown_df['portfolio_value'].iloc[-1]:.4f}")
+print(f"  最新回撤: {drawdown_df['drawdown'].iloc[-1] * 100:.2f}%")
+
+
+# 保存格式化后的压力测试报告
+print("\n【保存格式化压力测试报告】")
+output_path = DATA_DIR / "formatted_stress_report.json"
+full_report = format_all_stress_reports(hist_results, macro_results, sector_results)
+with output_path.open("w", encoding="utf-8") as f:
+    json.dump(full_report, f, ensure_ascii=False, indent=2)
+print(f"  已保存到: {output_path}")
+
+# 保存压力测试综合报告到 MongoDB
+save_stress_report(full_report, user_id=user_id)
+print(f"  已保存到 MongoDB，user_id={user_id}")
+
+# 查询并展示最新的压力测试报告
+print("\n【查询最新压力测试报告】")
+latest_report = get_stress_report(user_id=user_id)
+if latest_report:
+    print(f"  报告包含 {len(latest_report)} 个字段")
 else:
-    print("无法计算组合净值回撤。")
+    print("  未找到历史压力测试报告")
+
+# 单独格式化首个历史场景（与 format_stress_reports 等价）
+print("\n【首个场景单独格式化】")
+first_formatted = format_stress_scenario(hist_results[0], hist_results)
+print(json.dumps(first_formatted, ensure_ascii=False, indent=2))
 
 
-# ============================================================
-# 调仓建议：基于 rebalance 模块
-# ============================================================
-from recommender.portfolio_advisor.rebalance import (
-    load_candidate_pool_from_jsonl_as_pool,
-    suggest_rebalance,
-)
-
-CANDIDATE_POOL_PATH = Path(__file__).resolve().parent.parent / "data" / "stock_dimension_scores.jsonl"
-DEFAULT_CANDIDATE_LIMIT = int(os.environ.get("CANDIDATE_LIMIT", "30"))
-
+# 调仓建议：确定组合的调入与调出
 print("\n" + "=" * 70)
-print("【调仓建议】")
+print("调仓建议")
 print("=" * 70)
-if not CANDIDATE_POOL_PATH.exists():
-    print(f"候选池文件不存在: {CANDIDATE_POOL_PATH}")
-else:
-    try:
-        pool = load_candidate_pool_from_jsonl_as_pool(
-            str(CANDIDATE_POOL_PATH),
-            limit=DEFAULT_CANDIDATE_LIMIT,
-        )
-    except Exception as e:
-        print(f"通过 FileVisitor 加载候选池失败（{e}），使用当前组合数据构造示例候选池。")
-        from recommender.portfolio_advisor.rebalance import CandidatePool, StockCandidate
-        pool = CandidatePool(candidates=[
-            StockCandidate(code=f"CAND_{i}", df=df.copy(), dimension_scores={})
-            for i, df in enumerate(dfs)
-        ])
 
-    print(f"实际加载候选数: {len(pool)}")
+CANDIDATE_POOL_PATH = DATA_DIR / "stock_dimension_scores.jsonl"
+if CANDIDATE_POOL_PATH.exists():
+    print(f"候选池数量: 从 {CANDIDATE_POOL_PATH} 加载")
+    # 加载所有股票的五维评分，供 LLM 原因生成使用
+    all_scores = load_stock_scores_from_jsonl(str(CANDIDATE_POOL_PATH))
 
-    if len(pool) == 0:
-        print("候选池为空，无法生成调仓建议。")
-    else:
+    if len(codes) > 0:
         plans = suggest_rebalance(
-            dfs,
-            weights,
-            pool,
-            objective="geometric_composite_score",
+            current_codes=codes,
+            current_weights=weights,
+            scores_path=str(CANDIDATE_POOL_PATH),
             max_actions=1,
             top_k=3,
-            min_overlap_days=60,
             verbose=False,
         )
 
         if not plans:
             print("未找到满足条件的调仓方案。")
         else:
-            print(f"找到 {len(plans)} 个方案，按几何加权综合分提升降序：\n")
-            for idx, plan in enumerate(plans, start=1):
-                print(f"方案 {idx}:")
-                print(f"  目标         : {plan.objective}")
-                print(f"  当前得分     : {plan.score_before:.2f}")
-                print(f"  调仓后得分   : {plan.score_after:.2f}")
-                print(f"  提升         : {plan.improvement:.2f}")
-                for action in plan.actions:
-                    print(f"  调出         : {action.code_out}")
-                    print(f"  调入         : {action.code_in}")
-                    print(f"  调入后权重   : {action.weight_in:.4f}")
-                    print(f"  原因         : {action.reason}")
-                print()
+            formatted_plans = format_rebalance_plans(
+                plans,
+                all_scores,
+                current_codes=codes,
+                current_weights=weights,
+                include_llm_reason=True,
+            )
+
+            # 保存调仓方案到 MongoDB
+            save_rebalance_plans(formatted_plans, user_id=user_id)
+            print(f"\n已保存调仓方案到 MongoDB，user_id={user_id}")
+
+            for plan_dict in formatted_plans:
+                print(f"\n方案:")
+                print(json.dumps(plan_dict, ensure_ascii=False, indent=2))
+
+            # 查询并展示最新的调仓方案
+            print("\n【查询最新调仓方案】")
+            latest_plans = get_rebalance_plans(user_id=user_id)
+            if latest_plans:
+                print(f"  共 {len(latest_plans)} 个方案")
+            else:
+                print("  未找到历史调仓方案")
+    else:
+        print("当前组合为空，跳过调仓建议。")
+else:
+    print(f"候选池文件不存在，跳过调仓建议: {CANDIDATE_POOL_PATH}")
 
 

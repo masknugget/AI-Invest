@@ -20,20 +20,37 @@ from typing import Dict, List, Literal, Optional
 # 历史极端事件场景
 # ============================================================================
 EXTREME_SCENARIOS = {
-    "2008年金融危机": {
-        "start_date": "2007-10-16",
-        "end_date": "2008-11-04",
-        "benchmark_drawdown": -0.724,  # 沪深300同期回撤
+    "2021-2022年核心资产泡沫破裂": {
+        "start_date": "2021-02-10",
+        "end_date": "2022-10-31",
+        "benchmark_drawdown": -0.410,  # 沪深300从5930.91跌至3501.94
     },
-    "2015年A股异常波动": {
-        "start_date": "2015-06-12",
-        "end_date": "2016-01-27",
-        "benchmark_drawdown": -0.478,
+    "2024年5-9月阴跌磨底": {
+        "start_date": "2024-05-20",
+        "end_date": "2024-09-18",
+        "benchmark_drawdown": -0.144,  # 沪深300从3690跌至3171.01
     },
-    "2020年疫情冲击": {
-        "start_date": "2020-01-14",
-        "end_date": "2020-03-19",
-        "benchmark_drawdown": -0.156,
+    "2025年4月关税冲击": {
+        "start_date": "2025-03-19",
+        "end_date": "2025-04-07",
+        "benchmark_drawdown": -0.105,  # 沪深300从4010.17跌至3589.44
+    },
+}
+
+# 已知历史场景的中文名称 -> {id, name} 映射。
+# 若场景不在此表中，回退到使用中文名称作为 id。
+DEFAULT_SCENARIO_ID_MAP: Dict[str, Dict[str, str]] = {
+    "2021-2022年核心资产泡沫破裂": {
+        "id": "2021-2022_core_asset_bubble",
+        "name": "2021-2022年核心资产泡沫破裂",
+    },
+    "2024年5-9月阴跌磨底": {
+        "id": "2024_may_sep_decline",
+        "name": "2024年5-9月阴跌磨底",
+    },
+    "2025年4月关税冲击": {
+        "id": "2025_april_tariff_shock",
+        "name": "2025年4月关税冲击",
     },
 }
 

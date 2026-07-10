@@ -17,13 +17,10 @@ dfs = [df, df_1, df_2]
 # 5维度透视表
 result = compute_portfolio_dimensions(dfs, weights)
 
-
-
 # 核心风险提示
 sample_industry = {
-    "消费/白酒": 0.40,
-    "医药生物": 0.35,
-    "新能源": 0.25,
+    "Specialty Retailers": 0.7,
+    "Natural Gas Utilities": 0.3,
 }
 
 raw_output = generate_risks(weights, sample_industry)
@@ -47,5 +44,5 @@ out_result = parse_risks(out_data)
 
 comprehensive_str = out_result['text']
 
-
 formatted = format_dimensions(result)
+

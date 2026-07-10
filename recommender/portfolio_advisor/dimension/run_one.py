@@ -52,11 +52,13 @@ def compute_stock_dimensions(
     efficiency = compute_position_efficiency(stock_dfs, stock_weights)
     stability = compute_return_stability(stock_dfs, stock_weights)
 
-    # 单只股票无法做风格分散，按完全集中处理：HHI=1，均衡得分=0
+    # 单只股票无法做组合层面的风格分散（HHI=1，有效风格数=1），
+    # 但为保持几何加权综合分的区分度，赋予中性风格分 50.0，
+    # 表示单股场景下风格信息未知，不惩罚也不奖励。
     style = StyleBalance(
         style_hhi=1.0,
         effective_style_num=1.0,
-        score=0.0,
+        score=50.0,
     )
 
     score_dict = {

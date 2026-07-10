@@ -1,8 +1,8 @@
 """
-投资组合风险诊断路由（初步实现）
+投资组合风险诊断路由
 
 提供账户健康度、五维能力、风险提示、行业分布与 AI 优化方案接口。
-所有数据当前来自 mock/risk_diagnosis/ 下的静态 JSON，仅作骨架演示。
+数据通过 app.core.db.p_advisor 从 MongoDB 读写。
 """
 
 import logging
@@ -12,13 +12,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.routers.auth_db import get_current_user
-from app.services.portfolio_advisor import risk_profile, advisor
+from app.core.db import p_advisor
 
 logger = logging.getLogger("webapi")
-router = APIRouter(prefix="/risk/diagnosis", tags=["risk-diagnosis"])
-
-# 调仓管家路由（独立前缀 /api/v1/rebalance）
-rebalance_router = APIRouter(prefix="/v1/rebalance", tags=["rebalance"])
+router = APIRouter(prefix="/v1/diagnosis", tags=["risk-diagnosis"])
 
 
 # ============================================================================
@@ -46,19 +43,13 @@ class AiSolutionQuery(BaseModel):
     scenario: Optional[str] = Field("risk_optimization", description="场景：risk_optimization/rebalance/goal_based")
 
 
-class CreatePlanRequest(BaseModel):
-    """生成调仓方案请求体"""
-    risk_level: str = Field(..., description="目标风险等级，如 R3")
-    constraints: Optional[dict] = Field(default_factory=dict, description="调仓约束条件")
-
-
 # ============================================================================
 # 统一响应包装
 # ============================================================================
 
 def _success(data: dict, message: str = "ok") -> dict:
     """统一成功响应格式：匹配接口描述中的 {code, data}。"""
-    return {"code": 0, "data": data, "message": message}
+    return {"code": 200, "data": data, "message": message}
 
 
 def _wrap_error(message: str, code: int = 1) -> dict:
@@ -77,13 +68,14 @@ async def get_report(
     # user: dict = Depends(get_current_user)
 ):
     """聚合返回评分、评级、评语及历史评分趋势。"""
-    user_id = 'admin'
+    user_id = 'admin123'
     try:
-        data = risk_profile.get_risk_report(
+        data = p_advisor.get_risk_report(
             user_id=user_id,
             account_type=account_type,
-            diagnosis_date=diagnosis_date
-        )
+            diagnosis_date=diagnosis_date,
+        ) or {}
+        data.setdefault("user_id", user_id)
         return _success(data, "获取账户健康度成功")
     except Exception as e:
         logger.error(f"❌ 获取账户健康度失败: {e}")
@@ -96,9 +88,10 @@ async def get_dimensions(
 ):
     """返回收益稳定性、风格均衡、持仓性价比、抗回撤能力、行业分散度五维评分。"""
 
-    user_id = 'admin'
+    user_id = 'admin123'
     try:
-        data = risk_profile.get_dimensions(user_id=user_id)
+        data = p_advisor.get_latest_dimensions(user_id=user_id)
+        data.setdefault("user_id", user_id)
         return _success(data, "获取五维评分成功")
     except Exception as e:
         logger.error(f"❌ 获取五维评分失败: {e}")
@@ -111,9 +104,13 @@ async def get_risk_alerts(
     # user: dict = Depends(get_current_user)
 ):
     """返回风险清单及详情，支持按严重程度过滤。"""
-    user_id = "admin"
+    user_id = "admin123"
     try:
-        data = risk_profile.get_risk_alerts(user_id=user_id, severity=severity)
+        data = p_advisor.get_risk_alert(
+            user_id=user_id,
+            severity=severity,
+        ) or {}
+        data.setdefault("user_id", user_id)
         return _success(data, "获取风险提示成功")
     except Exception as e:
         logger.error(f"❌ 获取风险提示失败: {e}")
@@ -126,9 +123,13 @@ async def get_industry_distribution(
     # user: dict = Depends(get_current_user)
 ):
     """返回行业占比分布，支持合并剩余行业为"其他"。"""
-    user_id = "admin"
+    user_id = "admin123"
     try:
-        data = risk_profile.get_industry_distribution(user_id=user_id, top_n=top_n)
+        data = p_advisor.get_industry_distribution(
+            user_id=user_id,
+            top_n=top_n,
+        ) or {}
+        data.setdefault("user_id", user_id)
         return _success(data, "获取行业分布成功")
     except Exception as e:
         logger.error(f"❌ 获取行业分布失败: {e}")
@@ -141,9 +142,12 @@ async def get_ai_solution(
     user: dict = Depends(get_current_user)
 ):
     """返回 AI 优化建议摘要、预期效果与具体调仓动作。"""
-    user_id = "admin"
+    user_id = "admin123"
     try:
-        data = risk_profile.get_ai_solution(user_id=user_id, scenario=scenario)
+        data = p_advisor.get_ai_solution(
+            user_id=user_id,
+            scenario=scenario or "risk_optimization",
+        )
         return _success(data, "获取 AI 优化方案成功")
     except Exception as e:
         logger.error(f"❌ 获取 AI 优化方案失败: {e}")
@@ -155,119 +159,10 @@ async def get_overview(
     user: dict = Depends(get_current_user)
 ):
     """聚合返回 report / dimensions / risk_alerts / industry_dist，减少移动端请求数。"""
-    user_id = "admin"
+    user_id = "admin123"
     try:
-        data = risk_profile.get_overview(user_id=user_id)
+        data = p_advisor.get_overview(user_id=user_id)
         return _success(data, "获取风险诊断聚合数据成功")
     except Exception as e:
         logger.error(f"❌ 获取风险诊断聚合数据失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ============================================================================
-# 调仓管家接口（前缀 /api/v1/rebalance）
-# ============================================================================
-
-@rebalance_router.get("/stress-test", summary="压力测试")
-async def rebalance_stress_test(
-    scenario: Optional[str] = Query(None, description="压力场景 ID，如 2008_financial_crisis"),
-    # user: dict = Depends(get_current_user)
-):
-    """历史极端行情下组合回撤模拟。"""
-    user_id = "admin"
-    try:
-        data = advisor.get_stress_test(scenario=scenario)
-        return _success(data, "获取压力测试数据成功")
-    except Exception as e:
-        logger.error(f"❌ 获取压力测试数据失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@rebalance_router.get("/diagnosis", summary="持仓诊断")
-async def rebalance_diagnosis(
-    # user: dict = Depends(get_current_user)
-):
-    user_id = "admin"
-    """当前组合收益、波动率与风险画像。"""
-    try:
-        data = advisor.get_diagnosis()
-        return _success(data, "获取持仓诊断成功")
-    except Exception as e:
-        logger.error(f"❌ 获取持仓诊断失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@rebalance_router.post("/plan", summary="生成调仓方案")
-async def rebalance_create_plan(
-    request: CreatePlanRequest,
-    # user: dict = Depends(get_current_user)
-):
-    """AI 计算优化后的配置方案。"""
-    user_id = "admin"
-    try:
-        data = advisor.create_plan(
-            risk_level=request.risk_level,
-            constraints=request.constraints
-        )
-        return _success(data, "生成调仓方案成功")
-    except Exception as e:
-        logger.error(f"❌ 生成调仓方案失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@rebalance_router.get("/plan/{plan_id}", summary="方案详情")
-async def rebalance_plan_detail(
-    plan_id: str,
-    # user: dict = Depends(get_current_user)
-):
-    """调仓方案买卖明细清单。"""
-    user_id = "admin"
-    try:
-        data = advisor.get_plan_detail(plan_id=plan_id)
-        return _success(data, "获取方案详情成功")
-    except Exception as e:
-        logger.error(f"❌ 获取方案详情失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@rebalance_router.get("/plan/{plan_id}/logic", summary="调仓逻辑")
-async def rebalance_plan_logic(
-    plan_id: str,
-    # user: dict = Depends(get_current_user)
-):
-    """调仓方案三大策略解释。"""
-    user_id = "admin"
-    try:
-        data = advisor.get_plan_logic(plan_id=plan_id)
-        return _success(data, "获取调仓逻辑成功")
-    except Exception as e:
-        logger.error(f"❌ 获取调仓逻辑失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@rebalance_router.get("/plan/{plan_id}/tips", summary="实施建议")
-async def rebalance_plan_tips(
-    plan_id: str,
-    # user: dict = Depends(get_current_user)
-):
-    """新手操作指引与 FAQ。"""
-    try:
-        data = advisor.get_plan_tips(plan_id=plan_id)
-        return _success(data, "获取实施建议成功")
-    except Exception as e:
-        logger.error(f"❌ 获取实施建议失败: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@rebalance_router.get("/faq", summary="常用问题")
-async def rebalance_faq(
-    # user: dict = Depends(get_current_user)
-):
-    """获取投资组合/基金常用问题（FAQ）。"""
-    user_id = "admin"
-    try:
-        data = advisor.get_common_questions()
-        return _success(data, "获取常用问题成功")
-    except Exception as e:
-        logger.error(f"❌ 获取常用问题失败: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -15,9 +15,16 @@ from typing import Any, List
 from pathlib import Path
 import pandas as pd
 
+from app.core.db import save_advisor_result
 from recommender.news_reader.llms import chat_once
 from recommender.portfolio_advisor.analyst import parse_risks, generate_risks, prompt_comprehensive
 from recommender.portfolio_advisor.dimension.run import compute_portfolio_dimensions
+from recommender.portfolio_advisor.format_adapt.format_advisor import (
+    format_advisor_result,
+    format_dimensions,
+    format_report,
+    format_risk_alerts,
+)
 
 
 def _unwrap_df(item: Any) -> Any:
@@ -46,51 +53,40 @@ dfs = [df_1, df_2, df_3]
 weights = [0.3, 0.3, 0.4]
 codes = [str(df["code"].iloc[0]) for df in dfs]
 
+# 核心风险提示
+sample_industry = {
+    "Specialty Retailers": 0.7,
+    "Natural Gas Utilities": 0.3,
+}
+
+user_id = "admin123"
+
+
+
+
+
+###########################
+
+print("=== save industry distribution ===")
+
+
 # 5维度透视表
 result = compute_portfolio_dimensions(dfs, weights)
 
-print("=" * 70)
-print("组合标的:", codes)
-print("组合权重:", weights)
-print("=" * 70)
 
-print("【抗回撤能力】")
-print(f"  最大回撤 MDD       : {result.drawdown_control.mdd:.4f}")
-print(f"  控制得分 (0-100)   : {result.drawdown_control.score:.2f}")
+out_dimensions = format_dimensions(result)
 
-print("\n【资产分散度】")
-print(f"  ENB (weight-based) : {result.portfolio_diversification.enb_weight_based:.4f}")
-print(f"  分散得分 (0-100)   : {result.portfolio_diversification.score:.2f}")
 
-print("\n【持仓性价比】")
-print(f"  夏普比率           : {result.position_efficiency.sharpe_ratio:.4f}")
-print(f"  性价比得分 (0-100) : {result.position_efficiency.score:.2f}")
-
-print("\n【收益稳定性】")
-print(f"  年化波动率         : {result.return_stability.annualized_volatility:.4f}")
-print(f"  稳定得分 (0-100)   : {result.return_stability.score:.2f}")
-
-print("\n【风格均衡】")
-print(f"  风格 HHI           : {result.style_balance.style_hhi:.4f}")
-print(f"  均衡得分 (0-100)   : {result.style_balance.score:.2f}")
-
-print("\n" + "=" * 70)
-print(f"综合健康分 (0-100)    : {result.composite_score:.2f}")
-print(f"几何加权综合分 (0-100) : {result.geometric_composite_score:.2f}")
-print("=" * 70)
-
-# 核心风险提示
-sample_industry = {
-    "消费/白酒": 0.40,
-    "医药生物": 0.35,
-    "新能源": 0.25,
-}
 
 raw_output = generate_risks(weights, sample_industry)
+risks: list = []
 if raw_output is None:
     print("调用 LLM 失败，未获取到风险提示。")
 else:
     risks = parse_risks(raw_output)
+
+# 保存起来
+
 
 score = result.to_score_dict()
 # 综合评分
@@ -104,5 +100,21 @@ _p = prompt_comprehensive(
 out_data = chat_once(_p)
 
 out_result = parse_risks(out_data)
+if not isinstance(out_result, dict):
+    out_result = {}
 
-comprehensive_str = out_result['text']
+comprehensive_str = out_result.get("text", "")
+comprehensive_label = out_result.get("label", "")
+
+out_risk_alert = format_risk_alerts(risks)
+out_risk_report = format_report(result, comprehensive_str)
+
+out_advisor_result = format_advisor_result(
+    dimensions=out_dimensions,
+    risk_report=out_risk_report,
+    risk_alert=out_risk_alert,
+    industry_distribution=sample_industry,
+)
+
+save_advisor_result(out_advisor_result, user_id=user_id)
+

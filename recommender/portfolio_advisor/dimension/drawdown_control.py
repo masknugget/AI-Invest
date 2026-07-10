@@ -128,7 +128,7 @@ def normalize_mdd_to_score(mdd: float) -> float:
     return round(score, 2)
 
 
-# ========== 使用示例 ==========
+
 if __name__ == "__main__":
     # 假设已调用 calculate_portfolio_mdd 得到 mdd 值
     mdd = 0.3624  # 36.24%
