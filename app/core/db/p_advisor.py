@@ -491,11 +491,20 @@ def get_overview(
         Dict: 聚合数据。
     """
     now = datetime.now()
+
+    data = get_risk_report(user_id)
+    alerts = data.get("risk_alert").get("alerts")
+    data_dimensions = get_latest_dimensions(user_id)
+
+    dist = get_industry_distribution(user_id) or {}
+    dist = dist.get("distribution", {})
+    dist_list = list(dist.values())
+
     return {
-        "report": get_risk_report(user_id) or {},
-        "dimensions": get_latest_dimensions(user_id),
-        "risk_alerts": get_risk_alert(user_id) or {},
-        "industry_dist": get_industry_distribution(user_id) or {},
+        "report": data.get('risk_report',{}),
+        "dimensions": data_dimensions.get("dimensions", {}),
+        "risk_alerts": alerts,
+        "industry_dist": dist_list,
         "meta": {
             "data_time": now.strftime("%Y-%m-%d"),
             "is_cache": True,
