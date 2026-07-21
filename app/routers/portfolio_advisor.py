@@ -166,3 +166,18 @@ async def get_overview(
     except Exception as e:
         logger.error(f"❌ 获取风险诊断聚合数据失败: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/portfolio-codes", summary="获取投资组合持仓")
+async def get_portfolio_codes(
+    user: dict = Depends(get_current_user)
+):
+    """返回用户最新保存的投资组合持仓代码列表。"""
+    user_id = user.get("username", "admin123")
+    try:
+        data = p_advisor.get_portfolio_codes(user_id=user_id) or {}
+        data.setdefault("user_id", user_id)
+        return _success(data, "获取投资组合持仓成功")
+    except Exception as e:
+        logger.error(f"❌ 获取投资组合持仓失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

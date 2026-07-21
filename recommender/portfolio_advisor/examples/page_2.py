@@ -49,8 +49,8 @@ def _unwrap_df(item: Any) -> Any:
     return item
 
 
-
 DATA_DIR = Path(r'F:\project_work\hf\AI-Invest\recommender\portfolio_advisor\data')
+
 
 def _read_parquet(filename: str) -> pd.DataFrame:
     """读取单个 parquet 文件，文件不存在时抛出 FileNotFoundError。"""
@@ -59,15 +59,24 @@ def _read_parquet(filename: str) -> pd.DataFrame:
         raise FileNotFoundError(f"数据文件不存在: {path}")
     return pd.read_parquet(path)
 
+
 # 模块级变量：df_1 ~ df_5
 df_1 = _read_parquet("df_1.parquet")
 df_2 = _read_parquet("df_2.parquet")
 df_3 = _read_parquet("df_3.parquet")
 
 dfs = [df_1, df_2, df_3]
+
 weights = [0.3, 0.3, 0.4]
 # codes = [str(df["code"].iloc[0]) for df in dfs]
 codes = ["sh.600008", "sh.600009", "sh.600010"]
+names = ["首创环保", "上海机场", "包钢股份"]
+
+industry_data = {
+    "sh.600008": "Natural Gas Utilities",
+    "sh.600009": "Specialty Retailers",
+    "sh.600010": "Specialty Retailers",
+}
 
 # 核心风险提示
 sample_industry = {
@@ -76,7 +85,6 @@ sample_industry = {
 }
 
 user_id = "admin123"
-
 
 # 构造压力测试所需的持仓与行情映射
 portfolio = [
@@ -91,7 +99,6 @@ _industry_lookup = {
     "sz.300291": "电子",
     "sh.601689": "汽车",
 }.get
-
 
 print("=" * 70)
 print("压力测试")
@@ -112,7 +119,6 @@ print("\n【历史极端行情压力测试 - 格式化输出】")
 formatted_stress = format_stress_reports(hist_results)
 for item in formatted_stress:
     print(json.dumps(item, ensure_ascii=False, indent=2))
-
 
 # 宏观情景压力测试
 print("\n【宏观情景压力测试】")
@@ -162,7 +168,6 @@ print(drawdown_df.tail())
 print(f"  最新组合净值: {drawdown_df['portfolio_value'].iloc[-1]:.4f}")
 print(f"  最新回撤: {drawdown_df['drawdown'].iloc[-1] * 100:.2f}%")
 
-
 # 保存格式化后的压力测试报告
 print("\n【保存格式化压力测试报告】")
 output_path = DATA_DIR / "formatted_stress_report.json"
@@ -187,7 +192,6 @@ else:
 print("\n【首个场景单独格式化】")
 first_formatted = format_stress_scenario(hist_results[0], hist_results)
 print(json.dumps(first_formatted, ensure_ascii=False, indent=2))
-
 
 # 调仓建议：确定组合的调入与调出
 print("\n" + "=" * 70)
@@ -240,5 +244,3 @@ if CANDIDATE_POOL_PATH.exists():
         print("当前组合为空，跳过调仓建议。")
 else:
     print(f"候选池文件不存在，跳过调仓建议: {CANDIDATE_POOL_PATH}")
-
-

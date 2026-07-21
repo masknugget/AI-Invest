@@ -689,3 +689,63 @@ def get_faq(
     except Exception as e:
         logger.exception("查询 FAQ 失败: user_id=%s, error=%s", user_id, e)
         return []
+
+
+def save_portfolio_codes(
+    data: List[Dict[str, Any]],
+    user_id: Union[str, int] = "admin123",
+) -> None:
+    """
+    保存 portfolio 持仓代码列表到 MongoDB。
+
+    Args:
+        data: 持仓代码列表，每条包含 code、name、industry、weight 等字段。
+        user_id: 用户ID，默认 admin123。
+    """
+    _, db = _init_db()
+    try:
+        coll = db["p_advisor_portfolio_codes"]
+        log_entry = {
+            "date_time": datetime.now(),
+            "user_id": user_id,
+            "data": data,
+        }
+        coll.insert_one(log_entry)
+        logger.info("p_advisor_portfolio_codes saved: user_id=%s count=%d", user_id, len(data))
+    except Exception as e:
+        logger.exception("保存 portfolio 代码失败: user_id=%s, error=%s", user_id, e)
+
+
+def get_portfolio_codes(
+    user_id: Union[str, int] = "admin123",
+) -> Optional[Dict[str, Any]]:
+    """
+    查询用户最新保存的 portfolio 持仓代码记录。
+
+    Args:
+        user_id: 用户ID，默认 admin123。
+
+    Returns:
+        Optional[Dict]: 最新记录，包含 date_time 与 data；找不到或发生异常返回 None。
+    """
+    if user_id is None:
+        return None
+
+    _, db = _init_db()
+    try:
+        coll = db["p_advisor_portfolio_codes"]
+        doc = coll.find_one(
+            {"user_id": user_id},
+            sort=[("date_time", DESCENDING)],
+        )
+
+        if doc:
+            doc.pop("_id", None)
+            logger.info("get_portfolio_codes: user_id=%s found", user_id)
+            return doc
+
+        logger.info("get_portfolio_codes: user_id=%s not found", user_id)
+        return None
+    except Exception as e:
+        logger.exception("查询 portfolio 代码失败: user_id=%s, error=%s", user_id, e)
+        return None

@@ -21,6 +21,7 @@ from app.core.db import (
     log_rec_content_history,
     log_rec_history,
     log_views_insight,
+    delete_views_insight,
 )
 from app.routers.auth_db import get_current_user
 from recommender.user_profile.gen_user_profiles import USER_PROFILE_TAGS
@@ -173,6 +174,27 @@ async def get_insight_views_history(
         for item in items
     ]
     return out_data
+
+
+@router.delete("/views/history", summary="删除 Insight 浏览历史")
+async def delete_insight_views_history(
+    insightId: Optional[str] = Query(None, description="要删除的 Insight ID，不传则清空该用户全部浏览历史"),
+    user: Dict[str, Any] = Depends(get_current_user),
+):
+    """
+    删除用户的 Insight 浏览历史。
+
+    - `insightId`: 指定要删除的 Insight ID；为空时删除该用户的全部浏览历史。
+    """
+    user_id = user.get("username", "unknown")
+    logger.info("delete_insight_views_history: user_id=%s insightId=%s", user_id, insightId)
+
+    result = delete_views_insight(user_id, insight_id=insightId)
+    if not result.get("success"):
+        logger.error("delete_insight_views_history failed: user_id=%s insightId=%s", user_id, insightId)
+        raise HTTPException(status_code=500, detail="删除浏览历史失败")
+
+    return result
 
 
 @router.get("/{insightId}", summary="获取 Insight 详情")

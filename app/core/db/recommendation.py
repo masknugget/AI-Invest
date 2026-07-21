@@ -218,6 +218,52 @@ def get_views_insight(
         return empty_result
 
 
+def delete_views_insight(
+    user_id: Union[str, int],
+    insight_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    删除用户 Insight 浏览历史。
+
+    Args:
+        user_id: 用户ID。
+        insight_id: 可选的 Insight ID。为 None 时清空该用户的全部浏览历史；
+            否则仅删除该 Insight 的浏览记录。
+
+    Returns:
+        Dict: 包含 success 状态和删除数量的字典。
+    """
+    result = {"success": False, "deleted_count": 0}
+    if user_id is None:
+        return result
+
+    _, db = _init_db()
+    try:
+        coll = db["insight_views"]
+        filter_dict = {"user_id": user_id}
+        if insight_id is not None:
+            filter_dict["insight_id"] = insight_id
+
+        delete_result = coll.delete_many(filter_dict)
+        result["deleted_count"] = delete_result.deleted_count
+        result["success"] = True
+        logger.info(
+            "delete_views_insight: user_id=%s insight_id=%s deleted_count=%d",
+            user_id,
+            insight_id,
+            result["deleted_count"],
+        )
+        return result
+    except Exception as e:
+        logger.exception(
+            "删除浏览历史失败: user_id=%s insight_id=%s, error=%s",
+            user_id,
+            insight_id,
+            e,
+        )
+        return result
+
+
 def get_recommendation_history_docs(
     user_id: Union[str, int],
     page_size: int = 20,
