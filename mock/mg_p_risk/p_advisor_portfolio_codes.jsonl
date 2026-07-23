@@ -1,0 +1,1 @@
+{"date_time": {"$date": "2026-07-21T16:50:56.353Z"}, "user_id": "admin123", "data": [{"code": "sh.600008", "name": "首创环保", "industry": "Natural Gas Utilities", "weight": 0.3}, {"code": "sh.600009", "name": "上海机场", "industry": "Specialty Retailers", "weight": 0.3}, {"code": "sh.600010", "name": "包钢股份", "industry": "Specialty Retailers", "weight": 0.4}]}

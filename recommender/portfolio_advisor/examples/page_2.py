@@ -27,6 +27,7 @@ from recommender.portfolio_advisor.format_adapt.format_stress import (
     format_stress_reports,
     format_stress_scenario,
 )
+from recommender.portfolio_advisor.rebalance.loader import load_code_name_from_jsonl
 from recommender.portfolio_advisor.stress_portfolio.history_stress import (
     compute_historical_stress,
     list_historical_scenario_names,
@@ -204,6 +205,7 @@ if CANDIDATE_POOL_PATH.exists():
     # 加载所有股票的五维评分，供 LLM 原因生成使用
     all_scores = load_stock_scores_from_jsonl(str(CANDIDATE_POOL_PATH))
 
+    code_name = load_code_name_from_jsonl(str(CANDIDATE_POOL_PATH))
     if len(codes) > 0:
         plans = suggest_rebalance(
             current_codes=codes,
@@ -224,6 +226,16 @@ if CANDIDATE_POOL_PATH.exists():
                 current_weights=weights,
                 include_llm_reason=True,
             )
+
+            # 为每个调仓动作补充股票名称（调入/调出）
+            for plan in formatted_plans:
+                for action in plan.get("actions", []):
+                    code_in = action.get("code_in")
+                    code_out = action.get("code_out")
+                    if code_in:
+                        action["name_in"] = code_name.get(code_in)
+                    if code_out:
+                        action["name_out"] = code_name.get(code_out)
 
             # 保存调仓方案到 MongoDB
             save_rebalance_plans(formatted_plans, user_id=user_id)

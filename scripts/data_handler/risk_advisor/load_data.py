@@ -23,6 +23,7 @@ COLLECTIONS: List[str] = [
     "p_advisor_faq",
     "p_advisor_rebalance_plans",
     "p_advisor_stress_report",
+    "p_advisor_portfolio_codes",
 ]
 
 

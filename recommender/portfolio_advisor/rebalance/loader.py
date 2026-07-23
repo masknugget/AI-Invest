@@ -56,6 +56,28 @@ def load_stock_scores_from_jsonl(path: str) -> dict[str, dict]:
     }
 
 
+def load_code_name_from_jsonl(path: str) -> dict[str, str]:
+    """
+    从 stock_dimension_scores.jsonl 加载所有股票的code和name。
+
+    Parameters
+    ----------
+    path : str
+        JSONL 文件路径。
+
+    Returns
+    -------
+    dict[str, dict]
+        以股票 code 为键、五维得分字典为值的映射。
+    """
+    records = load_jsonl(path)
+    return {
+        str(record["code"]): str(record["name"])
+        for record in records
+        if "code" in record
+    }
+
+
 def get_current_stock_scores(current_codes: List[str], scores_path: str) -> List[dict]:
     """
     从 stock_dimension_scores.jsonl 加载当前组合各股票的维度得分。
