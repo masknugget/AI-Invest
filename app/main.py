@@ -36,6 +36,7 @@ from app.routers import ai_insights as ai_insights_router
 from app.routers import portfolio_advisor as portfolio_advisor_router
 from app.routers import portfolio_relalance as portfolio_rebalance_router
 
+from app.services.mcp.server import mcp
 
 
 def get_version() -> str:
@@ -319,6 +320,8 @@ app.include_router(ai_insights_router.router, prefix="/api", tags=["ai-insights"
 app.include_router(portfolio_advisor_router.router, prefix="/api", tags=["risk-diagnosis"])
 app.include_router(portfolio_rebalance_router.router, prefix="/api", tags=["rebalance"])
 
+# 挂载 MCP 服务（SSE 传输），客户端可通过 /mcp/sse 连接
+app.mount("/mcp", mcp.sse_app())
 
 
 @app.get("/")
