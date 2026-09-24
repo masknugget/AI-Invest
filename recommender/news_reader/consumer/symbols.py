@@ -1,10 +1,10 @@
 import json
 
-from recommender.newsReader.agents.analyst.symbol import prompt_technical, prompt_fundamental, prompt_high_dividend, \
+from recommender.news_reader.agents.analyst.symbol import prompt_technical, prompt_fundamental, prompt_high_dividend, \
     prompt_highlow52
-from recommender.newsReader.agents.reporter.align_data import prompt_align_data
-from recommender.newsReader.llms import chat_once
-from recommender.newsReader.utils import parse_json_from_llm
+from recommender.news_reader.agents.reporter.align_data import prompt_align_data
+from recommender.news_reader.llms import chat_once
+from recommender.news_reader.utils import parse_json_from_llm
 
 
 def pipeline_symbols(

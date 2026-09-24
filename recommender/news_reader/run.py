@@ -2,7 +2,7 @@ import os
 import json
 import pandas as pd
 
-from recommender.newsReader.consumer.news import pipeline_news
+from recommender.news_reader.consumer.news import pipeline_news
 
 dir_path = r'D:\BaiduNetdiskDownload\财经新闻\新浪财经新闻-2025'
 

@@ -107,7 +107,7 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 marshmallow==3.26.1
 matplotlib==3.10.8
-mcp==1.24.0
+fastmcp>=2.3.0
 mdurl==0.1.2
 mini-racer==0.12.4
 mmh3==5.2.0

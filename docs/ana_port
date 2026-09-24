@@ -1,0 +1,83 @@
+模块现状
+
+```
+ portfolio_advisor/
+ ├── dimension/run.py:249    compute_portfolio_dimensions(dfs, weights) → 五维评分 dataclass
+ ├── dimension/*.py          5 个纯计算维度：回撤控制/收益稳定性/持仓效率/分散度/风格平衡
+ ├── rebalance/engine.py:24  suggest_rebalance(codes, weights, scores_path) → 调仓方案列表
+ ├── stress_portfolio/       历史情景/宏观情景/板块情景压力测试（纯函数）
+ ├── analyst.py              LLM 文案层：generate_risks / reason_llm / prompt_comprehensive
+ ├── format_adapt/           结果 → 前端友好 dict（rebalance 格式化时会触发 LLM 写原因）
+ └── data_read.py            ⚠️ import 即读本地 parquet + 硬编码 F:\ 路径，封装时要绕开
+```
+
+已有的 app/services/mcp/server.py 文档注释里写了"组合调仓建议"但还没实现——app/services/portfolio_advisor/advisor.py 目前是读 mock/ JSON 的 mock 实现。所以这一步既是 MCP 封装，也
+是把这个 mock 换成真实计算的机会。
+
+MCP 方案（4 个工具，按"平台 LLM 做总结"的思路设计）
+
+```
+ diagnose_portfolio(codes, weights, start_date, end_date)
+   ├─ 服务端：app.core.db 查行情 → compute_portfolio_dimensions（纯计算，<1s）
+   ├─ 返回：五维指标 + 得分 + 综合分（JSON，不含文案）
+   └─ 平台 LLM 负责把五维得分翻译成自然语言诊断——server 端 prompt_comprehensive 这次调用省掉
+
+ suggest_portfolio_rebalance(codes, weights, objective, top_k)
+   ├─ 服务端：suggest_rebalance（纯计算，<1s）
+   ├─ 返回：候选调仓方案列表（换出/换入/权重/预期改善分数）
+   └─ ⚠️ 关键：禁止走 format_adapt/format_rebalance.py——它在格式化阶段会同步调 LLM 写原因
+      （每个 action 一次 chat_once）。改为返回原始 plan dict，调仓理由由平台 LLM 根据
+      分数对比自行生成，把 LLM 调用从服务端彻底清零
+
+ stress_test_portfolio(codes, weights, scenario_type, scenario_name)
+   ├─ scenario_type: "historical"（2015股灾等，需行情）/ "macro"（加息/衰退等）/ "sector"（板块冲击）
+   └─ 纯计算，返回各情景组合损益
+
+ get_portfolio_risk_alerts(codes, weights)          【可选】
+   └─ 组合集中度/行业分布/回撤预警等衍生指标，纯计算
+```
+
+与 news_reader 方案的对照
+
+┌─────────────────┬────────────────────┬───────────────────────────────────────────────────────────┐
+│ 维度            │ news_reader        │ portfolio_advisor                                         │
+├─────────────────┼────────────────────┼───────────────────────────────────────────────────────────┤
+│ 服务端 LLM 调用 │ 6~10 次/条，是瓶颈 │ 可降为 0 次——计算全本地                                   │
+├─────────────────┼────────────────────┼───────────────────────────────────────────────────────────┤
+│ 加速手段        │ 拆工具、并行、缓存 │ 基本不需要加速，重点是剪掉隐藏的 LLM 调用（format_adapt） │
+├─────────────────┼────────────────────┼───────────────────────────────────────────────────────────┤
+│ 平台 LLM 角色   │ 路由 + 综合报告    │ 全部文案（诊断解读、调仓理由）                            │
+├─────────────────┼────────────────────┼───────────────────────────────────────────────────────────┤
+│ 耗时            │ 15~40s             │ <1s（历史压测取数约 1~2s）                                │
+└─────────────────┴────────────────────┴───────────────────────────────────────────────────────────┘
+
+关键风险点（实施时必须处理）
+
+1. data_read.py import 陷阱：dimension/run.py 头部 import 了它，而它 import 时就读 data/df_1~5.parquet（硬编码 F:\ 路径）。MCP server 部署环境不一定有这些文件 → import 直接炸。方
+  案：改 data_read.py 为惰性加载（把读取挪进函数内），或让 run.py 的 import 变 lazy。
+2. format_adapt 里的隐式 LLM 调用：format_rebalance.py:69 格式化时调 reason_llm，有硬编码 key + 慢。MCP 工具返回原始数据，绕开它。
+3. 历史压测的取数：compute_historical_stress 需要各股票行情 dfs_map，服务端从 MongoDB stock_daily_quotes 批量取（参考 app/services/portfolio_advisor/data_page_1.py 的
+  get_stock_data），注意日期对齐和缺失股票的处理。
+4. 入口已存在 mock：app/routers/portfolio_relalance.py 挂在 /api，MCP 工具应与路由共享同一个真实 service 层（在 app/services/portfolio_advisor/ 下新建 real_service.py 或改造现有
+  advisor.py），避免两处逻辑分叉。
+5. 顺带提醒：analyst.py/news_reader/llms.py 的硬编码 DashScope key 在这个模块也被复用，吊销 key 时要一起考虑。
+
+调用链（以 diagnose 为例）
+
+```
+ MCP client LLM
+   → mcp: diagnose_portfolio(["600519","300750"], [0.6,0.4], "2024-01-01", "2025-01-01")
+     → app/services/portfolio_advisor/service.py（新建，复用给路由）
+       → app.core.db 查 stock_daily_quotes（批量）
+       → recommender.portfolio_advisor.dimension.run.compute_portfolio_dimensions(dfs, weights)
+     ← 返回 {五维指标, 五维得分, 综合分, 几何综合分}
+   ← 平台 LLM 读分数 → 自己写中文诊断报告给用户
+```
+
+建议实施顺序
+
+1. 修 data_read.py 惰性加载（解除 import 炸弹）
+2. 在 app/services/portfolio_advisor/ 建真实 service 层（ diagnosis / rebalance / stress 三个函数，返回原始 dict，不碰 LLM）
+3. app/services/mcp/tools/portfolio_advisor.py 写 4 个工具函数 + server.py 注册 + 更新 instructions（写明"诊断文案和调仓理由由你生成，禁止要求服务端总结"）
+4. 验证：MCP Inspector 走一遍完整流程
+

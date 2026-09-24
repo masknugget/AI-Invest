@@ -40,7 +40,7 @@ def save_jsonl(
             f.write(line + "\n")
 
 
-def load_jsonl(
+def  load_jsonl(
     path: Union[str, Path],
     **json_loads_kwargs: Any,
 ) -> List[Any]:

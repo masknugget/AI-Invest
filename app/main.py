@@ -36,7 +36,8 @@ from app.routers import ai_insights as ai_insights_router
 from app.routers import portfolio_advisor as portfolio_advisor_router
 from app.routers import portfolio_relalance as portfolio_rebalance_router
 
-from app.services.mcp.server import mcp
+from app.services.mcp.server_chat import mcp
+from fastmcp.utilities.lifespan import combine_lifespans
 
 
 def get_version() -> str:
@@ -218,6 +219,9 @@ async def lifespan(app: FastAPI):
         logger.info("TradingAgents FastAPI backend stopped")
 
 
+# 创建 FastMCP ASGI 子应用（path="/" 因为主应用会 mount 到 /mcp）
+mcp_app = mcp.http_app(path="/")
+
 # 创建FastAPI应用
 app = FastAPI(
     title="TradingAgents-CN API",
@@ -225,7 +229,7 @@ app = FastAPI(
     version=get_version(),
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
-    lifespan=lifespan
+    lifespan=combine_lifespans(lifespan, mcp_app.lifespan)
 )
 
 # 安全中间件
@@ -320,8 +324,8 @@ app.include_router(ai_insights_router.router, prefix="/api", tags=["ai-insights"
 app.include_router(portfolio_advisor_router.router, prefix="/api", tags=["risk-diagnosis"])
 app.include_router(portfolio_rebalance_router.router, prefix="/api", tags=["rebalance"])
 
-# 挂载 MCP 服务（SSE 传输），客户端可通过 /mcp/sse 连接
-app.mount("/mcp", mcp.sse_app())
+
+app.mount("/mcp", mcp_app)
 
 
 @app.get("/")

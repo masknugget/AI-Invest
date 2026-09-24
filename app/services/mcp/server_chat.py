@@ -31,7 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 # 日志
 logging.basicConfig(
@@ -45,7 +45,7 @@ logger = logging.getLogger("app.services.mcp.server")
 # ---------------------------------------------------------------------------
 
 mcp = FastMCP(
-    name="ai-invest-mcp",
+    "ai-invest-mcp",
     instructions=(
         "你是 AI-Invest 股票分析助手的 MCP 服务。\n"
         "可用工具：\n"
@@ -88,7 +88,7 @@ def main() -> None:
     parser.add_argument(
         "--transport",
         choices=["stdio", "sse", "streamable-http"],
-        default="stdio",
+        default="streamable-http",
         help="MCP 传输协议，默认 stdio",
     )
     parser.add_argument(
@@ -108,13 +108,16 @@ def main() -> None:
 
     if args.transport == "stdio":
         mcp.run(transport="stdio")
-    elif args.transport in ("sse", "streamable-http"):
-        # FastMCP 的 run() 不直接暴露 host/port，
-        # 如需自定义 SSE 地址，请改用 mcp.settings 或 ASGI 挂载。
-        mcp.run(transport=args.transport)
+    elif args.transport in ("sse", "streamable-http", "http"):
+        # fastmcp 的 run() 支持通过 host/port 自定义 HTTP/SSE 监听地址
+        mcp.run(transport=args.transport, host=args.host, port=args.port)
     else:
         parser.error(f"不支持的传输协议: {args.transport}")
 
 
 if __name__ == "__main__":
-    main()
+    mcp.run(
+        host='0.0.0.0',
+        port=8088,
+        transport="streamable-http",
+    )

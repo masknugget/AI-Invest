@@ -1,27 +1,30 @@
-from recommender.newsReader.agents.analyst.symbol.high_dividend_analyst import prompt_high_dividend
-from recommender.newsReader.agents.analyst.symbol.highlow52_analyst import prompt_highlow52
-from recommender.newsReader.agents.analyst.industry_analyst import prompt_industry
-from recommender.newsReader.agents.analyst.macro_analyst import prompt_macro
-from recommender.newsReader.agents.analyst.micro_analyst import prompt_micro
-from recommender.newsReader.agents.analyst.portfolio_analyst import prompt_portfolio
-from recommender.newsReader.agents.analyst.price_fluctuation_analyst import prompt_price_fluctuation
-from recommender.newsReader.agents.analyst.repurchase_analyst import prompt_repurchase
-from recommender.newsReader.agents.analyst.symbol.technical_analyst import prompt_technical
-from recommender.newsReader.agents.analyst.symbol.fundamental_analyst import prompt_fundamental
+from recommender.news_reader.agents.analyst.symbol.high_dividend_analyst import prompt_high_dividend
+from recommender.news_reader.agents.analyst.symbol.highlow52_analyst import prompt_highlow52
+from recommender.news_reader.agents.analyst.industry_analyst import prompt_industry
+from recommender.news_reader.agents.analyst.macro_analyst import prompt_macro
+from recommender.news_reader.agents.analyst.micro_analyst import prompt_micro
+from recommender.news_reader.agents.analyst.portfolio_analyst import prompt_portfolio
+from recommender.news_reader.agents.analyst.price_fluctuation_analyst import prompt_price_fluctuation
+from recommender.news_reader.agents.analyst.repurchase_analyst import prompt_repurchase
+from recommender.news_reader.agents.analyst.risk_analyst import prompt_risk
+from recommender.news_reader.agents.analyst.sentiment_analyst import prompt_sentiment
+from recommender.news_reader.agents.analyst.symbol.technical_analyst import prompt_technical
+from recommender.news_reader.agents.analyst.symbol.fundamental_analyst import prompt_fundamental
+from recommender.news_reader.agents.analyst.valuation_analyst import prompt_valuation
 
 _Mapping = {
     "MacroAgent": prompt_macro(),
     "IndustryAgent": prompt_industry(),
     "MicroAgent": prompt_micro(),
     "EventAgent": prompt_repurchase(),
-    "ValuationAgent": prompt_micro(),
+    "ValuationAgent": prompt_valuation(),
     "TechnicalAgent": prompt_technical(),
     "TechnicalHLAgent": prompt_highlow52(),
-    "SentimentAgent": prompt_micro(),
+    "SentimentAgent": prompt_sentiment(),
     "DividendAgent": prompt_high_dividend(),
     "FundamentalAgent": prompt_fundamental(),
     "PortfolioAgent": prompt_portfolio(),
-    "RiskAgent": "风险预警与压力测试",
+    "RiskAgent": prompt_risk(),
 }
 
 _MappingName = {

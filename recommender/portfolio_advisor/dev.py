@@ -1,6 +1,7 @@
 from typing import Dict, List
 
-from research.newsReader.llms import chat_once
+from recommender.news_reader.llms import chat_once
+
 
 
 def gen_analyst(

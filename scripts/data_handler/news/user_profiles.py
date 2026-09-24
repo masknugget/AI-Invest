@@ -5,8 +5,8 @@ import sys
 from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any
 
-from recommender.newsReader.llms import chat_once
-from recommender.newsReader.utils import parse_json_from_llm
+from recommender.news_reader.llms import chat_once
+from recommender.news_reader.utils import parse_json_from_llm
 
 from scripts.data_handler.news.prompt_userprofiles import build_user_profile_prompt
 from app.core.database import get_mongo_db_sync

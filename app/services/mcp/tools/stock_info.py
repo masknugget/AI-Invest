@@ -1,59 +1,54 @@
-from typing import Optional
-import time
-
-from app.core.db.document import search_symbol, get_symbol_info
+from app.services.chatbot.tools import search_stock_information
 
 
-def get_stock_info(
-    stock_code: str,
-    date_time: Optional[str] = None,
-    indicator_name: Optional[str] = None,
-) -> str:
+def get_stock_info(stock_code: str) -> str:
     """
-    获取股票基础信息，包括收盘价、商业描述以及市盈率/市净率/市销率等关键指标。
+    MCP 工具封装：获取股票信息，并将结果整理成适合大模型直接阅读的 system 提示词文本。
 
-    该函数由 app.services.mcp.server 通过 mcp.add_tool() 注册为 MCP 工具，
-    因此本模块不需要（也不能，避免循环导入）再使用 @mcp.tool() 装饰器。
+    设计目的
+    --------
+    - 对下游 MCP/Agent 来说，工具的价值在于"取数 + 结构化/格式化输出"。
+    - 该函数负责调用底层数据工具 `search_stock_information`，并把返回的股票信息拼接为
+      一段可直接注入到 LLM system / tool 结果中的文本，指导模型"优先使用最新数据回答"。
 
-    Args:
-        stock_code: 股票代码或股票名称（如 "00700" 或 "腾讯控股"）。
-        date_time: 日期（格式：YYYY-MM-DD），保留参数用于后续扩展，目前内部使用默认区间。
-        indicator_name: 指标名称（如：收盘价、开盘价、成交量、涨跌幅等），保留参数用于后续扩展。
+    参数
+    ----
+    stock_code : str
+        股票代码或股票名称（例如: '0700'、'腾讯控股'、'AAPL' 等）。
+        具体支持的格式由 `search_stock_information` 内部的 `search_symbol` 决定。
 
-    Returns:
-        股票信息文本，包含名称、代码、收盘价、商业描述和指标数据。
+    返回
+    ----
+    str
+        - 成功: 返回 system_content 文本，包含固定引导语 + tool_data（股票信息全文）。
+          调用方可将该字符串作为 tool 输出 / system prompt 的一部分，供模型回答用户问题。
+        - 失败: 返回以"工具调用出错:"开头的错误文本，保证调用链不抛异常、可降级展示。
+
+    依赖
+    ----
+    search_stock_information(stock_code)
+        返回值形如: (tool_data: str, data_dt: dict)
+        - tool_data: 已格式化的股票信息文本（含名称/代码/收盘价/描述/日期/最新价格/新闻等）
+        - data_dt: 结构化指标字典（目前本函数未使用，但可用于后续结构化推理/计算）
+
+    注意事项（给 MCP/Agent 的使用约束）
+    --------------------------------
+    - 回答用户问题时：优先使用 tool_data 中"最新价格-实时"的信息；
+      若实时为空或缺失，再使用"收盘价/日期"等历史字段。
+    - 本函数只做信息拼装，不做投资建议或结论判断；分析应交给上层 Agent/LLM。
     """
-    time_s1 = time.time()
+    try:
+        # 调用底层取数工具：
+        # tool_data 为可读文本；data_dt 为结构化字典（预留给后续增强使用）
+        tool_data, data_dt = search_stock_information(stock_code)
 
-    code_result = search_symbol(stock_code)
-    print("time >>> 获取search_symbol", time.time() - time_s1)
+        # 给大模型的指令：强调"最新优先"，避免模型用过期收盘价回答实时问题
+        system_content = (
+            "请根据以下股票信息回答用户问题：以最新优先，如果最新有数据的话，否则用其他\n\n"
+            f"{tool_data}"
+        )
+        return system_content
 
-    if not code_result:
-        return f"未找到股票代码或名称: {stock_code}"
-
-    stock_code = code_result.get("symbol", "")
-    stock_name = code_result.get("name", "")
-
-    if not stock_code:
-        return f"未找到股票代码或名称: {stock_code}"
-
-    time_s1 = time.time()
-    # 与原 chatbot.tools.search_stock_information 保持一致，使用固定区间获取最新快照数据
-    result_dt = get_symbol_info(stock_code, "2025-01-16", "2025-06-16")
-    result_dt = result_dt or {}
-    print("time >>> 获取get_symbol_info", time.time() - time_s1)
-
-    result_str = f"""股票名称: {stock_name}
-股票代码: {result_dt.get("symbol", stock_code)}
-收盘价: {result_dt.get("close", "")}
-商业描述: {result_dt.get("business_desc", "")}
-"""
-
-    data_dt = {
-        "收盘价": result_dt.get("close", ""),
-        "市盈率": result_dt.get("pe", ""),
-        "市净率": result_dt.get("pb", ""),
-        "市销率": result_dt.get("ps", ""),
-    }
-
-    return result_str + "\n数据详情:\n" + "\n".join(f"{k}: {v}" for k, v in data_dt.items())
+    except Exception as e:
+        # MCP 友好：不抛异常，统一返回可展示的错误信息，便于上层降级处理
+        return f"工具调用出错: {str(e)}"
