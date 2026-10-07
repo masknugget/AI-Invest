@@ -49,3 +49,8 @@ def create_analyst(name: str):
     else:
         return "", ""
 
+
+def list_agent_names() -> list:
+    """返回全部可用分析 Agent 名（_Mapping 的键），供 MCP 工具等外部校验使用。"""
+    return list(_Mapping.keys())
+

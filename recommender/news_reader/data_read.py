@@ -29,8 +29,6 @@ for i in file_names:
         break
 
 
-
-
 content = news[100]
 
 

@@ -55,10 +55,5 @@ def parse_json_from_llm(content: str) -> T:
         data = json.loads(content)
         return data
     except json.decoder.JSONDecodeError as e:
-        print("json load错误")
-
-    try:
-        data = eval(content)
-        return data
-    except Exception as e:
-        raise e
+        # 不再使用 eval() 兜底（任意代码执行风险），解析失败即抛异常由上层重试
+        raise OutputParserException(f"无法从 LLM 返回中提取 JSON：{e}") from e
