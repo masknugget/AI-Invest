@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import List
 
 from app.services.mcp.tools.news_reader import contract
-from app.services.news_analysis import store
+
 
 
 async def list_news_analysts() -> str:
@@ -46,44 +46,3 @@ async def list_news_analysts() -> str:
         )
     except Exception as e:
         return contract.error_response(tool, f"查询分析师清单失败: {e}")
-
-
-async def search_news_insights(
-    query: str = "",
-    stock_code: str = "",
-    limit: int = contract.LIMIT_DEFAULT,
-) -> str:
-    """
-    检索历史新闻分析结果（MongoDB insight_agg 集合）。
-
-    按 title / summary / tags / keywords 关键词匹配和/或股票代码过滤，
-    按 create_time 倒序返回。纯查询，无 LLM 调用，毫秒级返回。
-
-    参数
-    ----
-    query : str
-        关键词（正则匹配 title/summary/tags/keywords），默认空（不过滤）。
-    stock_code : str
-        股票代码（匹配 data_align.stock_codes.code），默认空（不过滤）。
-    limit : int
-        返回条数上限 1~100，默认 10。
-
-    返回 data：{"count": 命中条数, "items": [分析结果, ...]}，
-    每条含 data_align（title/summary/stock_codes/tags/...）与 article_id/create_time。
-    解读 item 内容时请结合当前对话上下文，不要照搬原文回复用户。
-    """
-    tool = "search_news_insights"
-    try:
-        limit = contract.validate_limit(limit)
-        results = await store.search_insights(
-            query=query or None,
-            stock_code=stock_code or None,
-            limit=limit,
-        )
-        return contract.make_response(
-            tool, {"count": len(results), "items": results}
-        )
-    except ValueError as e:
-        return contract.error_response(tool, str(e))
-    except Exception as e:
-        return contract.error_response(tool, f"检索历史分析失败: {e}")
