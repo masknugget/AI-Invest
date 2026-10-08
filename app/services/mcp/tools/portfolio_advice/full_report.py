@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import List
 
 from app.services.mcp.tools.portfolio_advice import _common
+from app.services.mcp.tools.portfolio_advice import data_source
 from app.services.mcp.tools.portfolio_advice.risk_alerts import _compute_risk_metrics
 
 
@@ -63,7 +64,7 @@ def portfolio_full_report(codes: List[str], weights: List[float]) -> str:
         fmt = _common.get_format_advisor()
 
         # 1. 五维评分（行情只拉取一次，供评分与历史压力测试复用）
-        dfs_map = _common.fetch_quotes(codes)
+        dfs_map = data_source.fetch_quotes(codes)
         dfs = [dfs_map[c] for c in codes]
         dimensions = dimension_run.compute_portfolio_dimensions(dfs, weights)
 
@@ -94,7 +95,7 @@ def portfolio_full_report(codes: List[str], weights: List[float]) -> str:
         for name in list_scenario_names():
             try:
                 scenario_results.append(
-                    compute_scenario_stress(portfolio, name, industry_lookup=_common.industry_lookup)
+                    compute_scenario_stress(portfolio, name, industry_lookup=data_source.industry_lookup)
                 )
             except ValueError as e:
                 stress_warnings.append(f"宏观情景「{name}」计算跳过: {e}")
@@ -103,7 +104,7 @@ def portfolio_full_report(codes: List[str], weights: List[float]) -> str:
         for sector in list_sector_names():
             try:
                 sector_results.append(
-                    compute_sector_stress(portfolio, sector=sector, industry_lookup=_common.industry_lookup)
+                    compute_sector_stress(portfolio, sector=sector, industry_lookup=data_source.industry_lookup)
                 )
             except ValueError as e:
                 stress_warnings.append(f"行业情景「{sector}」计算跳过: {e}")

@@ -2,7 +2,7 @@
 投资组合核心风险提示生成示例
 
 用法：
-    python research/portfolio_advisor/analyst.py
+    python recommender/portfolio_advisor/analyst.py
 
 流程：
     1. 根据资产权重与行业分布构造风控专家 Prompt。
@@ -109,7 +109,11 @@ def parse_risks(raw: Optional[str]):
         data: Any = json.loads(text)
         if isinstance(data, list):
             return [item for item in data if isinstance(item, dict)]
-        return data
+        # 模型输出非列表（如单个 dict 或标量）：统一返回空列表，
+        # 避免调用方按 list 迭代时拿到 dict 的 key 字符串。
+        print("[warn] 模型输出不是 JSON 列表，已忽略。原始输出如下：")
+        print(raw)
+        return []
     except json.JSONDecodeError:
         print("[warn] JSON 解析失败，原始输出如下：")
         print(raw)

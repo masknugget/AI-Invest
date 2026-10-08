@@ -29,8 +29,14 @@ def _extract_daily_returns(df: pd.DataFrame) -> pd.Series:
     df = df.sort_values("date").set_index("date")
 
     if "pctChg" in df.columns:
-        # pctChg 通常为百分比数值，需转为小数
-        return (df["pctChg"] / 100).rename("daily_return")
+        # pctChg 量纲自适应：百分比制（如 1.5 表示 1.5%）转小数；
+        # 小数制（|x| <= 1，如 0.015）保持不变。
+        # 与 return_stability.calculate_annualized_volatility 的判断口径一致，
+        # 避免同一数据在两个维度间被缩放两次或漏缩放。
+        s = pd.to_numeric(df["pctChg"], errors="coerce")
+        if s.abs().max() > 1:
+            s = s / 100
+        return s.rename("daily_return")
     else:
         # 通过收盘价与前收盘价计算
         return (df["close"] / df["preclose"] - 1).rename("daily_return")
@@ -128,7 +134,10 @@ def normalize_sharpe_to_score(sharpe_ratio: float) -> float:
     float
         归一化后的分数（0~100）。
     """
-    if sharpe_ratio < 0:
+    if not (sharpe_ratio >= 0):
+        # 负数夏普得 0 分；NaN（数据不足等异常输入）同样落到 0 分而非误给满分。
+        # 注意不能用 sharpe_ratio < 0 判断：NaN 与任何值比较都为 False，
+        # 会一路落到末尾的 else 分支被误判为 100 分。
         return 0.0
     elif sharpe_ratio < 1:
         return sharpe_ratio * 60.0
@@ -196,6 +205,13 @@ def calculate_portfolio_sharpe_ratio(
     # ---------- 提取并对齐日收益率 ----------
     returns_list = [_extract_daily_returns(df) for df in dfs]
     aligned_returns = _align_returns(returns_list)
+
+    # 对齐后不足 2 天无法计算样本标准差（ddof=1 会产生 NaN），
+    # 与 return_stability.calculate_annualized_volatility 的校验保持一致。
+    if len(aligned_returns) < 2:
+        raise ValueError(
+            f"对齐后的共同交易日不足 2 天（当前 {len(aligned_returns)} 天），无法计算夏普比率"
+        )
 
     # ---------- 计算组合日收益率 ----------
     weights_arr = np.array(weights)

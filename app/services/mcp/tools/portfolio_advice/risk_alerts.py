@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Dict, List
 
 from app.services.mcp.tools.portfolio_advice import _common
+from app.services.mcp.tools.portfolio_advice import data_source
 
 # HHI 集中度阈值
 _HHI_HIGH = 0.5
@@ -71,7 +72,7 @@ def _rule_based_risks(
 
 def _compute_risk_metrics(codes: List[str], weights: List[float]) -> Dict:
     """计算行业分布、HHI 与规则化风险项（底层实现，供 risk_alerts 与 full_report 复用）。"""
-    industry_dist = _common.build_industry_distribution(codes, weights)
+    industry_dist = data_source.build_industry_distribution(codes, weights)
     hhi = sum(w * w for w in industry_dist.values())
     risks = _rule_based_risks(industry_dist, hhi, dict(zip(codes, weights)))
 

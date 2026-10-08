@@ -8,7 +8,8 @@
 行情 DataFrame 进行重算。
 """
 
-from typing import Dict, List
+from math import comb
+from typing import Dict, List, Optional
 
 from recommender.portfolio_advisor.rebalance.constraints import clamp_max_actions
 from recommender.portfolio_advisor.rebalance.loader import (
@@ -19,6 +20,20 @@ from recommender.portfolio_advisor.rebalance.scoring import evaluate_portfolio_f
 from recommender.portfolio_advisor.rebalance.search import search_rebalance_plans, search_rebalance_plans_by_scores
 from recommender.portfolio_advisor.rebalance.types import CandidatePool, RebalancePlan
 from recommender.portfolio_advisor.rebalance.weights import WEIGHT_STRATEGIES
+
+# 搜索空间上限：超出后串行枚举将长时间无响应（max_actions=3 + 300 只候选
+# 时约 4500 万次评估）。超限时要求调用方缩小 max_actions 或候选池。
+_MAX_SEARCH_EVALUATIONS = 200_000
+
+
+def _estimate_evaluations(n_current: int, n_candidates: int, max_actions: int) -> int:
+    """估算搜索空间内需评估的替换组合总数。"""
+    total = 0
+    for k in range(1, max_actions + 1):
+        if k > n_current or k > n_candidates:
+            continue
+        total += comb(n_current, k) * comb(n_candidates, k)
+    return total
 
 
 def suggest_rebalance(
@@ -32,6 +47,7 @@ def suggest_rebalance(
     top_k: int = 3,
     verbose: bool = False,
     fixed_new_weight: float = 0.0,
+    candidate_limit: Optional[int] = None,
 ) -> List[RebalancePlan]:
     """
     生成调仓建议。
@@ -81,7 +97,9 @@ def suggest_rebalance(
         raise ValueError("current_stock_scores 长度必须与 current_codes 一致")
 
     current_codes_set = set(current_codes)
-    candidate_pool = load_candidate_pool_from_jsonl_as_pool(scores_path, fetch_full_df=False)
+    candidate_pool = load_candidate_pool_from_jsonl_as_pool(
+        scores_path, fetch_full_df=False, limit=candidate_limit
+    )
     candidates = [
         c for c in candidate_pool.candidates if c.code not in current_codes_set
     ]
@@ -90,6 +108,16 @@ def suggest_rebalance(
     candidate_pool = CandidatePool(candidates=candidates)
 
     max_actions = clamp_max_actions(max_actions, n_current)
+
+    # 搜索空间防护：超出上限直接报错并给出收敛路径，避免串行枚举长时间无响应
+    estimated = _estimate_evaluations(n_current, len(candidates), max_actions)
+    if estimated > _MAX_SEARCH_EVALUATIONS:
+        raise ValueError(
+            f"调仓搜索空间过大：约 {estimated:,} 个待评估方案"
+            f"（{n_current} 只持仓 × {len(candidates)} 只候选 × max_actions={max_actions}），"
+            f"上限 {_MAX_SEARCH_EVALUATIONS:,}。"
+            f"请降低 max_actions，或通过 candidate_limit 缩小候选池"
+        )
 
     score_current, portfolio_current = evaluate_portfolio_from_scores(
         current_codes, current_stock_scores, current_weights, objective
@@ -179,6 +207,16 @@ def suggest_rebalance_by_scores(
         raise ValueError("候选股票池不能为空")
 
     max_actions = clamp_max_actions(max_actions, n_current)
+
+    # 搜索空间防护（与 suggest_rebalance 一致）
+    estimated = _estimate_evaluations(n_current, len(candidates), max_actions)
+    if estimated > _MAX_SEARCH_EVALUATIONS:
+        raise ValueError(
+            f"调仓搜索空间过大：约 {estimated:,} 个待评估方案"
+            f"（{n_current} 只持仓 × {len(candidates)} 只候选 × max_actions={max_actions}），"
+            f"上限 {_MAX_SEARCH_EVALUATIONS:,}。"
+            f"请降低 max_actions，或缩小传入的候选池"
+        )
 
     score_current, portfolio_current = evaluate_portfolio_from_scores(
         current_codes, current_stock_scores, current_weights, objective

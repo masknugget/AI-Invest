@@ -126,6 +126,7 @@ def _evaluate_replacement_worker_by_scores(args) -> Tuple[Optional[RebalancePlan
             score_after=score_new,
             improvement=improvement,
             objective=objective,
+            weights_after=new_weights,
         )
         return plan, messages
 

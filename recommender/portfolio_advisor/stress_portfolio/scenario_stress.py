@@ -66,27 +66,18 @@ DEFAULT_SCENARIO_SHOCKS = {
 def _lookup_industry(
     industry_lookup: Optional[Callable[[str], Optional[str]]] = None,
 ) -> Callable[[str], Optional[str]]:
-    """返回行业查询函数。未提供时使用硬编码的 mock 映射。"""
-    if industry_lookup is not None:
-        return industry_lookup
+    """校验并返回行业查询函数。
 
-    _mock_industry_map: Dict[str, str] = {
-        "600519": "食品饮料",
-        "000858": "食品饮料",
-        "000001": "银行",
-        "600036": "银行",
-        "601318": "非银金融",
-        "000333": "家用电器",
-        "002594": "汽车",
-        "300750": "电气设备",
-        "000725": "电子",
-        "600276": "医药生物",
-    }
-
-    def _query(code: str) -> Optional[str]:
-        return _mock_industry_map.get(code)
-
-    return _query
+    industry_lookup 为必传：持仓代码必须能映射到申万一级行业，
+    否则所有股票会落入"未知行业"且压力损失被静默计算为 0，
+    给出"零风险"的错误结果。不提供时直接报错，拒绝静默降级。
+    """
+    if industry_lookup is None:
+        raise ValueError(
+            "必须提供 industry_lookup（股票代码 -> 申万一级行业名称的查询函数），"
+            "否则无法将持仓映射到板块桶，压力测试结果无意义"
+        )
+    return industry_lookup
 
 
 def calculate_scenario_stress_result(
@@ -104,7 +95,7 @@ def calculate_scenario_stress_result(
     scenario_shocks : Dict[str, float]
         板块桶 -> 预期收益率冲击（例如 {"科技": -0.15}）。
     industry_lookup : Callable[[str], Optional[str]], optional
-        股票代码 -> 申万一级行业名称。未提供时延迟构造 IndustryQuery。
+        股票代码 -> 申万一级行业名称，必传；否则抛出 ValueError。
 
     返回
     -------
@@ -161,6 +152,22 @@ def calculate_scenario_stress_result(
     }
 
 
+def _validate_portfolio(portfolio: List[Dict[str, Any]]) -> None:
+    """校验持仓列表：非空、含 code/weight 字段、权重和为 1。
+
+    与 history_stress._ensure_portfolio_df 的校验口径一致，
+    避免权重和不为 1 时 portfolio_loss_pct 的量纲错误。
+    """
+    if not portfolio:
+        raise ValueError("portfolio cannot be empty")
+    for i, item in enumerate(portfolio):
+        if "code" not in item or "weight" not in item:
+            raise ValueError(f"第 {i} 个持仓缺少必要字段 code/weight")
+    total = sum(float(item["weight"]) for item in portfolio)
+    if abs(total - 1.0) > 1e-6:
+        raise ValueError(f"权重之和必须等于 1，当前为 {total}")
+
+
 def compute_scenario_stress(
     portfolio: List[Dict[str, Any]],
     scenario_name: str,
@@ -184,13 +191,16 @@ def compute_scenario_stress(
     返回
     -------
     dict
-        损失结果字典。
+        损失结果字典。portfolio_loss_pct / portfolio_loss_amount 为负值表示亏损
+        （与 history_stress 的符号约定一致）。
     """
     scenario_lib = scenarios if scenarios is not None else DEFAULT_SCENARIO_SHOCKS
     if scenario_name not in scenario_lib:
         raise ValueError(
             f"未知情景：{scenario_name}。可用情景：{list(scenario_lib.keys())}"
         )
+
+    _validate_portfolio(portfolio)
 
     portfolio_df = pd.DataFrame(portfolio)
     if "amount" not in portfolio_df.columns:

@@ -50,7 +50,11 @@ def effective_number_of_bets_weight_based(
 
     sum_sq = np.sum(weights_arr ** 2)
     if sum_sq < 1e-12:
-        return 1.0
+        # 非负且和为 1 的权重必有 sum_sq >= 1/n（Cauchy-Schwarz），
+        # 触发此分支说明输入数据自相矛盾，应报错而非返回"完全集中"的错误语义。
+        raise ValueError(
+            f"权重平方和异常趋近 0（{sum_sq}），与权重和为 1 的校验结果矛盾，请检查输入数据"
+        )
 
     return float(1.0 / sum_sq)
 
@@ -144,17 +148,25 @@ def compute_enb_from_dataframes(
         if missing:
             raise ValueError(f"第{i}个DataFrame缺少列: {missing}")
 
-    # 合并收益率数据，按日期对齐
-    merged = dfs[0][["date", "pctChg"]].copy()
+    # 合并收益率数据，按日期对齐。
+    # 先按 date 去重（保留最后一条），避免数据源中的重复交易日
+    # 在 merge 时产生笛卡尔积膨胀行数、污染协方差矩阵。
+    # 与 position_efficiency / return_stability 的处理口径保持一致。
+    def _dedup_date(df: pd.DataFrame) -> pd.DataFrame:
+        return df.drop_duplicates(subset="date", keep="last")
+
+    merged = _dedup_date(dfs[0])[["date", "pctChg"]].copy()
     merged.columns = ["date", "pctChg_0"]
 
     for i in range(1, n):
-        temp = dfs[i][["date", "pctChg"]].copy()
+        temp = _dedup_date(dfs[i])[["date", "pctChg"]].copy()
         temp.columns = ["date", f"pctChg_{i}"]
         merged = merged.merge(temp, on="date", how="inner")
 
-    # 提取收益率矩阵 (T × n)
-    returns = merged[[f"pctChg_{i}" for i in range(n)]].values
+    # 提取收益率矩阵 (T × n)，丢弃含缺失值的日期行
+    # （与 position_efficiency / return_stability 的 dropna 口径一致，
+    # 否则 NaN 会污染协方差矩阵，导致 risk-based ENB 输出 NaN）
+    returns = merged[[f"pctChg_{i}" for i in range(n)]].dropna().values
 
     # 计算协方差矩阵（单资产时退化为 1×1）
     cov_matrix = np.cov(returns, rowvar=False)

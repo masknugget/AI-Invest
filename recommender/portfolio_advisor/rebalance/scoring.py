@@ -4,7 +4,7 @@
 将 PortfolioDimensions 映射到各种优化目标得分。
 """
 
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 from recommender.portfolio_advisor.dimension.run import (
     DEFAULT_DIMENSION_WEIGHTS,
@@ -18,6 +18,16 @@ from recommender.portfolio_advisor.dimension.run import (
     compute_geometric_composite_score,
     compute_portfolio_dimensions,
 )
+
+# one.py 持久化的可选原始指标，聚合后填充进合成 PortfolioDimensions，
+# 避免下游展示"预计回撤 = 0"之类的无意义数值（旧版得分文件无这些字段）
+METRIC_NAMES: Set[str] = {
+    "mdd",
+    "sharpe_ratio",
+    "annualized_volatility",
+    "enb_weight_based",
+    "style_hhi",
+}
 
 
 OBJECTIVES: Set[str] = {
@@ -92,6 +102,8 @@ def _aggregate_dimension_scores(
     all_dims = set()
     for scores in dimension_scores_list:
         all_dims.update(scores.keys())
+    # 原始指标键不参与维度得分聚合
+    all_dims -= METRIC_NAMES
 
     result = {}
     for dim in all_dims:
@@ -102,16 +114,49 @@ def _aggregate_dimension_scores(
     return result
 
 
+def _aggregate_metrics(
+    dimension_scores_list: List[Dict[str, float]],
+    weights: List[float],
+) -> Dict[str, float]:
+    """按权重聚合各股票的原始指标（mdd / sharpe 等）。
+
+    近似说明：组合层面的真实指标是路径依赖的（如组合 MDD 不等于个股 MDD
+    的加权平均），此处加权平均仅用于展示参考，严格计算需行情数据重算。
+    无任何股票带指标字段时返回空字典。
+    """
+    total_weight = sum(weights)
+    aggregated: Dict[str, float] = {}
+    for metric in METRIC_NAMES:
+        pairs = [
+            (scores[metric], w)
+            for scores, w in zip(dimension_scores_list, weights)
+            if metric in scores
+        ]
+        if not pairs:
+            continue
+        covered = sum(w for _, w in pairs)
+        aggregated[metric] = sum(v * w for v, w in pairs) / covered if covered > 0 else 0.0
+    return aggregated
+
+
 def make_portfolio_dimensions_from_scores(
     scores: Dict[str, float],
     dimension_weights=None,
     geometric_weights=None,
+    metrics: Optional[Dict[str, float]] = None,
 ) -> PortfolioDimensions:
-    """从维度得分字典构造合成 PortfolioDimensions（指标值置 0，仅保留得分）。"""
+    """从维度得分字典构造合成 PortfolioDimensions。
+
+    指标值（mdd / sharpe 等）优先取 metrics 参数（个股指标加权聚合结果）；
+    未提供时置 0.0，仅保留得分。原始指标需 one.py 生成的得分文件携带，
+    旧版文件无指标字段时行为与此前一致。
+    """
     if dimension_weights is None:
         dimension_weights = DEFAULT_DIMENSION_WEIGHTS
     if geometric_weights is None:
         geometric_weights = GEOMETRIC_DIMENSION_WEIGHTS
+    if metrics is None:
+        metrics = {}
 
     # 确保所有维度都有值，缺失补 0
     complete_scores = {dim: scores.get(dim, 0.0) for dim in dimension_weights}
@@ -126,21 +171,24 @@ def make_portfolio_dimensions_from_scores(
 
     return PortfolioDimensions(
         drawdown_control=DrawdownControl(
-            mdd=0.0, score=complete_scores.get("drawdown_control", 0.0)
+            mdd=float(metrics.get("mdd", 0.0)),
+            score=complete_scores.get("drawdown_control", 0.0),
         ),
         portfolio_diversification=PortfolioDiversification(
-            enb_weight_based=0.0,
-            enb_risk_based=0.0,
+            enb_weight_based=float(metrics.get("enb_weight_based", 0.0)),
+            enb_risk_based=0.0,  # 个股级不持久化风险 ENB，组合值需行情重算
             score=complete_scores.get("portfolio_diversification", 0.0),
         ),
         position_efficiency=PositionEfficiency(
-            sharpe_ratio=0.0, score=complete_scores.get("position_efficiency", 0.0)
+            sharpe_ratio=float(metrics.get("sharpe_ratio", 0.0)),
+            score=complete_scores.get("position_efficiency", 0.0),
         ),
         return_stability=ReturnStability(
-            annualized_volatility=0.0, score=complete_scores.get("return_stability", 0.0)
+            annualized_volatility=float(metrics.get("annualized_volatility", 0.0)),
+            score=complete_scores.get("return_stability", 0.0),
         ),
         style_balance=StyleBalance(
-            style_hhi=0.0,
+            style_hhi=float(metrics.get("style_hhi", 0.0)),
             effective_style_num=0.0,
             score=complete_scores.get("style_balance", 0.0),
         ),
@@ -176,6 +224,7 @@ def evaluate_portfolio_from_scores(
         (目标得分, 合成 PortfolioDimensions)。
     """
     aggregated_scores = _aggregate_dimension_scores(dimension_scores_list, weights)
-    portfolio = make_portfolio_dimensions_from_scores(aggregated_scores)
+    aggregated_metrics = _aggregate_metrics(dimension_scores_list, weights)
+    portfolio = make_portfolio_dimensions_from_scores(aggregated_scores, metrics=aggregated_metrics)
     score = extract_objective_score(portfolio, objective)
     return score, portfolio

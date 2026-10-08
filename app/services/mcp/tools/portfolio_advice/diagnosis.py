@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import List
 
 from app.services.mcp.tools.portfolio_advice import _common
+from app.services.mcp.tools.portfolio_advice import data_source
 
 
 def portfolio_diagnosis(codes: List[str], weights: List[float]) -> str:
@@ -33,7 +34,7 @@ def portfolio_diagnosis(codes: List[str], weights: List[float]) -> str:
     tool = "portfolio_diagnosis"
     try:
         codes, weights = _common.validate_portfolio(codes, weights)
-        dfs_map = _common.fetch_quotes(codes)
+        dfs_map = data_source.fetch_quotes(codes)
         dfs = [dfs_map[c] for c in codes]
 
         result = _common.get_dimension_run().compute_portfolio_dimensions(dfs, weights)

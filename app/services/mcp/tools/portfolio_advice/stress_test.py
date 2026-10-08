@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 
 from app.services.mcp.tools.portfolio_advice import _common
+from app.services.mcp.tools.portfolio_advice import data_source
 
 _VALID_SCENARIO_TYPES = ("history", "scenario", "sector")
 
@@ -16,7 +17,7 @@ def _run_history_stress(codes, weights, scenario_names, warnings) -> List[Dict]:
         list_historical_scenario_names,
     )
 
-    dfs_map = _common.fetch_quotes(codes)
+    dfs_map = data_source.fetch_quotes(codes)
     portfolio = _common.build_portfolio_arg(codes, weights)
     results = compute_historical_stress(portfolio, dfs_map, scenario_ids=scenario_names)
     if not results:
@@ -39,7 +40,7 @@ def _run_scenario_stress(codes, weights, scenario_names, warnings) -> List[Dict]
         try:
             results.append(
                 compute_scenario_stress(
-                    portfolio, name, industry_lookup=_common.industry_lookup
+                    portfolio, name, industry_lookup=data_source.industry_lookup
                 )
             )
         except ValueError as e:
@@ -60,7 +61,7 @@ def _run_sector_stress(codes, weights, scenario_names, warnings) -> List[Dict]:
         try:
             results.append(
                 compute_sector_stress(
-                    portfolio, sector=sector, industry_lookup=_common.industry_lookup
+                    portfolio, sector=sector, industry_lookup=data_source.industry_lookup
                 )
             )
         except ValueError as e:

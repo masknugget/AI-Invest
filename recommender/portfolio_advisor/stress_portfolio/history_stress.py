@@ -212,6 +212,7 @@ def calculate_historical_scenario_result(
             "portfolio_value": 组合总市值,
             "portfolio_loss_pct": 组合损失百分比（保留 1 位小数，负数）,
             "portfolio_loss_amount": 组合损失金额,
+            "data_coverage": 有场景窗口数据的权重占比（0~1，小于 1 时损失被低估）,
             "per_asset": 逐票明细列表,
             "warnings": 警告信息,
         }
@@ -223,6 +224,7 @@ def calculate_historical_scenario_result(
     warnings: List[str] = []
     per_asset: List[Dict[str, Any]] = []
     weighted_drawdown = 0.0
+    covered_weight = 0.0  # 实际有场景窗口数据的权重合计，用于 data_coverage
 
     for _, row in portfolio_df.iterrows():
         code = row["code"]
@@ -253,6 +255,7 @@ def calculate_historical_scenario_result(
             drawdown = 0.0
         else:
             drawdown = hist["max_drawdown"]
+            covered_weight += weight
 
         loss_amount = amount * drawdown
         weighted_drawdown += weight * drawdown
@@ -282,6 +285,9 @@ def calculate_historical_scenario_result(
         "portfolio_value": round(portfolio_value, 2),
         "portfolio_loss_pct": round(weighted_drawdown * 100, 1),
         "portfolio_loss_amount": round(portfolio_loss_amount, 2),
+        # 数据覆盖度：实际有场景窗口行情的权重占比。小于 1 时组合损失被低估
+        # （缺数据股票回撤记为 0），调用方应结合 warnings 判断结果可信度。
+        "data_coverage": round(covered_weight, 4),
         "per_asset": per_asset,
         "warnings": warnings,
     }

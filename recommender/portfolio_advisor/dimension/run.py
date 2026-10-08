@@ -229,7 +229,8 @@ def compute_geometric_composite_score(
         几何加权综合得分，范围 [0, 100]。
     """
     total_weight = sum(weights.values())
-    if not (0.999 <= total_weight <= 1.001):
+    # 仅容忍浮点舍入误差；旧实现的 ±0.001 宽容带会静默放行明显错误的权重
+    if abs(total_weight - 1.0) > 1e-9:
         raise ValueError(f"几何加权权重之和应为 1，当前为 {total_weight}")
 
     missing = set(weights.keys()) - set(scores.keys())

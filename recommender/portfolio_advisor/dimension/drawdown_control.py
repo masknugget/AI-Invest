@@ -33,18 +33,27 @@ def calculate_portfolio_mdd(
     注意:
         无风险利率在最大回撤计算中不需要使用。
     """
-    # 输入校验
+    # 输入校验（用 ValueError 而非 assert：assert 在 python -O 下会被剥离）
     n_assets = len(dfs)
-    assert n_assets >= 1, "资产数量必须至少为1"
-    assert len(weights) == n_assets, f"权重数量({len(weights)})必须与资产数量({n_assets})一致"
-    assert abs(sum(weights) - 1.0) < 1e-6, f"权重之和必须等于1，当前为{sum(weights)}"
+    if n_assets < 1:
+        raise ValueError("资产数量必须至少为1")
+    if len(weights) != n_assets:
+        raise ValueError(f"权重数量({len(weights)})必须与资产数量({n_assets})一致")
+    if abs(sum(weights) - 1.0) >= 1e-6:
+        raise ValueError(f"权重之和必须等于1，当前为{sum(weights)}")
 
-    # 按日期对齐所有资产数据，取交集（inner join）
-    merged = dfs[0][['date', price_col]].copy()
+    # 按日期对齐所有资产数据，取交集（inner join）。
+    # 先按 date 去重（保留最后一条），避免数据源中的重复交易日
+    # 在 merge 时产生笛卡尔积膨胀行数、污染回撤计算。
+    # 与 position_efficiency / return_stability 的处理口径保持一致。
+    def _dedup_date(df: pd.DataFrame) -> pd.DataFrame:
+        return df.drop_duplicates(subset='date', keep='last')
+
+    merged = _dedup_date(dfs[0])[['date', price_col]].copy()
     merged = merged.rename(columns={price_col: 'p0'})
 
     for i in range(1, n_assets):
-        df_i = dfs[i][['date', price_col]].copy()
+        df_i = _dedup_date(dfs[i])[['date', price_col]].copy()
         df_i = df_i.rename(columns={price_col: f'p{i}'})
         merged = merged.merge(df_i, on='date', how='inner')
 
@@ -107,7 +116,8 @@ def normalize_mdd_to_score(mdd: float) -> float:
         >>> normalize_mdd_to_score(0.3624)
         18.35
     """
-    assert mdd >= 0, "MDD 必须为非负数"
+    if mdd < 0:
+        raise ValueError(f"MDD 必须为非负数，当前为 {mdd}")
 
     if mdd <= 0.10:
         # [0, 0.10] -> [100, 80]

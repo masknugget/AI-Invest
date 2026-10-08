@@ -22,6 +22,15 @@ DIMENSION_NAMES = {
     "style_balance",
 }
 
+# one.py 持久化的可选原始指标（旧版得分文件无这些字段，存在才提取）
+METRIC_NAMES = (
+    "mdd",
+    "sharpe_ratio",
+    "annualized_volatility",
+    "enb_weight_based",
+    "style_hhi",
+)
+
 
 class _DataSet(Protocol):
     """FileVisitor.data_set() 返回对象的协议，避免依赖具体类型。"""
@@ -30,8 +39,12 @@ class _DataSet(Protocol):
 
 
 def _extract_dimension_scores(record: dict) -> dict:
-    """从 JSONL 记录中提取五维得分。"""
-    return {dim: float(record[dim]) for dim in DIMENSION_NAMES if dim in record}
+    """从 JSONL 记录中提取五维得分；原始指标（如 mdd）存在时一并带出。"""
+    scores = {dim: float(record[dim]) for dim in DIMENSION_NAMES if dim in record}
+    for metric in METRIC_NAMES:
+        if metric in record:
+            scores[metric] = float(record[metric])
+    return scores
 
 
 def load_stock_scores_from_jsonl(path: str) -> dict[str, dict]:
@@ -58,7 +71,7 @@ def load_stock_scores_from_jsonl(path: str) -> dict[str, dict]:
 
 def load_code_name_from_jsonl(path: str) -> dict[str, str]:
     """
-    从 stock_dimension_scores.jsonl 加载所有股票的code和name。
+    从 stock_dimension_scores.jsonl 加载所有股票的 code 和 name。
 
     Parameters
     ----------
@@ -67,14 +80,15 @@ def load_code_name_from_jsonl(path: str) -> dict[str, str]:
 
     Returns
     -------
-    dict[str, dict]
-        以股票 code 为键、五维得分字典为值的映射。
+    dict[str, str]
+        以股票 code 为键、name 为值的映射。缺少 name 字段的记录自动跳过
+        （one.py 生成的得分文件不含 name，此时返回空字典而非抛 KeyError）。
     """
     records = load_jsonl(path)
     return {
         str(record["code"]): str(record["name"])
         for record in records
-        if "code" in record
+        if "code" in record and "name" in record
     }
 
 

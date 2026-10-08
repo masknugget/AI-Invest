@@ -47,6 +47,9 @@ class RebalancePlan:
     score_after: float
     improvement: float
     objective: str
+    # 调仓后的组合权重（与 portfolio_after 对应，和为 1）。
+    # 默认空列表以保持对旧调用方的兼容；search 模块生成时会填充。
+    weights_after: List[float] = field(default_factory=list)
 
     def to_dict(self) -> Dict:
         return {
@@ -55,6 +58,7 @@ class RebalancePlan:
             "score_after": self.score_after,
             "improvement": self.improvement,
             "objective": self.objective,
+            "weights_after": list(self.weights_after),
             "dimensions_before": dict(self.portfolio_before.to_score_dict()),
             "dimensions_after": dict(self.portfolio_after.to_score_dict()),
         }

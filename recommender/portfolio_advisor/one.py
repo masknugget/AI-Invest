@@ -60,6 +60,13 @@ def main():
             "start_date": start_date,
             "end_date": end_date,
             **result.to_score_dict(),
+            # 原始指标一并持久化，供调仓模块聚合展示
+            # （否则合成 PortfolioDimensions 的指标值只能置 0，下游无法展示预计回撤等）
+            "mdd": result.drawdown_control.mdd,
+            "sharpe_ratio": result.position_efficiency.sharpe_ratio,
+            "annualized_volatility": result.return_stability.annualized_volatility,
+            "enb_weight_based": result.portfolio_diversification.enb_weight_based,
+            "style_hhi": result.style_balance.style_hhi,
         }
         data_result.append(result_dict)
         print(f"已处理 {name}: {code}")

@@ -89,7 +89,8 @@ def build_portfolio(
     将 List[pd.DataFrame] + List[float] 合并为投资组合 DataFrame
     自动按 date 对齐，并处理不同列的加权逻辑
     """
-    assert len(dfs) == len(weights), "dfs 和 weights 长度必须一致"
+    if len(dfs) != len(weights):
+        raise ValueError("dfs 和 weights 长度必须一致")
 
     # 权重归一化
     weights = np.array(weights, dtype=float)
