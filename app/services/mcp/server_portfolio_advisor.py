@@ -3,6 +3,7 @@ AI-Invest Portfolio Advisor MCP 服务入口
 
 使用 FastMCP 暴露投资组合分析能力（全部纯计算、零 LLM 调用）：
 - portfolio_diagnosis             组合五维评分
+- single_stock_diagnosis          单股五维预计算结果查询
 - portfolio_risk_alerts           行业分布 + 规则化风险指标
 - portfolio_rebalance_suggestion  调仓建议
 - portfolio_stress_test           压力测试
@@ -51,6 +52,7 @@ mcp = FastMCP(
         "所有工具均为纯计算，返回结构化指标数据，不做任何 LLM 文本生成。\n"
         "可用工具：\n"
         "- portfolio_diagnosis: 组合五维评分（回撤控制/分散度/仓位效率/收益稳定性/风格平衡）\n"
+        "- single_stock_diagnosis: 查询单股预计算的五维诊断结果（读 p_advisor_cal_dimensions，不重算）\n"
         "- portfolio_risk_alerts: 行业分布、集中度 HHI 与规则化风险项\n"
         "- portfolio_rebalance_suggestion: 基于候选池预计算得分的调仓建议\n"
         "- portfolio_stress_test: 历史/宏观/行业三类压力测试\n"
@@ -71,9 +73,11 @@ from app.services.mcp.tools.portfolio_advice import (
     portfolio_rebalance_suggestion,
     portfolio_risk_alerts,
     portfolio_stress_test,
+    single_stock_diagnosis,
 )
 
 mcp.add_tool(portfolio_diagnosis)
+mcp.add_tool(single_stock_diagnosis)
 mcp.add_tool(portfolio_risk_alerts)
 mcp.add_tool(portfolio_rebalance_suggestion)
 mcp.add_tool(portfolio_stress_test)

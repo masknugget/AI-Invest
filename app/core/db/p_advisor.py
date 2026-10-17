@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
+import pandas as pd
 from pymongo import ASCENDING, DESCENDING
 
 from app.core.db.connection import _init_db
@@ -125,6 +126,51 @@ def get_dimensions(
     except Exception as e:
         logger.exception("查询维度评分失败: user_id=%s, error=%s", user_id, e)
         return []
+
+
+def get_all_cal_dimension():
+    _, db = _init_db()
+    try:
+        col = db['p_advisor_cal_dimensions']
+
+        all_result = []
+        for doc in col.find():
+            doc.pop("_id", None)
+            all_result.append(doc)
+
+        # 变成数据
+        df = pd.DataFrame(all_result)
+        df = df.drop_duplicates(subset=['code'])
+        code_list = df.to_dict('records')
+        return code_list
+    except Exception as e:
+        return {}, {}
+
+
+def get_all_cal_dimension_dict():
+    code_list = get_all_cal_dimension()
+    try:
+        out_data = {}
+        code_name = {}
+        for item in code_list:
+            out_data[item['code']] = {
+                'drawdown_control': item['drawdown_control'],
+                'portfolio_diversification': item['portfolio_diversification'],
+                'position_efficiency': item['position_efficiency'],
+                'return_stability': item['return_stability'],
+                'style_balance': item['style_balance'],
+            }
+            code_name[item['code']] = item['name']
+        return out_data, code_name
+    except Exception as e:
+        return {}, {}
+
+# 45485883
+def get_current_scores(current_codes: List[str]):
+    all_scores, _ = get_all_cal_dimension_dict()
+    missing = [code for code in current_codes if code not in all_scores]
+
+    return [all_scores[code] for code in current_codes]
 
 
 def get_latest_dimensions(

@@ -10,7 +10,44 @@ from __future__ import annotations
 from typing import List
 
 from app.services.mcp.tools.news_reader import contract
+from app.services.news_analysis import store
 
+
+async def search_news_insights(
+    query: str = "",
+    stock_code: str = "",
+    limit: int = contract.LIMIT_DEFAULT,
+) -> str:
+    """
+    检索 insight_agg 中的历史新闻分析（按标题/摘要/标签/关键词或股票代码）。
+
+    零 LLM 调用，只读 MongoDB；适用于「最近关于 XX 的新闻分析」「某只股票的
+    历史资讯结论」等回溯类问题。
+
+    返回 data：{"count": 条数, "query": 关键词, "stock_code": 代码,
+    "items": [历史分析记录]}，按 create_time 倒序。
+    """
+    tool = "search_news_insights"
+    try:
+        limit = contract.validate_limit(limit)
+        items = await store.search_insights(
+            query=query or None,
+            stock_code=stock_code or None,
+            limit=limit,
+        )
+        return contract.make_response(
+            tool,
+            {
+                "count": len(items),
+                "query": query,
+                "stock_code": stock_code,
+                "items": items,
+            },
+        )
+    except ValueError as e:
+        return contract.error_response(tool, str(e))
+    except Exception as e:
+        return contract.error_response(tool, f"检索历史分析失败: {e}")
 
 
 async def list_news_analysts() -> str:

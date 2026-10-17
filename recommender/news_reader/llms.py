@@ -1,7 +1,7 @@
 """
 新闻分析流水线的 LLM 调用汇聚点。
 
-配置注入（不再有硬编码 API key），按优先级读取环境变量：
+配置注入：按优先级读取环境变量，均未配置时回退使用 DEFAULT_API：
 - NEWS_READER_API_KEY       : LLM API key（最高优先级）
 - DASHSCOPE_API_KEY         : 百炼 API key
 - OPENAI_API_KEY            : OpenAI 兼容 key
@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 DEFAULT_MODEL = "qwen3.5-flash"
+DEFAULT_API = "sk-ws-H.PYHDHPX.Uu6h.MEUCIQDdO2xMFpbnYj_v_qhIMdrTaWGurrQe5ioTnJsMZdBuLAIgOWsGxFf-81YjER8XMtX96b9NkI8cOFZP9G4CO6zpaeQ"
 
 _MAX_RETRIES = 2  # 最多重试 2 次（共 3 次尝试）
 _TIMEOUT = 30.0  # 单次调用超时 30s
@@ -38,17 +39,15 @@ _BACKOFF_BASE = 1.5  # 退避基数（秒）
 
 
 def get_api_key() -> str:
-    """按优先级解析 LLM API key，未配置时抛 RuntimeError。"""
+    """按优先级解析 LLM API key，环境变量均未配置时回退使用 DEFAULT_API。"""
     key = (
         os.environ.get("NEWS_READER_API_KEY")
         or os.environ.get("DASHSCOPE_API_KEY")
         or os.environ.get("OPENAI_API_KEY")
     )
     if not key:
-        raise RuntimeError(
-            "未配置新闻分析 LLM API key，请设置环境变量 NEWS_READER_API_KEY"
-            "（或 DASHSCOPE_API_KEY / OPENAI_API_KEY）"
-        )
+        logger.debug("未配置 LLM API key 环境变量，回退使用 DEFAULT_API")
+        return DEFAULT_API
     return key
 
 

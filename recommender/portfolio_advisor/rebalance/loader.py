@@ -1,8 +1,9 @@
 """
 候选股票池加载器。
 
-支持从 stock_dimension_scores.jsonl 加载候选股票及其预计算五维得分。
-优化调仓仅依赖该 JSONL 中的 dimension_scores，不再加载行情 DataFrame。
+从 MongoDB 的 p_advisor_cal_dimensions 集合（app.core.db.get_all_cal_dimension）
+加载候选股票及其预计算五维得分，不再读取本地 JSONL 文件。
+优化调仓仅依赖其中的 dimension_scores，不加载行情 DataFrame。
 """
 
 import warnings
@@ -10,8 +11,8 @@ from typing import Any, List, Optional, Protocol
 
 import pandas as pd
 
+from app.core.db import get_all_cal_dimension
 from recommender.portfolio_advisor.rebalance.types import CandidatePool, StockCandidate
-from recommender.portfolio_advisor.utils import load_jsonl
 
 
 DIMENSION_NAMES = {
@@ -39,7 +40,7 @@ class _DataSet(Protocol):
 
 
 def _extract_dimension_scores(record: dict) -> dict:
-    """从 JSONL 记录中提取五维得分；原始指标（如 mdd）存在时一并带出。"""
+    """从维度记录中提取五维得分；原始指标（如 mdd）存在时一并带出。"""
     scores = {dim: float(record[dim]) for dim in DIMENSION_NAMES if dim in record}
     for metric in METRIC_NAMES:
         if metric in record:
@@ -47,21 +48,34 @@ def _extract_dimension_scores(record: dict) -> dict:
     return scores
 
 
-def load_stock_scores_from_jsonl(path: str) -> dict[str, dict]:
+def _load_records() -> List[dict]:
     """
-    从 stock_dimension_scores.jsonl 加载所有股票的维度得分。
+    从 MongoDB p_advisor_cal_dimensions 读取全部标的维度记录（已按 code 去重）。
+
+    get_all_cal_dimension 在集合为空或查询异常时可能返回非 list 结构，
+    此处统一兜底为空列表，避免调用方处理多种返回类型。
+    """
+    data = get_all_cal_dimension()
+    if not isinstance(data, list):
+        return []
+    return [record for record in data if isinstance(record, dict)]
+
+
+def load_stock_scores_from_jsonl(path: Optional[str] = None) -> dict[str, dict]:
+    """
+    从 MongoDB p_advisor_cal_dimensions 加载所有股票的维度得分。
 
     Parameters
     ----------
-    path : str
-        JSONL 文件路径。
+    path : Optional[str]
+        已废弃，保留仅为向后兼容；数据来源改为 MongoDB，不再读取本地文件。
 
     Returns
     -------
     dict[str, dict]
         以股票 code 为键、五维得分字典为值的映射。
     """
-    records = load_jsonl(path)
+    records = _load_records()
     return {
         str(record["code"]): _extract_dimension_scores(record)
         for record in records
@@ -69,22 +83,21 @@ def load_stock_scores_from_jsonl(path: str) -> dict[str, dict]:
     }
 
 
-def load_code_name_from_jsonl(path: str) -> dict[str, str]:
+def load_code_name_from_jsonl(path: Optional[str] = None) -> dict[str, str]:
     """
-    从 stock_dimension_scores.jsonl 加载所有股票的 code 和 name。
+    从 MongoDB p_advisor_cal_dimensions 加载所有股票的 code 和 name。
 
     Parameters
     ----------
-    path : str
-        JSONL 文件路径。
+    path : Optional[str]
+        已废弃，保留仅为向后兼容；数据来源改为 MongoDB，不再读取本地文件。
 
     Returns
     -------
     dict[str, str]
-        以股票 code 为键、name 为值的映射。缺少 name 字段的记录自动跳过
-        （one.py 生成的得分文件不含 name，此时返回空字典而非抛 KeyError）。
+        以股票 code 为键、name 为值的映射。缺少 name 字段的记录自动跳过。
     """
-    records = load_jsonl(path)
+    records = _load_records()
     return {
         str(record["code"]): str(record["name"])
         for record in records
@@ -92,16 +105,16 @@ def load_code_name_from_jsonl(path: str) -> dict[str, str]:
     }
 
 
-def get_current_stock_scores(current_codes: List[str], scores_path: str) -> List[dict]:
+def get_current_stock_scores(current_codes: List[str], scores_path: Optional[str] = None) -> List[dict]:
     """
-    从 stock_dimension_scores.jsonl 加载当前组合各股票的维度得分。
+    从 MongoDB p_advisor_cal_dimensions 加载当前组合各股票的维度得分。
 
     Parameters
     ----------
     current_codes : List[str]
         当前组合标的代码。
-    scores_path : str
-        stock_dimension_scores.jsonl 文件路径。
+    scores_path : Optional[str]
+        已废弃，保留仅为向后兼容；数据来源改为 MongoDB，不再读取本地文件。
 
     Returns
     -------
@@ -111,13 +124,13 @@ def get_current_stock_scores(current_codes: List[str], scores_path: str) -> List
     Raises
     ------
     ValueError
-        当前组合中存在股票在 scores_path 中找不到维度得分。
+        当前组合中存在股票在 p_advisor_cal_dimensions 中找不到维度得分。
     """
-    all_scores = load_stock_scores_from_jsonl(scores_path)
+    all_scores = load_stock_scores_from_jsonl()
     missing = [code for code in current_codes if code not in all_scores]
     if missing:
         raise ValueError(
-            f"当前组合中以下股票缺少维度得分，请检查 {scores_path}: {missing}"
+            f"当前组合中以下股票缺少维度得分，请检查 p_advisor_cal_dimensions: {missing}"
         )
     return [all_scores[code] for code in current_codes]
 
@@ -136,19 +149,19 @@ def _load_df_for_code(code: str, file_visitor: Optional[Any] = None) -> Optional
 
 
 def load_candidate_pool_from_jsonl(
-    path: str,
+    path: Optional[str] = None,
     require_code: bool = True,
     limit: Optional[int] = None,
     fetch_full_df: bool = True,
     file_visitor: Optional[Any] = None,
 ) -> List[StockCandidate]:
     """
-    从 stock_dimension_scores.jsonl 加载候选池。
+    从 MongoDB p_advisor_cal_dimensions 加载候选池。
 
     Parameters
     ----------
-    path : str
-        JSONL 文件路径。
+    path : Optional[str]
+        已废弃，保留仅为向后兼容；数据来源改为 MongoDB，不再读取本地文件。
     require_code : bool, default True
         是否要求每条记录必须包含 code 字段。若为 True 且缺失，抛出 ValueError。
     fetch_full_df : bool, default True
@@ -163,7 +176,7 @@ def load_candidate_pool_from_jsonl(
     List[StockCandidate]
         候选股票列表。
     """
-    records = load_jsonl(path)
+    records = _load_records()
     if limit is not None and limit > 0:
         records = records[:limit]
     candidates: List[StockCandidate] = []
@@ -172,7 +185,7 @@ def load_candidate_pool_from_jsonl(
         if "code" not in record:
             if require_code:
                 raise ValueError(
-                    f"第 {idx + 1} 行缺少 'code' 字段，请重新运行 one.py 生成包含 code 的数据。"
+                    f"第 {idx + 1} 条记录缺少 'code' 字段，请检查 p_advisor_cal_dimensions 数据。"
                 )
             # 不强制要求时跳过无 code 的记录
             continue
@@ -199,13 +212,13 @@ def load_candidate_pool_from_jsonl(
 
 
 def load_candidate_pool_from_jsonl_as_pool(
-    path: str,
+    path: Optional[str] = None,
     require_code: bool = True,
     limit: Optional[int] = None,
     fetch_full_df: bool = True,
     file_visitor: Optional[Any] = None,
 ) -> CandidatePool:
-    """以 CandidatePool 对象形式返回候选池。"""
+    """以 CandidatePool 对象形式返回候选池（数据来源：MongoDB p_advisor_cal_dimensions）。"""
     candidates = load_candidate_pool_from_jsonl(
         path,
         require_code=require_code,

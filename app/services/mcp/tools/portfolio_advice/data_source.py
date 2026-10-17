@@ -14,10 +14,21 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
+from bson.decimal128 import Decimal128
 import pandas as pd
 
 # 行情回看年限
 QUOTE_LOOKBACK_YEARS = 3
+
+# ---------------------------------------------------------------------------
+# 【本地开发环境】本地 MongoDB 行情源
+# 线上环境行情位于 stock_db.stock_daily_technical；本地通常没有该库，
+# 改从本地 tradingagents.stock_daily_quotes 读取。上线部署时，只需注释掉
+# _fetch_quote_from_db 中对 _fetch_quote_from_local_mongo 的调用即可。
+# ---------------------------------------------------------------------------
+LOCAL_MONGO_URI = "mongodb://localhost:27017"
+LOCAL_QUOTES_DB = "tradingagents"
+LOCAL_QUOTES_COLL = "stock_daily_quotes"
 
 
 # ============================================================================
@@ -76,6 +87,7 @@ def detect_code_market(code: str) -> str:
 _QUOTE_FIELD_ALIASES = {
     "date": ["trade_date", "date", "日期", "Date"],
     "close": ["close", "收盘", "Close", "adj_close", "Adj Close"],
+    "volume": ["vol", "成交量", "Volume", "VOLUME", "volume"],
     "pctChg": ["pctChg", "pct_chg", "changepercent", "涨跌幅", "PctChg"],
     "code": ["symbol", "code", "股票代码"],
 }
@@ -88,6 +100,12 @@ def _pick_column(df: pd.DataFrame, aliases: List[str]) -> Optional[str]:
     return None
 
 
+def _to_numeric_series(values: pd.Series) -> pd.Series:
+    """先解包 MongoDB Decimal128，再转换数值；无效值保留为 NaN。"""
+    values = values.map(lambda value: value.to_decimal() if isinstance(value, Decimal128) else value)
+    return pd.to_numeric(values, errors="coerce")
+
+
 def _records_to_df(records: List[Dict[str, Any]], code: str) -> Optional[pd.DataFrame]:
     """将 MongoDB / akshare / yfinance 记录统一转换为引擎所需的 date/code/close/pctChg DataFrame。"""
     if not records:
@@ -95,19 +113,21 @@ def _records_to_df(records: List[Dict[str, Any]], code: str) -> Optional[pd.Data
     df = pd.DataFrame(records)
     date_col = _pick_column(df, _QUOTE_FIELD_ALIASES["date"])
     close_col = _pick_column(df, _QUOTE_FIELD_ALIASES["close"])
+    volume_col = _pick_column(df, _QUOTE_FIELD_ALIASES["volume"])
     if not date_col or not close_col:
         return None
     out = pd.DataFrame(
         {
             "date": pd.to_datetime(df[date_col]).dt.strftime("%Y-%m-%d"),
             "code": code,
-            "close": pd.to_numeric(df[close_col], errors="coerce"),
+            "close": _to_numeric_series(df[close_col],),
+            "volume": _to_numeric_series(df[volume_col]) if volume_col else float("nan"),
         }
     )
     pct_col = _pick_column(df, _QUOTE_FIELD_ALIASES["pctChg"])
     if pct_col:
         # akshare 风格的 pctChg 为百分数数值，统一除以 100
-        raw = pd.to_numeric(df[pct_col], errors="coerce")
+        raw = _to_numeric_series(df[pct_col])
         out["pctChg"] = raw / 100.0 if raw.abs().median() > 1.5 else raw
     else:
         out["pctChg"] = out["close"].pct_change()
@@ -116,8 +136,97 @@ def _records_to_df(records: List[Dict[str, Any]], code: str) -> Optional[pd.Data
         return None
     return out
 
+def _fetch_quote_from_daily_performance(
+    code: str, start_date: str, end_date: str,
+) -> Optional[pd.DataFrame]:
+    """解析股票代码并获取港股/A股日线；共享接口目前最多返回最近 60 条。"""
+    try:
+        from app.core.db.document import get_daily_performance, search_symbol
+    except Exception:
+        return None
+
+    queried = set()
+    for candidate in _symbol_candidates(code):
+        try:
+            info = search_symbol(candidate)
+            if not info or not info.get("symbol"):
+                continue
+            symbol = str(info["symbol"]).strip()
+            market = str(info.get("market") or "HK").strip().upper()
+            if not symbol or market not in {"HK", "CN"}:
+                continue
+            key = (symbol, market)
+            if key in queried:
+                continue
+            queried.add(key)
+            _, data_out = get_daily_performance(symbol, start_date, end_date, market=market)
+            records = pd.DataFrame(data_out).to_dict("records")
+            df = _records_to_df(records, code)
+            if df is not None:
+                return df
+        except Exception:
+            continue
+    return None
+
+
+def _fetch_quote_from_local_mongo(code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    """
+    【本地开发环境专用】从本地 MongoDB 的 tradingagents.stock_daily_quotes 读取日线行情。
+
+    线上环境行情位于 stock_db.stock_daily_technical（见 _fetch_quote_from_db 其余分支），
+    本地通常没有该库，因此这里直接读本地已入库的 stock_daily_quotes 作为优先数据源。
+    上线部署时，只需注释掉 _fetch_quote_from_db 中对本函数的调用即可。
+
+    数据格式：symbol/code 为纯 6 位（如 '000001'），full_symbol 为 '000001.SZ'，
+    trade_date 为字符串 'YYYY-MM-DD'（按字符串区间过滤），
+    pct_chg 为百分数（如 2.86 表示 2.86%），此处统一转为小数再交给 _records_to_df。
+    """
+    try:
+        from pymongo import MongoClient
+    except Exception:
+        return None
+
+    candidates = _symbol_candidates(code)
+    client = MongoClient(LOCAL_MONGO_URI)
+    try:
+        coll = client[LOCAL_QUOTES_DB][LOCAL_QUOTES_COLL]
+        query = {
+            "$or": [
+                {"symbol": {"$in": candidates}},
+                {"full_symbol": {"$in": candidates}},
+                {"code": {"$in": candidates}},
+            ],
+            "trade_date": {"$gte": start_date, "$lte": end_date},
+        }
+        records = list(coll.find(query, {"_id": 0}))
+        if not records:
+            return None
+        # stock_daily_quotes.pct_chg 为百分数，统一转小数，避免 _records_to_df 的量纲启发式误判
+        for rec in records:
+            pct = rec.get("pct_chg")
+            if pct is not None:
+                try:
+                    rec["pct_chg"] = float(pct) / 100.0
+                except (TypeError, ValueError):
+                    pass
+        return _records_to_df(records, code)
+    except Exception:
+        return None
+    finally:
+        client.close()
+
 
 def _fetch_quote_from_db(code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    # ===== 本地开发环境：优先读本地 MongoDB(tradingagents.stock_daily_quotes) =====
+    # 上线部署时，注释掉下面 3 行即可（其余分支走线上 stock_db 数据源）。
+    local_df = _fetch_quote_from_local_mongo(code, start_date, end_date)
+    if local_df is not None:
+        return local_df
+    # ===== 本地开发环境结束 =====
+
+    df = _fetch_quote_from_daily_performance(code, start_date, end_date)
+    if df is not None:
+        return df
     try:
         from tradingagents.db.document import get_stock_data
     except Exception:
@@ -133,45 +242,6 @@ def _fetch_quote_from_db(code: str, start_date: str, end_date: str) -> Optional[
     return None
 
 
-def _fetch_quote_from_akshare(code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
-    if detect_code_market(code) != "cn":
-        return None
-    num = code.split(".", 1)[1] if "." in code else code
-    try:
-        import akshare as ak
-
-        df = ak.stock_zh_a_hist(
-            symbol=num, period="daily", start_date=start_date.replace("-", ""),
-            end_date=end_date.replace("-", ""), adjust="qfq",
-        )
-    except Exception:
-        return None
-    return _records_to_df(df.to_dict(orient="records"), code)
-
-
-def _fetch_quote_from_yfinance(code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
-    if detect_code_market(code) == "cn":
-        return None
-    candidates = [s for s in _symbol_candidates(code) if s.endswith(".HK") or "." not in s]
-    try:
-        import yfinance as yf
-    except Exception:
-        return None
-    for sym in candidates:
-        try:
-            df = yf.download(sym, start=start_date, end=end_date, progress=False)
-        except Exception:
-            continue
-        if df is None or df.empty:
-            continue
-        df = df.reset_index()
-        records = df.to_dict(orient="records")
-        out = _records_to_df(records, code)
-        if out is not None:
-            return out
-    return None
-
-
 def fetch_quote_df(code: str, lookback_years: int = QUOTE_LOOKBACK_YEARS) -> pd.DataFrame:
     """
     获取单只标的历史行情 DataFrame（date/code/close/pctChg 列）。
@@ -183,12 +253,6 @@ def fetch_quote_df(code: str, lookback_years: int = QUOTE_LOOKBACK_YEARS) -> pd.
     start_date = (datetime.now() - timedelta(days=365 * lookback_years)).strftime("%Y-%m-%d")
 
     df = _fetch_quote_from_db(code, start_date, end_date)
-    if df is not None:
-        return df
-    df = _fetch_quote_from_akshare(code, start_date, end_date)
-    if df is not None:
-        return df
-    df = _fetch_quote_from_yfinance(code, start_date, end_date)
     if df is not None:
         return df
     raise ValueError(

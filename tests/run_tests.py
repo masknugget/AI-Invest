@@ -20,6 +20,7 @@ TEST_MODULES = {
     "服务层": [
         "tests/test_services/test_auth_service.py",
         "tests/test_services/test_trading_time.py",
+        "tests/test_services/test_mcp/portfolio/run_all.py",
     ],
     "工具函数": [
         "tests/test_utils/test_stock_utils.py",

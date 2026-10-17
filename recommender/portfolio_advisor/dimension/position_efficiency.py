@@ -118,11 +118,18 @@ def normalize_sharpe_to_score(sharpe_ratio: float) -> float:
     将夏普比率归一化到 0~100 分（分段加权打分法）。
 
     映射规则：
-        - sharpe < 0          → 0 分
-        - 0 ≤ sharpe < 1      → 0 ~ 60 分（每单位 60 分）
+        - sharpe ≤ -1         → 0 分
+        - -1 < sharpe < 0     → 0 ~ 30 分（负夏普区间线性映射，每单位 30 分）
+        - 0 ≤ sharpe < 1      → 30 ~ 60 分（每单位 30 分）
         - 1 ≤ sharpe < 2      → 60 ~ 90 分（每单位 30 分）
         - 2 ≤ sharpe < 3      → 90 ~ 100 分（每单位 10 分）
         - sharpe ≥ 3          → 100 分
+
+    说明：
+        旧版本对所有负夏普（跑不赢无风险利率）一律给 0 分，缺乏区分度。
+        现在为负夏普区间 -1~0 保留 0~30 分的线性映射；为保证打分随夏普单调
+        递增（不出现“越差反而分越高”的倒挂），正区间 0~1 的下限相应抬到 30，
+        即 0~1 → 30~60。sharpe=1/2/3 处的锚点（60/90/100）保持不变。
 
     Parameters
     ----------
@@ -134,16 +141,22 @@ def normalize_sharpe_to_score(sharpe_ratio: float) -> float:
     float
         归一化后的分数（0~100）。
     """
-    if not (sharpe_ratio >= 0):
-        # 负数夏普得 0 分；NaN（数据不足等异常输入）同样落到 0 分而非误给满分。
-        # 注意不能用 sharpe_ratio < 0 判断：NaN 与任何值比较都为 False，
-        # 会一路落到末尾的 else 分支被误判为 100 分。
+    # NaN（数据不足等异常输入）必须最先拦截并落到 0 分而非误给满分。
+    # 注意：NaN 与任何值比较都为 False，若不单独处理会一路落到末尾的 else
+    # 分支被误判为 100 分。±inf 不是 NaN，会正常走后续分段（inf→100，-inf→0）。
+    if np.isnan(sharpe_ratio):
         return 0.0
-    elif sharpe_ratio < 1:
-        return sharpe_ratio * 60.0
-    elif sharpe_ratio < 2:
+    elif sharpe_ratio <= -1.0:
+        return 0.0
+    elif sharpe_ratio < 0.0:
+        # -1 ~ 0 线性映射到 0 ~ 30：sharpe=-1→0，sharpe→0-→30
+        return (sharpe_ratio + 1.0) * 30.0
+    elif sharpe_ratio < 1.0:
+        # 0 ~ 1 线性映射到 30 ~ 60（与负区间在 0 处连续）
+        return 30.0 + sharpe_ratio * 30.0
+    elif sharpe_ratio < 2.0:
         return 60.0 + (sharpe_ratio - 1.0) * 30.0
-    elif sharpe_ratio < 3:
+    elif sharpe_ratio < 3.0:
         return 90.0 + (sharpe_ratio - 2.0) * 10.0
     else:
         return 100.0

@@ -1,244 +1,108 @@
 # -*- coding: utf-8 -*-
 """
-news_reader.llms 测试：配置注入 / messages 构造 / 同步与异步调用的重试与空响应。
+news_reader.llms 真实连通性测试 —— 实际调用大模型并把返回结果打印出来。
 
-所有真实 LLM 调用均 mock，不依赖网络与 API key。
+目的：验证「模型到底能不能调通」（真实网络调用，无任何 mock）。
+说明：本文件只负责端到端连通性验证，且只测试同步入口 chat_once。
+     achat_once 以及重试、空响应、messages 构造等逻辑单测已由
+     tests/test_services/test_mcp/test_news_reader_mcp.py（全 mock）覆盖。
+
+前置条件：提供 API key（三选一，优先级从高到低），可用任意方式注入环境变量：
+    $env:NEWS_READER_API_KEY = "sk-..."     # 最高优先级
+    $env:DASHSCOPE_API_KEY   = "sk-..."
+    $env:OPENAI_API_KEY      = "sk-..."
+可选（不设则用默认值）：
+    $env:NEWS_READER_BASE_URL       默认 https://dashscope.aliyuncs.com/compatible-mode/v1
+    $env:NEWS_READER_MODEL          默认模型（提取/轻量阶段）
+    $env:NEWS_READER_ANALYST_MODEL  分析 Agent 模型
+
+若项目根存在 .env，会自动加载到环境变量（python-dotenv）。
 
 运行方式：
     python tests/test_recommender/test_news_reader/test_llms.py
 """
-import asyncio
-import os
 import sys
+import time
+import traceback
 from pathlib import Path
-from typing import Optional
 
 project_root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(project_root))
 
-import httpx
-from openai import APITimeoutError
+# Windows 控制台 UTF-8，避免中文输出乱码
+if sys.platform == "win32":
+    import ctypes
+
+    # 将控制台输出代码页切到 65001(UTF-8)，否则中文按 GBK 渲染会乱码
+    try:
+        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+    except Exception:
+        pass
+    if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+        import io
+
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+
+# 可选加载项目根 .env（不存在则忽略）
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(project_root / ".env", override=False)
+except Exception:
+    pass
 
 import recommender.news_reader.llms as llms
 
-for _k in ("NEWS_READER_API_KEY", "DASHSCOPE_API_KEY", "OPENAI_API_KEY",
-           "NEWS_READER_BASE_URL", "NEWS_READER_MODEL", "NEWS_READER_ANALYST_MODEL"):
-    os.environ.pop(_k, None)
+
+def _mask(secret: str) -> str:
+    """遮蔽密钥，仅保留首尾各 4 位。"""
+    if not secret:
+        return "(未设置)"
+    if len(secret) <= 8:
+        return secret[:2] + "****"
+    return f"{secret[:4]}****{secret[-4:]}"
 
 
-class _FakeMessage:
-    def __init__(self, content: Optional[str]):
-        self.content = content
-
-
-class _FakeChoice:
-    def __init__(self, content: Optional[str]):
-        self.message = _FakeMessage(content)
-
-
-class _FakeCompletion:
-    def __init__(self, content: Optional[str]):
-        self.choices = [_FakeChoice(content)]
-
-
-class _FakeCompletions:
-    """前 failures 次抛 APITimeoutError，之后返回固定内容。"""
-
-    def __init__(self, failures=0, content: Optional[str] = '{"ok": true}'):
-        self.failures = failures
-        self.content = content
-        self.calls = 0
-
-    def create(self, **kwargs):
-        self.calls += 1
-        if self.calls <= self.failures:
-            raise APITimeoutError(request=httpx.Request("POST", "https://example.com"))
-        return _FakeCompletion(self.content)
-
-
-class _FakeAsyncCompletions:
-    def __init__(self, failures=0, content: Optional[str] = '{"ok": true}'):
-        self.failures = failures
-        self.content = content
-        self.calls = 0
-
-    async def create(self, **kwargs):
-        self.calls += 1
-        if self.calls <= self.failures:
-            raise APITimeoutError(request=httpx.Request("POST", "https://example.com"))
-        return _FakeCompletion(self.content)
-
-
-class _FakeChat:
-    def __init__(self, completions):
-        self.completions = completions
-
-
-class _FakeClient:
-    def __init__(self, failures=0, content: Optional[str] = '{"ok": true}'):
-        self.chat = _FakeChat(_FakeCompletions(failures, content))
-
-
-class _FakeAsyncClient:
-    def __init__(self, failures=0, content: Optional[str] = '{"ok": true}'):
-        self.chat = _FakeChat(_FakeAsyncCompletions(failures, content))
-
-
-def _run(coro):
-    return asyncio.new_event_loop().run_until_complete(coro)
-
-
-# ============================================================================
-# 配置注入
-# ============================================================================
-
-def test_api_key_priority():
-    print("=== 测试 API key 优先级：NEWS_READER > DASHSCOPE > OPENAI ===")
+def _show_config():
+    print("=" * 70)
+    print("当前 LLM 配置")
+    print("-" * 70)
     try:
-        llms.get_api_key()
-        raise AssertionError("无 key 应抛 RuntimeError")
-    except RuntimeError:
-        pass
-
-    os.environ["OPENAI_API_KEY"] = "sk-openai"
-    assert llms.get_api_key() == "sk-openai"
-    os.environ["DASHSCOPE_API_KEY"] = "sk-ds"
-    assert llms.get_api_key() == "sk-ds"
-    os.environ["NEWS_READER_API_KEY"] = "sk-nr"
-    assert llms.get_api_key() == "sk-nr"
-    for k in ("NEWS_READER_API_KEY", "DASHSCOPE_API_KEY", "OPENAI_API_KEY"):
-        os.environ.pop(k)
-    print("✅ 通过")
+        key = llms.get_api_key()
+        print(f"  API key       : {_mask(key)}")
+    except RuntimeError as e:
+        print(f"  API key       : ❌ {e}")
+        return False
+    print(f"  base_url        : {llms.get_base_url()}")
+    print(f"  默认模型         : {llms.get_default_model()}")
+    print(f"  分析 Agent 模型  : {llms.get_analyst_model()}")
+    print("=" * 70)
+    return True
 
 
-def test_base_url_and_models():
-    print("=== 测试 base_url 与模型配置 ===")
-    assert llms.get_base_url() == llms.DEFAULT_BASE_URL
-    os.environ["NEWS_READER_BASE_URL"] = "https://custom.example.com/v1"
-    assert llms.get_base_url() == "https://custom.example.com/v1"
-    os.environ.pop("NEWS_READER_BASE_URL")
-
-    assert llms.get_default_model() == llms.DEFAULT_MODEL
-    os.environ["NEWS_READER_MODEL"] = "qwen-flash"
-    assert llms.get_default_model() == "qwen-flash"
-    # ANALYST 缺省回退默认模型
-    assert llms.get_analyst_model() == "qwen-flash"
-    os.environ["NEWS_READER_ANALYST_MODEL"] = "qwen-max"
-    assert llms.get_analyst_model() == "qwen-max"
-    os.environ.pop("NEWS_READER_ANALYST_MODEL")
-    os.environ.pop("NEWS_READER_MODEL")
-    print("✅ 通过")
+def test_sync_call():
+    """同步 chat_once：发一句简单指令，打印模型原始返回。"""
+    print("\n=== 真实调用：chat_once（同步）===")
+    prompt = "用一句话解释什么是量化宽松（QE）。"
+    print(f"  请求 prompt: {prompt}")
+    t0 = time.perf_counter()
+    resp = llms.chat_once(prompt)
+    dt = time.perf_counter() - t0
+    print(f"  耗时: {dt:.2f}s")
+    print(f"  模型返回:\n{resp}")
+    assert resp and resp.strip(), "模型返回为空"
+    print("✅ chat_once 连通")
 
 
-# ============================================================================
-# messages 构造（历史 tuple bug 回归）
-# ============================================================================
+def main():
+    if not _show_config():
+        print("\n❌ 未检测到 API key，无法进行真实调用。请先设置环境变量后重试：")
+        print(r'    $env:NEWS_READER_API_KEY = "sk-..."   # 或 DASHSCOPE_API_KEY / OPENAI_API_KEY')
+        return False
 
-def test_build_messages():
-    print("=== 测试 messages 构造（tuple bug 回归）===")
-    m = llms._build_messages("你好", "你是助手")
-    assert isinstance(m, list) and len(m) == 2
-    assert m[0]["role"] == "system" and m[1]["role"] == "user"
-    m2 = llms._build_messages("你好", None)
-    assert isinstance(m2, list) and len(m2) == 1 and m2[0]["role"] == "user"
-    print("✅ 通过")
-
-
-# ============================================================================
-# chat_once / achat_once
-# ============================================================================
-
-def test_chat_once_success_and_model():
-    print("=== 测试 chat_once 正常调用与 model 参数 ===")
-    fake = _FakeClient()
-    orig = llms._sync_client
-    llms._sync_client = lambda: fake
-    try:
-        resp = llms.chat_once("hi", model="custom-model")
-        assert resp == '{"ok": true}'
-        assert fake.chat.completions.calls == 1
-    finally:
-        llms._sync_client = orig
-    print("✅ 通过")
-
-
-def test_chat_once_retry_then_success():
-    print("=== 测试 chat_once 超时重试后成功 ===")
-    fake = _FakeClient(failures=2)
-    orig_client, orig_sleep = llms._sync_client, llms.time.sleep
-    llms._sync_client = lambda: fake
-    llms.time.sleep = lambda s: None
-    try:
-        assert llms.chat_once("hi") == '{"ok": true}'
-        assert fake.chat.completions.calls == 3
-    finally:
-        llms._sync_client, llms.time.sleep = orig_client, orig_sleep
-    print("✅ 通过")
-
-
-def test_chat_once_retry_exhausted():
-    print("=== 测试 chat_once 重试耗尽抛异常 ===")
-    fake = _FakeClient(failures=99)
-    orig_client, orig_sleep = llms._sync_client, llms.time.sleep
-    llms._sync_client = lambda: fake
-    llms.time.sleep = lambda s: None
-    try:
-        try:
-            llms.chat_once("hi")
-            raise AssertionError("应抛 APITimeoutError")
-        except APITimeoutError:
-            pass
-        assert fake.chat.completions.calls == llms._MAX_RETRIES + 1
-    finally:
-        llms._sync_client, llms.time.sleep = orig_client, orig_sleep
-    print("✅ 通过")
-
-
-def test_chat_once_empty_response_raises():
-    print("=== 测试 LLM 空响应抛错 ===")
-    fake = _FakeClient(content=None)
-    orig = llms._sync_client
-    llms._sync_client = lambda: fake
-    try:
-        try:
-            llms.chat_once("hi")
-            raise AssertionError("空响应应抛 RuntimeError")
-        except RuntimeError as e:
-            assert "空" in str(e)
-    finally:
-        llms._sync_client = orig
-    print("✅ 通过")
-
-
-def test_achat_once_retry():
-    print("=== 测试 achat_once 异步重试 ===")
-    fake = _FakeAsyncClient(failures=1)
-    orig_client = llms._async_client
-
-    async def _no_sleep(s):
-        return None
-
-    orig_sleep = llms.asyncio.sleep
-    llms._async_client = lambda: fake
-    llms.asyncio.sleep = _no_sleep
-    try:
-        assert _run(llms.achat_once("hi")) == '{"ok": true}'
-        assert fake.chat.completions.calls == 2
-    finally:
-        llms._async_client, llms.asyncio.sleep = orig_client, orig_sleep
-    print("✅ 通过")
-
-
-def run_all_tests():
     tests = [
-        ("api_key_priority", test_api_key_priority),
-        ("base_url_and_models", test_base_url_and_models),
-        ("build_messages", test_build_messages),
-        ("chat_once_success_and_model", test_chat_once_success_and_model),
-        ("chat_once_retry_then_success", test_chat_once_retry_then_success),
-        ("chat_once_retry_exhausted", test_chat_once_retry_exhausted),
-        ("chat_once_empty_response_raises", test_chat_once_empty_response_raises),
-        ("achat_once_retry", test_achat_once_retry),
+        ("chat_once_sync", test_sync_call),
     ]
     passed = failed = 0
     for name, func in tests:
@@ -247,10 +111,14 @@ def run_all_tests():
             passed += 1
         except Exception as e:
             failed += 1
-            print(f"❌ {name} failed: {e}")
-    print(f"\n=== {passed} passed, {failed} failed ===")
+            print(f"❌ {name} 失败: {e}")
+            traceback.print_exc()
+
+    print("\n" + "=" * 70)
+    print(f"=== 大模型连通性测试: {passed} passed, {failed} failed ===")
+    print("=" * 70)
     return failed == 0
 
 
 if __name__ == "__main__":
-    sys.exit(0 if run_all_tests() else 1)
+    sys.exit(0 if main() else 1)
