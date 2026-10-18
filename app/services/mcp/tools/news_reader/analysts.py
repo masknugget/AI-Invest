@@ -49,8 +49,8 @@ def agent_tool_name(agent_name: str) -> str:
 
 
 def _make_caller(agent_name: str, tool_name: str):
-    async def _analyst_tool(content: str, meta: str) -> str:
-        return await pipeline.analyst_response(
+    def _analyst_tool(content: str, meta: str) -> str:
+        return pipeline.analyst_response(
             content, meta, agent_name=agent_name, tool_name=tool_name
         )
 

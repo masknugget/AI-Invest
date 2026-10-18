@@ -65,3 +65,22 @@ async def search_insights(
         .limit(limit)
     )
     return await cursor.to_list(length=limit)
+
+
+def save_insight_sync(data: Dict[str, Any]) -> str:
+    """同步版 save_insight（当前实现跳过存储）。"""
+    # TODO: 实现同步 MongoDB 存储
+    article_id = data.get("article_id")
+    if not article_id:
+        raise ValueError("分析结果缺少 article_id 字段")
+    return article_id
+
+
+def search_insights_sync(
+    query: Optional[str] = None,
+    stock_code: Optional[str] = None,
+    limit: int = 10,
+) -> List[Dict[str, Any]]:
+    """同步版 search_insights（当前实现返回空列表）。"""
+    # TODO: 实现同步 MongoDB 查询
+    return []

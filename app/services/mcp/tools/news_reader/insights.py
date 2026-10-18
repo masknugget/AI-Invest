@@ -13,7 +13,7 @@ from app.services.mcp.tools.news_reader import contract
 from app.services.news_analysis import store
 
 
-async def search_news_insights(
+def search_news_insights(
     query: str = "",
     stock_code: str = "",
     limit: int = contract.LIMIT_DEFAULT,
@@ -28,29 +28,24 @@ async def search_news_insights(
     "items": [历史分析记录]}，按 create_time 倒序。
     """
     tool = "search_news_insights"
-    try:
-        limit = contract.validate_limit(limit)
-        items = await store.search_insights(
-            query=query or None,
-            stock_code=stock_code or None,
-            limit=limit,
-        )
-        return contract.make_response(
-            tool,
-            {
-                "count": len(items),
-                "query": query,
-                "stock_code": stock_code,
-                "items": items,
-            },
-        )
-    except ValueError as e:
-        return contract.error_response(tool, str(e))
-    except Exception as e:
-        return contract.error_response(tool, f"检索历史分析失败: {e}")
+    limit = contract.validate_limit(limit)
+    items = store.search_insights_sync(
+        query=query or None,
+        stock_code=stock_code or None,
+        limit=limit,
+    )
+    return contract.make_response(
+        tool,
+        {
+            "count": len(items),
+            "query": query,
+            "stock_code": stock_code,
+            "items": items,
+        },
+    )
 
 
-async def list_news_analysts() -> str:
+def list_news_analysts() -> str:
     """
     查询当前可用的全部新闻分析师工具清单。
 
@@ -62,24 +57,21 @@ async def list_news_analysts() -> str:
     specialty 为该分析师的中文专长与方法论。
     """
     tool = "list_news_analysts"
-    try:
-        from recommender.news_reader.agents.analyst.factory import (
-            create_analyst,
-            list_agent_names,
-        )
+    from recommender.news_reader.agents.analyst.factory import (
+        create_analyst,
+        list_agent_names,
+    )
 
-        from app.services.mcp.tools.news_reader.analysts import agent_tool_name
+    from app.services.mcp.tools.news_reader.analysts import agent_tool_name
 
-        analysts: List[dict] = []
-        for agent_name in list_agent_names():
-            _, specialty = create_analyst(agent_name)
-            analysts.append({
-                "agent_name": agent_name,
-                "tool_name": agent_tool_name(agent_name),
-                "specialty": specialty,
-            })
-        return contract.make_response(
-            tool, {"count": len(analysts), "analysts": analysts}
-        )
-    except Exception as e:
-        return contract.error_response(tool, f"查询分析师清单失败: {e}")
+    analysts: List[dict] = []
+    for agent_name in list_agent_names():
+        _, specialty = create_analyst(agent_name)
+        analysts.append({
+            "agent_name": agent_name,
+            "tool_name": agent_tool_name(agent_name),
+            "specialty": specialty,
+        })
+    return contract.make_response(
+        tool, {"count": len(analysts), "analysts": analysts}
+    )

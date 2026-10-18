@@ -83,9 +83,11 @@ from app.services.mcp.tools.news_reader import (  # noqa: E402
 )
 
 
-def run(coro):
-    """同步执行协程（不引入 pytest）。"""
-    return asyncio.run(coro)
+def run(coro_or_value):
+    """同步执行协程或直接返回普通值（不引入 pytest）。"""
+    if asyncio.iscoroutine(coro_or_value):
+        return asyncio.run(coro_or_value)
+    return coro_or_value
 
 
 def parse(resp: str) -> dict:

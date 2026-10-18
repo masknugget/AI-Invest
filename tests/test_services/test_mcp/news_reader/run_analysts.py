@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import _bootstrap  # noqa: F401  触发路径设置 + recommender 命名空间注册 + .env 加载
-from _bootstrap import banner, parse, run
+from _bootstrap import banner, parse
 from app.services.mcp.tools.news_reader import analysts, pipeline
 
 CONTENT = "某头部新能源车企宣布完成 50 亿元定向增发，募集资金用于固态电池研发。"
@@ -33,7 +33,7 @@ def main():
         print(f"  - {name:<22} {tool.title}")
 
     banner("步骤 2：extract_news_meta 获取 meta（真实 LLM）")
-    meta_resp = parse(run(pipeline.extract_news_meta(CONTENT)))
+    meta_resp = parse(pipeline.extract_news_meta(CONTENT))
     print(json.dumps(meta_resp, ensure_ascii=False, indent=2))
     if meta_resp["status"] != "success":
         print("\n⚠️ 提取失败（多为 LLM key 未配置/失效），分析师调用跳过。")
@@ -41,7 +41,7 @@ def main():
 
     banner("步骤 3：真实调用 macro_analyst(content, meta)")
     macro = tools.get("macro_analyst") or next(iter(tools.values()))
-    report_resp = parse(run(macro.fn(CONTENT, meta_resp["data"])))
+    report_resp = parse(macro.fn(CONTENT, meta_resp["data"]))
     print("tool:", report_resp.get("tool"))
     print("status:", report_resp.get("status"))
     data = report_resp.get("data") or {}

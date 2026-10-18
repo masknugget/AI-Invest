@@ -26,31 +26,6 @@ import time
 import traceback
 from pathlib import Path
 
-project_root = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(project_root))
-
-# Windows 控制台 UTF-8，避免中文输出乱码
-if sys.platform == "win32":
-    import ctypes
-
-    # 将控制台输出代码页切到 65001(UTF-8)，否则中文按 GBK 渲染会乱码
-    try:
-        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
-    except Exception:
-        pass
-    if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
-        import io
-
-        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
-
-# 可选加载项目根 .env（不存在则忽略）
-try:
-    from dotenv import load_dotenv
-
-    load_dotenv(project_root / ".env", override=False)
-except Exception:
-    pass
 
 import recommender.news_reader.llms as llms
 

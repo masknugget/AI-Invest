@@ -4,8 +4,9 @@ News Reader 流水线工具（docs/news_reader_mcp_design.md 第 4 节）。
 工具编排约定：
 - 每个工具只做三件事：契约校验/解析（contract.py）→ 调用 service 层 → 响应封装
 - 服务端不做综合报告/解读文案；综合工作由平台 LLM 基于各 Agent 报告完成
-- 流水线阶段：extract_news_meta → 各分析师工具（analysts.py 生成，可并行 ×N）
-  → finalize_news_analysis；analyze_news 为无法多轮编排客户端提供的一体式封装
+- 流水线阶段：extract_news_meta → route_news_analysts（可选路由，独立于 router.py）
+  → 各分析师工具（analysts.py 生成，可并行 ×N）→ finalize_news_analysis；
+  analyze_news 为无法多轮编排客户端提供的一体式封装
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ from app.services.mcp.tools.news_reader import contract
 from app.services.news_analysis import service
 
 
-async def extract_news_meta(content: str) -> str:
+def extract_news_meta(content: str) -> str:
     """
     对新闻做结构化提取：命名实体(ner) + 分类标签(label) + 事件关系(event)。
 
@@ -29,17 +30,14 @@ async def extract_news_meta(content: str) -> str:
     选定分析师并并行调用（并发 ≤3）。
     """
     tool = "extract_news_meta"
-    try:
-        content = contract.validate_content(content)
-        meta = await service.extract_meta(content)
-        return contract.make_response(tool, meta)
-    except ValueError as e:
-        return contract.error_response(tool, str(e))
-    except Exception as e:
-        return contract.error_response(tool, f"结构化提取失败: {e}")
+    content = contract.validate_content(content)
+    print(f"[pipeline] extract_news_meta: 调用 service.extract_meta, 内容长度={len(content)}")
+    meta = service.extract_meta(content)
+    print(f"[pipeline] extract_news_meta: 完成, 返回 keys={list(meta.keys())}")
+    return contract.make_response(tool, meta)
 
 
-async def analyst_response(
+def analyst_response(
     content: Any,
     meta: Any,
     agent_name: str,
@@ -50,20 +48,17 @@ async def analyst_response(
     agent_name 固定于工具本身（如 macro_analyst 固定为 MacroAgent），
     tool_name 用于错误响应的 tool 字段标识。
     """
-    try:
-        content = contract.validate_content(content)
-        meta_dict = contract.parse_meta(meta)
-        report = await service.run_analyst(content, meta_dict, agent_name)
-        return contract.make_response(
-            tool_name, {"agent_name": agent_name, "report": report}
-        )
-    except ValueError as e:
-        return contract.error_response(tool_name, str(e))
-    except Exception as e:
-        return contract.error_response(tool_name, f"分析 Agent 运行失败: {e}")
+    content = contract.validate_content(content)
+    meta_dict = contract.parse_meta(meta)
+    print(f"[pipeline] analyst_response: agent_name={agent_name}, tool_name={tool_name}")
+    report = service.run_analyst(content, meta_dict, agent_name)
+    print(f"[pipeline] analyst_response: 完成, 报告长度={len(report)}")
+    return contract.make_response(
+        tool_name, {"agent_name": agent_name, "report": report}
+    )
 
 
-async def finalize_news_analysis(
+def finalize_news_analysis(
     content: str,
     meta: str,
     analyses: str,
@@ -96,23 +91,18 @@ async def finalize_news_analysis(
         是否写入 MongoDB insight_agg，默认 True。
     """
     tool = "finalize_news_analysis"
-    try:
-        content = contract.validate_content(content)
-        meta_dict = contract.parse_meta(meta)
-        analyses_dict = contract.parse_analyses(analyses)
-        data_align = await service.finalize(
-            content, meta_dict, analyses_dict, save=save
-        )
-        return contract.make_response(
-            tool, {"data_align": data_align, "saved": save}
-        )
-    except ValueError as e:
-        return contract.error_response(tool, str(e))
-    except Exception as e:
-        return contract.error_response(tool, f"结构化对齐失败: {e}")
+    content = contract.validate_content(content)
+    meta_dict = contract.parse_meta(meta)
+    analyses_dict = contract.parse_analyses(analyses)
+    print(f"[pipeline] finalize_news_analysis: agents={list(analyses_dict.keys())}, save={save}")
+    data_align = service.finalize(content, meta_dict, analyses_dict, save=save)
+    print(f"[pipeline] finalize_news_analysis: 完成")
+    return contract.make_response(
+        tool, {"data_align": data_align, "saved": save}
+    )
 
 
-async def analyze_news(content: str, save: bool = True) -> str:
+def analyze_news(content: str, save: bool = True) -> str:
     """
     一体式新闻分析（提取 → 路由 → 全部 Agent → 结构化对齐），约 15~40 秒。
 
@@ -125,11 +115,8 @@ async def analyze_news(content: str, save: bool = True) -> str:
     返回 data：完整流水线结果（含各 Agent 报告与 data_align）。
     """
     tool = "analyze_news"
-    try:
-        content = contract.validate_content(content)
-        out_data = await service.analyze_news(content, save=save)
-        return contract.make_response(tool, out_data)
-    except ValueError as e:
-        return contract.error_response(tool, str(e))
-    except Exception as e:
-        return contract.error_response(tool, f"新闻分析失败: {e}")
+    content = contract.validate_content(content)
+    print(f"[pipeline] analyze_news: 开始一体式分析, save={save}")
+    out_data = service.analyze_news(content, save=save)
+    print(f"[pipeline] analyze_news: 完成")
+    return contract.make_response(tool, out_data)

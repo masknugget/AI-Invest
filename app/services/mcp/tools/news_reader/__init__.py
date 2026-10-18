@@ -6,6 +6,8 @@ News Reader MCP 工具包。
                 （Agent 名单来自 factory.list_agent_names()，单一事实来源）
 - pipeline.py   流水线工具（docs/news_reader_mcp_design.md 第 4 节）：
                 extract_news_meta → finalize_news_analysis + analyze_news 一体式封装
+- router.py     路由工具（阶段2，独立职责）：route_news_analysts —— 服务端 LLM
+                依据 meta 推荐应激活的分析师（agent_names + 可直接调用的 tools + 理由）
 - analysts.py   分析师工具工厂：按 factory 生成 12 个独立分析师 MCP 工具
                 （macro_analyst / micro_analyst / ...，单一事实来源）
 - insights.py   存储与发现查询工具：search_news_insights（只读 MongoDB，零 LLM）、
@@ -28,9 +30,11 @@ from app.services.mcp.tools.news_reader.pipeline import (
     extract_news_meta,
     finalize_news_analysis,
 )
+from app.services.mcp.tools.news_reader.router import route_news_analysts
 
 __all__ = [
     "extract_news_meta",
+    "route_news_analysts",
     "build_analyst_tools",
     "agent_tool_name",
     "finalize_news_analysis",

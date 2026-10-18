@@ -3,7 +3,8 @@ AI-Invest News Reader MCP 服务入口
 
 使用 FastMCP 暴露财经新闻多智能体分析能力（服务端做结构化提取与确定性
 流水线，综合报告/解读由平台侧 LLM 基于工具返回结果撰写）：
-- extract_news_meta        结构化提取（NER/标签/事件，三路并行，带缓存）
+- extract_news_meta        结构化提取（NER/标签/事件，三路并行）
+- route_news_analysts      阶段2 路由决策（服务端 LLM 推荐应调用哪些分析师，可选）
 - macro_analyst 等 12 个分析师工具  每个分析 Agent 一等暴露（按 factory 动态生成）
 - finalize_news_analysis   结构化对齐 + 可选入库 insight_agg
 - search_news_insights     检索历史新闻分析
@@ -96,6 +97,9 @@ mcp = FastMCP(
         "可用工具：\n"
         "- extract_news_meta: 结构化提取（实体/标签/事件），约 2~6 秒，三路并行，"
         "重复新闻命中缓存零 LLM 调用。\n"
+        "- route_news_analysts（可选）: 服务端 LLM 路由，传入 extract_news_meta 的 "
+        "data 字段，返回推荐的分析师清单（agent_names + 可直接调用的 tools）与理由；"
+        "若你已能按下方路由规则自行判断，可跳过本工具直接选分析师。\n"
         "- 12 个分析师工具（macro_analyst / industry_analyst / micro_analyst / "
         "event_analyst / valuation_analyst / technical_analyst / technical_hl_analyst / "
         "sentiment_analyst / dividend_analyst / fundamental_analyst / portfolio_analyst / "
@@ -117,7 +121,8 @@ mcp = FastMCP(
         "  news_type 含 RUMOR               → 追加 risk_analyst\n"
         " 默认/不确定                       → micro_analyst + sentiment_analyst\n"
         "不确定有哪些分析师可用时，先调用 list_news_analysts 查询全部分析师及其专长。\n"
-        "典型流程：extract_news_meta → (并行调用若干分析师工具) → 你自行综合解读；"
+        "典型流程：extract_news_meta → (可选 route_news_analysts 获取推荐分析师) → "
+        "(并行调用若干分析师工具) → 你自行综合解读；"
         "仅当需要结构化数据/保存时调用 finalize_news_analysis。"
     ),
     lifespan=lifespan,
@@ -133,10 +138,12 @@ from app.services.mcp.tools.news_reader import (
     extract_news_meta,
     finalize_news_analysis,
     list_news_analysts,
+    route_news_analysts,
     search_news_insights,
 )
 
 mcp.add_tool(extract_news_meta)
+mcp.add_tool(route_news_analysts)
 mcp.add_tool(list_news_analysts)
 # 12 个分析师工具按 factory 清单动态生成（单一事实来源）
 for _analyst_tool in build_analyst_tools():

@@ -24,31 +24,22 @@ import time
 from functools import lru_cache
 from typing import List, Optional
 
-from openai import APIError, APITimeoutError, AsyncOpenAI, OpenAI, RateLimitError
+from openai import APIConnectionError, APITimeoutError, AsyncOpenAI, OpenAI, RateLimitError
 from openai.types.chat import ChatCompletionMessageParam
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-DEFAULT_MODEL = "qwen3.5-flash"
-DEFAULT_API = "sk-ws-H.PYHDHPX.Uu6h.MEUCIQDdO2xMFpbnYj_v_qhIMdrTaWGurrQe5ioTnJsMZdBuLAIgOWsGxFf-81YjER8XMtX96b9NkI8cOFZP9G4CO6zpaeQ"
+DEFAULT_MODEL = "qwen3.8-flash"
+DEFAULT_API = "sk-ws-H.PYIYHYX.wRcx.MEQCIAEQz9Kd7IuaZEs257-ZUB-sHVqwygDhPvGTzgyCUEi0AiB6Z7cjcWNvR772h4ARh5Kid3tOhDIQn2W9-SZUHZ4t3g"
 
 _MAX_RETRIES = 2  # 最多重试 2 次（共 3 次尝试）
-_TIMEOUT = 30.0  # 单次调用超时 30s
 _BACKOFF_BASE = 1.5  # 退避基数（秒）
 
 
 def get_api_key() -> str:
     """按优先级解析 LLM API key，环境变量均未配置时回退使用 DEFAULT_API。"""
-    key = (
-        os.environ.get("NEWS_READER_API_KEY")
-        or os.environ.get("DASHSCOPE_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-    )
-    if not key:
-        logger.debug("未配置 LLM API key 环境变量，回退使用 DEFAULT_API")
-        return DEFAULT_API
-    return key
+    return DEFAULT_API
 
 
 def get_base_url() -> str:
@@ -70,7 +61,6 @@ def _sync_client() -> OpenAI:
     return OpenAI(
         api_key=get_api_key(),
         base_url=get_base_url(),
-        timeout=_TIMEOUT,
         max_retries=0,  # 重试由本模块统一控制
     )
 
@@ -80,7 +70,6 @@ def _async_client() -> AsyncOpenAI:
     return AsyncOpenAI(
         api_key=get_api_key(),
         base_url=get_base_url(),
-        timeout=_TIMEOUT,
         max_retries=0,
     )
 
@@ -100,8 +89,8 @@ def _build_messages(
 
 
 def _should_retry(exc: Exception) -> bool:
-    """429 限流 / 超时 / 5xx 服务端错误才重试，4xx 请求错误直接抛。"""
-    return isinstance(exc, (RateLimitError, APITimeoutError, APIError))
+    """仅重试限流/超时/网络连接错误，4xx 客户端错误（含 401 认证）直接抛。"""
+    return isinstance(exc, (RateLimitError, APITimeoutError, APIConnectionError))
 
 
 def chat_once(
@@ -112,26 +101,15 @@ def chat_once(
     """同步单轮 LLM 调用（兼容旧接口；新增 model 参数支持分阶段选模型）。"""
     messages = _build_messages(user_prompt, sys_prompt)
     model = model or get_default_model()
+    base_url = get_base_url()
+    print(f"[llms] chat_once: model={model}, base_url={base_url}, prompt长度={len(user_prompt)}")
     client = _sync_client()
-
-    for attempt in range(_MAX_RETRIES + 1):
-        try:
-            completion = client.chat.completions.create(model=model, messages=messages)
-            content = completion.choices[0].message.content
-            if content is None:
-                raise RuntimeError("LLM 返回内容为空")
-            return content
-        except Exception as e:
-            if attempt < _MAX_RETRIES and _should_retry(e):
-                wait = _BACKOFF_BASE * (2 ** attempt)
-                logger.warning(
-                    "chat_once 调用失败（第 %d 次）: %s，%.1fs 后重试",
-                    attempt + 1, e, wait,
-                )
-                time.sleep(wait)
-                continue
-            raise
-    raise RuntimeError("LLM 调用失败：重试次数耗尽")
+    completion = client.chat.completions.create(model=model, messages=messages)
+    content = completion.choices[0].message.content
+    if content is None:
+        raise RuntimeError("LLM 返回内容为空")
+    print(f"[llms] chat_once: 完成, 响应长度={len(content)}")
+    return content
 
 
 async def achat_once(
@@ -139,26 +117,5 @@ async def achat_once(
     sys_prompt: Optional[str] = None,
     model: Optional[str] = None,
 ) -> str:
-    """异步单轮 LLM 调用，供并行流水线（asyncio.gather）使用。"""
-    messages = _build_messages(user_prompt, sys_prompt)
-    model = model or get_default_model()
-    client = _async_client()
-
-    for attempt in range(_MAX_RETRIES + 1):
-        try:
-            completion = await client.chat.completions.create(model=model, messages=messages)
-            content = completion.choices[0].message.content
-            if content is None:
-                raise RuntimeError("LLM 返回内容为空")
-            return content
-        except Exception as e:
-            if attempt < _MAX_RETRIES and _should_retry(e):
-                wait = _BACKOFF_BASE * (2 ** attempt)
-                logger.warning(
-                    "achat_once 调用失败（第 %d 次）: %s，%.1fs 后重试",
-                    attempt + 1, e, wait,
-                )
-                await asyncio.sleep(wait)
-                continue
-            raise
-    raise RuntimeError("LLM 调用失败：重试次数耗尽")
+    """异步单轮 LLM 调用（内部委托给同步 chat_once 实现）。"""
+    return chat_once(user_prompt, sys_prompt, model)

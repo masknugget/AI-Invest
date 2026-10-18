@@ -62,3 +62,15 @@ async def set_json(key: str, value: Any, ttl: int = TTL_SECONDS) -> None:
         await client.setex(key, ttl, json.dumps(value, ensure_ascii=False))
     except Exception as e:
         logger.warning("新闻缓存写入失败 %s: %s", key, e)
+
+
+def get_json_sync(key: str) -> Optional[Any]:
+    """同步版 get_json（当前实现跳过缓存，直接返回 None）。"""
+    # TODO: 实现同步 Redis 缓存读取
+    return None
+
+
+def set_json_sync(key: str, value: Any, ttl: int = TTL_SECONDS) -> None:
+    """同步版 set_json（当前实现跳过缓存）。"""
+    # TODO: 实现同步 Redis 缓存写入
+    pass
