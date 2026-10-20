@@ -12,6 +12,10 @@ Portfolio Advisor MCP 工具包。
 - portfolio_rebalance_suggestion  调仓建议
 - portfolio_stress_test           压力测试
 - portfolio_full_report           组合全景报告
+- portfolio_html_report_prompt    HTML 可视化报告生成 prompt 包装工具
+
+辅助（非 MCP 工具）：
+- build_portfolio_html_report_prompt  将上述工具 JSON 结果包装为 HTML 报告生成 prompt
 """
 from app.services.mcp.tools.portfolio_advice.diagnosis import portfolio_diagnosis
 from app.services.mcp.tools.portfolio_advice.diagnosis import single_stock_diagnosis
@@ -19,6 +23,10 @@ from app.services.mcp.tools.portfolio_advice.risk_alerts import portfolio_risk_a
 from app.services.mcp.tools.portfolio_advice.rebalance import portfolio_rebalance_suggestion
 from app.services.mcp.tools.portfolio_advice.stress_test import portfolio_stress_test
 from app.services.mcp.tools.portfolio_advice.full_report import portfolio_full_report
+from app.services.mcp.tools.portfolio_advice.prompt_portfilo import (
+    build_portfolio_html_report_prompt,
+    portfolio_html_report_prompt,
+)
 
 __all__ = [
     "portfolio_diagnosis",
@@ -27,4 +35,6 @@ __all__ = [
     "portfolio_rebalance_suggestion",
     "portfolio_stress_test",
     "portfolio_full_report",
+    "portfolio_html_report_prompt",
+    "build_portfolio_html_report_prompt",
 ]

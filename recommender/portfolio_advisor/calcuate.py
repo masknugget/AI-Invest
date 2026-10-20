@@ -96,7 +96,7 @@ def main() -> None:
 
             df_data = build_pct_chg(df_data)
             result = compute_stock_dimensions(df_data)
-
+            print(symbol)
             info = get_basic_info(symbol)
             full_symbol = info.get("full_symbol", "")
             if not full_symbol and "full_symbol" in df_data.columns:

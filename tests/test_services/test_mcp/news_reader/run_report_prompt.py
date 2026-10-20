@@ -57,6 +57,26 @@ def main():
         print("#" * 70)
         print(prompt)
 
+    # ------------------------------------------------------------------
+    # 合并演示：build_merged_report_prompt 把前两个分析师合并为一份综合报告 Prompt
+    # （步骤1/2 会再走一次真实 LLM；extract 命中 Redis 缓存时零 LLM 调用）
+    # ------------------------------------------------------------------
+    banner("build_merged_report_prompt（多视角合并为单一综合报告 Prompt）")
+    try:
+        merged = report_prompt.build_merged_report_prompt(CONTENT)
+    except Exception as e:  # LLM key 失效 / 网络异常等
+        print("⚠️ 合并构建失败（多为 LLM key 未配置/失效）:", e)
+        return False
+
+    banner("合并结果：纳入综合的分析师 selected")
+    print(json.dumps(merged["selected"], ensure_ascii=False, indent=2))
+
+    banner("合并结果：完整合并 Prompt（merged_prompt）")
+    print(f"prompt 长度={len(merged['merged_prompt'])}")
+    print("\n" + "#" * 70)
+    print(merged["merged_prompt"])
+    print("#" * 70)
+
     print("\n✅ report_prompt 真实调用示例执行完毕")
     return True
 

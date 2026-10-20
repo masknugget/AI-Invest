@@ -8,6 +8,7 @@ AI-Invest Portfolio Advisor MCP 服务入口
 - portfolio_rebalance_suggestion  调仓建议
 - portfolio_stress_test           压力测试
 - portfolio_full_report           组合全景报告
+- portfolio_html_report_prompt    可视化 HTML 报告生成 prompt 包装
 
 设计原则：server 只返回结构化指标，风险提示/调仓理由/报告解读等文本
 由平台侧 AI 基于工具返回数据生成（平台 AI 已有 LLM 调用能力），
@@ -57,6 +58,8 @@ mcp = FastMCP(
         "- portfolio_rebalance_suggestion: 基于候选池预计算得分的调仓建议\n"
         "- portfolio_stress_test: 历史/宏观/行业三类压力测试\n"
         "- portfolio_full_report: 五维评分+风险+全场景压力测试的组合全景\n"
+        "- portfolio_html_report_prompt: 生成「可视化 HTML 报告」的完整 prompt 字符串"
+        "（内部会调 full_report / rebalance 并格式化为表格，自身不调 LLM，由你据此产出 HTML）\n"
         "风险提示、调仓理由与报告解读请由你（调用方 AI）基于工具返回的结构化数据自行生成。\n"
         "股票代码使用 baostock 风格（如 sh.600000、sz.000001、hk.00700）；"
         "weights 允许总和不为 1，服务端自动归一化。"
@@ -70,6 +73,7 @@ mcp = FastMCP(
 from app.services.mcp.tools.portfolio_advice import (
     portfolio_diagnosis,
     portfolio_full_report,
+    portfolio_html_report_prompt,
     portfolio_rebalance_suggestion,
     portfolio_risk_alerts,
     portfolio_stress_test,
@@ -82,6 +86,7 @@ mcp.add_tool(portfolio_risk_alerts)
 mcp.add_tool(portfolio_rebalance_suggestion)
 mcp.add_tool(portfolio_stress_test)
 mcp.add_tool(portfolio_full_report)
+mcp.add_tool(portfolio_html_report_prompt)
 
 
 @mcp.custom_route("/health_mcp", methods=["GET"])

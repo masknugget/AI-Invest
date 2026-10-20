@@ -4,11 +4,12 @@ Portfolio Advisor MCP 工具公共层。
 职责：
 - 统一响应封装（status / tool / data / warnings / error）
 - 参数校验（股票代码、权重）
-- 预计算分数文件检查
 - 引擎模块安全导入（data_read 存在硬编码路径与模块级 IO，做注入兜底）
 
 数据获取（行情多源冗余 / 行业查询 / 代码格式探测）已拆至同包 data_source.py，
 本模块仅做重导出以保持向后兼容。
+调仓引擎的候选池已迁移到 MongoDB p_advisor_cal_dimensions，
+本地 stock_dimension_scores.jsonl 不再是必需依赖，故此处不再做文件校验。
 
 所有工具均为同步纯计算函数，docstring 即 MCP tool 描述。
 """
@@ -37,14 +38,6 @@ from app.services.mcp.tools.portfolio_advice.data_source import (  # noqa: E402
     fetch_quotes,
     industry_lookup,
 )
-
-# 预计算五维得分文件（调仓引擎依赖）
-SCORES_PATH = (
-    PROJECT_ROOT / "recommender" / "portfolio_advisor" / "data" / "stock_dimension_scores.jsonl"
-)
-
-# 分数文件过期阈值（天）
-SCORES_MAX_AGE_DAYS = 7
 
 MAX_PORTFOLIO_SIZE = 20
 
@@ -189,42 +182,3 @@ def validate_portfolio(codes: List[str], weights: List[float]) -> Tuple[List[str
 def build_portfolio_arg(codes: List[str], weights: List[float]) -> List[Dict[str, Any]]:
     """构造压力测试引擎所需的 portfolio 参数。"""
     return [{"code": c, "weight": w} for c, w in zip(codes, weights)]
-
-
-# ============================================================================
-# 预计算分数文件检查
-# ============================================================================
-
-def check_scores_file(max_age_days: int = SCORES_MAX_AGE_DAYS) -> Tuple[Path, List[str]]:
-    """
-    检查 stock_dimension_scores.jsonl 存在性与时效。
-
-    返回 (path, warnings)；文件缺失抛 ValueError。
-    """
-    if not SCORES_PATH.exists():
-        raise ValueError(
-            f"预计算分数文件不存在: {SCORES_PATH}，"
-            "请先运行候选池离线打分（compute_stock_dimensions）生成 stock_dimension_scores.jsonl"
-        )
-    warnings: List[str] = []
-    mtime = datetime.fromtimestamp(SCORES_PATH.stat().st_mtime)
-    age_days = (datetime.now() - mtime).days
-    if age_days > max_age_days:
-        warnings.append(
-            f"预计算分数文件已 {age_days} 天未更新（阈值 {max_age_days} 天），调仓建议时效性可能不足"
-        )
-    return SCORES_PATH, warnings
-
-
-def scores_file_meta() -> Dict[str, Any]:
-    """返回分数文件元信息（路径/更新时间/大小）。"""
-    try:
-        path, _ = check_scores_file()
-        stat = path.stat()
-        return {
-            "path": str(path),
-            "updated_at": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
-            "size_bytes": stat.st_size,
-        }
-    except ValueError as e:
-        return {"path": str(SCORES_PATH), "error": str(e)}
